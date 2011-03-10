@@ -1,0 +1,1 @@
+SELECT * FROM hoge WHERE id = /* id */1
