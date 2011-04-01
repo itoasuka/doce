@@ -33,7 +33,7 @@ public class BasicDataSourceProviderTest {
 		domaProperties.setProperty("DBCP.initialSize", "3");
 		domaProperties.setProperty("DBCP.maxActive", "3");
 		domaProperties.setProperty("DBCP.maxIdle", "3");
-		domaProperties.setProperty("DBCP.maxOpenStatements", "3");
+		domaProperties.setProperty("DBCP.maxOpenPreparedStatements", "3");
 		domaProperties.setProperty("DBCP.maxWait", "1000");
 		domaProperties.setProperty("DBCP.minEvictableIdleTimeMillis", "1000");
 		domaProperties.setProperty("DBCP.minIdle", "3");
