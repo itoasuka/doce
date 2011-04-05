@@ -1,4 +1,4 @@
-package jp.osd.doma.guice;
+package jp.osd.doma.guice.internal;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -26,7 +26,7 @@ import com.google.inject.Inject;
  *
  * @author asuka
  */
-public class SimpleDataSouceProvider implements
+public class SimpleDataSourceProvider implements
 		Provider<DataSource> {
 	private final SimpleDataSource dataSource = new SimpleDataSource();
 
@@ -41,7 +41,7 @@ public class SimpleDataSouceProvider implements
 	 * @see SimpleDataSource#setPassword(String)
 	 */
 	@Inject
-	public SimpleDataSouceProvider(@Named("JDBC.url") final String url,
+	public SimpleDataSourceProvider(@Named("JDBC.url") final String url,
 			@Named("JDBC.username") final String username,
 			@Named("JDBC.password") final String password) {
 		dataSource.setUrl(url);

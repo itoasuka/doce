@@ -1,4 +1,4 @@
-package jp.osd.doma.guice;
+package jp.osd.doma.guice.internal;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
@@ -6,6 +6,9 @@ import static junit.framework.Assert.fail;
 
 import java.util.Properties;
 
+import jp.osd.doma.guice.DomaModule;
+import jp.osd.doma.guice.SimpleDataSourceModule;
+import jp.osd.doma.guice.DomaModule.Builder;
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -26,7 +29,8 @@ public class TransactionInterceptorTest {
 
 	public TransactionInterceptorTest() {
 		final Properties domaProperties = new Properties();
-		domaProperties.setProperty("JDBC.url", "jdbc:h2:mem:mydb;DB_CLOSE_DELAY=-1");
+		domaProperties.setProperty("JDBC.url",
+				"jdbc:h2:mem:mydb;DB_CLOSE_DELAY=-1");
 		domaProperties.setProperty("JDBC.username", "foo");
 		domaProperties.setProperty("JDBC.password", "bar");
 		domaProperties.setProperty("Doma.dialect", H2Dialect.class.getName());
@@ -35,8 +39,8 @@ public class TransactionInterceptorTest {
 			public void configure(Binder binder) {
 				Names.bindProperties(binder, domaProperties);
 			}
-		}, new DomaModule.Builder().addDaoTypes(HogeDao.class)
-				.create());
+		}, new SimpleDataSourceModule(),
+				new DomaModule.Builder().addDaoTypes(HogeDao.class).create());
 	}
 
 	@Test

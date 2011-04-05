@@ -5,11 +5,10 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Provider;
-import javax.sql.DataSource;
 
 import jp.osd.doma.guice.internal.ClassUtils;
+import jp.osd.doma.guice.internal.DialectProvider;
 import jp.osd.doma.guice.internal.GuiceManagedConfig;
-import jp.osd.doma.guice.internal.LocalTransaction;
 import jp.osd.doma.guice.internal.TransactionInterceptor;
 
 import org.seasar.doma.jdbc.Config;
@@ -34,11 +33,11 @@ import com.google.inject.matcher.Matchers;
  */
 public class DomaModule extends AbstractModule {
 	private final List<Class<?>> daoTypes;
-	private final Class<? extends Provider<? extends DataSource>> dataSourceProviderType;
 	private final Class<? extends SqlFileRepository> sqlFileRepositoryType;
 	private final Class<? extends JdbcLogger> jdbcLoggerType;
 	private final Class<? extends RequiresNewController> requiresNewControllerType;
 	private final Class<? extends Provider<Dialect>> dialectProviderType;
+	private final Class<? extends Dialect> dialectType;
 	private final String daoPackage;
 	private final String daoSubpackage;
 	private final String daoSuffix;
@@ -50,9 +49,6 @@ public class DomaModule extends AbstractModule {
 	protected void configure() {
 		requestInjection(this);
 
-		// データソースプロバイダの設定
-		bind(DataSource.class).toProvider(dataSourceProviderType).in(
-				Scopes.SINGLETON);
 		// SQL ファイルリポジトリの設定
 		bind(SqlFileRepository.class).to(sqlFileRepositoryType).in(
 				Scopes.SINGLETON);
@@ -63,13 +59,13 @@ public class DomaModule extends AbstractModule {
 				Scopes.SINGLETON);
 
 		// Dialect の設定
-		bind(Dialect.class).toProvider(dialectProviderType);
-
+		if (dialectType == null) {
+			bind(Dialect.class).toProvider(dialectProviderType);
+		} else {
+			bind(Dialect.class).to(dialectType);
+		}
 		// Doma 用 Config クラスの設定
 		bind(Config.class).to(GuiceManagedConfig.class).in(Scopes.SINGLETON);
-
-		// トランザクションの設定
-		bind(Transaction.class).to(LocalTransaction.class);
 
 		// ローカルトランザクションインタセプタの設定
 		TransactionInterceptor lti = new TransactionInterceptor();
@@ -83,20 +79,19 @@ public class DomaModule extends AbstractModule {
 		}
 	}
 
-	private DomaModule(
-			List<Class<?>> daoTypes,
-			Class<? extends Provider<? extends DataSource>> dataSourceProviderType,
+	private DomaModule(List<Class<?>> daoTypes,
 			Class<? extends SqlFileRepository> sqlFileRepositoryType,
 			Class<? extends JdbcLogger> jdbcLoggerType,
 			Class<? extends RequiresNewController> requiresNewControllerType,
 			Class<? extends Provider<Dialect>> dialectProviderType,
-			String daoPackage, String daoSubpackage, String daoSuffix) {
+			Class<? extends Dialect> dialectType, String daoPackage,
+			String daoSubpackage, String daoSuffix) {
 		this.daoTypes = daoTypes;
-		this.dataSourceProviderType = dataSourceProviderType;
 		this.sqlFileRepositoryType = sqlFileRepositoryType;
 		this.jdbcLoggerType = jdbcLoggerType;
 		this.requiresNewControllerType = requiresNewControllerType;
 		this.dialectProviderType = dialectProviderType;
+		this.dialectType = dialectType;
 		this.daoPackage = daoPackage;
 		this.daoSubpackage = daoSubpackage;
 		this.daoSuffix = daoSuffix;
@@ -123,11 +118,11 @@ public class DomaModule extends AbstractModule {
 	 */
 	public static final class Builder {
 		private final List<Class<?>> daoTypes = new ArrayList<Class<?>>();
-		private Class<? extends Provider<? extends DataSource>> dataSourceProviderType = SimpleDataSouceProvider.class;
 		private Class<? extends SqlFileRepository> sqlFileRepositoryType = GreedyCacheSqlFileRepository.class;
 		private Class<? extends JdbcLogger> jdbcLoggerType = UtilLoggingJdbcLogger.class;
 		private Class<? extends RequiresNewController> requiresNewControllerType = NullRequiresNewController.class;
 		private Class<? extends Provider<Dialect>> dialectProviderType = DialectProvider.class;
+		private Class<? extends Dialect> dialectType = null;
 		private String daoPackage = "";
 		private String daoSubpackage = "";
 		private String daoSuffix = "Impl";
@@ -136,22 +131,6 @@ public class DomaModule extends AbstractModule {
 		 * 新たにオブジェクトを構築します。
 		 */
 		public Builder() {
-		}
-
-		/**
-		 * {@link DataSource} オブジェクトを提供するプロバイダの型を設定します。
-		 * <P>
-		 * このメソッドでプロバイダの型を指定しなかった場合、{@link DataSource} オブジェクトの提供には
-		 * {@link SimpleDataSouceProvider} が使用されます。
-		 * 
-		 * @param dataSourceProviderType
-		 *            {@link DataSource} オブジェクトを提供するプロバイダの型を設定
-		 * @return このメソッドのレシーバオブジェクト
-		 */
-		public Builder setDataSourceProviderType(
-				Class<? extends Provider<? extends DataSource>> dataSourceProviderType) {
-			this.dataSourceProviderType = dataSourceProviderType;
-			return this;
 		}
 
 		/**
@@ -221,13 +200,28 @@ public class DomaModule extends AbstractModule {
 			this.dialectProviderType = dialectProviderType;
 			return this;
 		}
+		
+		/**
+		 * {@link Dialect} の実装型を指定します。このメソッドで実装型を指定したとき、{@link #setDialectProviderType(Class)} の設定は無視されます。
+		 *
+		 * @param dialectType {@link Dialect} の実装型
+		 * @return このメソッドのレシーバオブジェクト
+		 * @see Config#getDialect()
+		 */
+		public Builder setDialectType(Class<? extends Dialect> dialectType) {
+			this.dialectType = dialectType;
+			return this;
+		}
 
 		/**
 		 * Guice の管理下に置く Dao インタフェースの型を設定します。ひもづく実装クラスは動的に指定されます。
 		 * <P>
-		 * これにより javac のバグ（Bug ID <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403465">6403465</a>）によるコンパイル時のエラーメッセージを抑制することができます。
+		 * これにより javac のバグ（Bug ID <a
+		 * href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403465"
+		 * >6403465</a>）によるコンパイル時のエラーメッセージを抑制することができます。
 		 * 
-		 * @param daoTypes Dao インタフェースの型
+		 * @param daoTypes
+		 *            Dao インタフェースの型
 		 * @return このメソッドのレシーバオブジェクト
 		 */
 		public Builder addDaoTypes(Class<?>... daoTypes) {
@@ -240,23 +234,27 @@ public class DomaModule extends AbstractModule {
 		/**
 		 * Guice の管理下に置く Dao インタフェースの型を設定します。ひもづく実装クラスは実行時に指定されます。
 		 * <P>
-		 * これにより javac のバグ（Bug ID <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403465">6403465</a>）によるコンパイル時のエラーメッセージを抑制することができます。
+		 * これにより javac のバグ（Bug ID <a
+		 * href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403465"
+		 * >6403465</a>）によるコンパイル時のエラーメッセージを抑制することができます。
 		 * 
-		 * @param daoTypes Dao インタフェースの型のコレクション
+		 * @param daoTypes
+		 *            Dao インタフェースの型のコレクション
 		 * @return このメソッドのレシーバオブジェクト
 		 */
 		public Builder addDaoTypes(Collection<Class<?>> daoTypes) {
 			this.daoTypes.addAll(daoTypes);
-			
+
 			return this;
 		}
 
 		/**
 		 * Dao の実装クラスのパッケージ名を設定します。これは Dao のインタフェースと実装クラスの実行時のひもづけに使用されます。
 		 * <P>
-		 * 設定しない場合、Dao インターフェース型と同じパッケージ名が使用されます。 
+		 * 設定しない場合、Dao インターフェース型と同じパッケージ名が使用されます。
 		 * 
-		 * @param daoPackage Dao の実装クラスのパッケージ名
+		 * @param daoPackage
+		 *            Dao の実装クラスのパッケージ名
 		 * @return このメソッドのレシーバオブジェクト
 		 */
 		public Builder setDaoPackage(String daoPackage) {
@@ -267,7 +265,8 @@ public class DomaModule extends AbstractModule {
 		/**
 		 * Dao の実装クラスのサブパッケージ名を設定します。これは Dao のインタフェースと実装クラスの実行時のひもづけに使用されます。
 		 * 
-		 * @param daoSubpackage Dao の実装クラスのサブパッケージ名
+		 * @param daoSubpackage
+		 *            Dao の実装クラスのサブパッケージ名
 		 * @return このメソッドのレシーバオブジェクト
 		 */
 		public Builder setDaoSubpackage(String daoSubpackage) {
@@ -278,9 +277,10 @@ public class DomaModule extends AbstractModule {
 		/**
 		 * Dao の実装クラスのクラス名のサフィックスを設定します。これは Dao のインタフェースと実装クラスの実行時のひもづけに使用されます。
 		 * <P>
-		 * 設定しない場合、{@literal "Impl"} が使用されます。 
+		 * 設定しない場合、{@literal "Impl"} が使用されます。
 		 * 
-		 * @param daoSuffix Dao の実装クラスのクラス名のサフィックス
+		 * @param daoSuffix
+		 *            Dao の実装クラスのクラス名のサフィックス
 		 * @return このメソッドのレシーバオブジェクト
 		 */
 		public Builder setDaoSuffix(String daoSuffix) {
@@ -294,10 +294,9 @@ public class DomaModule extends AbstractModule {
 		 * @return {@link DomaModule} オブジェクト
 		 */
 		public DomaModule create() {
-			return new DomaModule(daoTypes, dataSourceProviderType,
-					sqlFileRepositoryType, jdbcLoggerType,
-					requiresNewControllerType, dialectProviderType, daoPackage,
-					daoSubpackage, daoSuffix);
+			return new DomaModule(daoTypes, sqlFileRepositoryType,
+					jdbcLoggerType, requiresNewControllerType,
+					dialectProviderType, dialectType, daoPackage, daoSubpackage, daoSuffix);
 		}
 	}
 }

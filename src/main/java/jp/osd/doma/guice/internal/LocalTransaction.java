@@ -9,8 +9,9 @@ import org.seasar.doma.jdbc.JdbcLogger;
 import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
 
 /**
- * Doma の {@link org.seasar.doma.jdbc.tx.LocalTransaction} を用いた {@link Transaction} の実装クラスです。
- *
+ * Doma の {@link org.seasar.doma.jdbc.tx.LocalTransaction} を用いた
+ * {@link Transaction} の実装クラスです。
+ * 
  * @author asuka
  */
 public class LocalTransaction implements Transaction {
@@ -21,8 +22,10 @@ public class LocalTransaction implements Transaction {
 	/**
 	 * 新たにオブジェクトを構築します。
 	 * 
-	 * @param dataSource データソース
-	 * @param jdbcLogger JDBC ロガー
+	 * @param dataSource
+	 *            データソース
+	 * @param jdbcLogger
+	 *            JDBC ロガー
 	 */
 	@Inject
 	public LocalTransaction(DataSource dataSource, JdbcLogger jdbcLogger) {

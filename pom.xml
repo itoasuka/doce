@@ -79,6 +79,13 @@
 			<version>1.4</version>
 			<optional>true</optional>
 		</dependency>
+
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
 		
 		<!-- テスト関連 -->
 		<dependency>
@@ -87,6 +94,12 @@
 			<version>4.8.2</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <version>3.0</version>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -411,18 +424,16 @@
 			</plugin> 
 			-->
 
-			<!-- CheckStyle プラグイン -->
-			<!-- 
-			<plugin> 
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId> 
-				<configuration> -->
-					<!-- 設定ファイルのありか -->
-					<!-- 
-					<configLocation>${basedir}/conf/checkstyle.xml</configLocation> 
-				</configuration> 
-			</plugin> 
-			-->
+            <!-- checkstyle: http://maven.apache.org/plugins/maven-checkstyle-plugin/ -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <!-- 設定ファイルのありか -->
+                    <configLocation>https://github.com/itoasuka/checkstyle/raw/master/standard.xml</configLocation>
+                </configuration>
+            </plugin> 
 
 			<!-- タグリストプラグイン -->
 			<plugin>

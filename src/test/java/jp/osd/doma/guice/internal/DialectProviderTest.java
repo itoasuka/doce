@@ -1,7 +1,7 @@
-package jp.osd.doma.guice;
+package jp.osd.doma.guice.internal;
 
 import static junit.framework.Assert.assertTrue;
-import jp.osd.doma.guice.DialectProvider;
+import jp.osd.doma.guice.internal.DialectProvider;
 
 import org.junit.Test;
 import org.seasar.doma.jdbc.dialect.Db2Dialect;

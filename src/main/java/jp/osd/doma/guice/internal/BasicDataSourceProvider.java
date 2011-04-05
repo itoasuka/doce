@@ -1,9 +1,8 @@
-package jp.osd.doma.guice;
+package jp.osd.doma.guice.internal;
 
 import javax.inject.Named;
 import javax.sql.DataSource;
 
-import jp.osd.doma.guice.internal.SettingHelper;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
@@ -12,7 +11,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 /**
- * Commons DBCP の {@link BasicDataSource} を用いたデータソースを提供するプロバイダです。
+ * <A HREF="http://commons.apache.org/dbcp/" TARGET="_blank">Common DBCP</A> の {@link BasicDataSource} を用いたデータソースを提供するプロバイダです。
  * 
  * @author asuka
  */

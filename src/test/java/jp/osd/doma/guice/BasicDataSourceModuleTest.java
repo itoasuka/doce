@@ -23,10 +23,10 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 
-public class BasicDataSourceProviderTest {
+public class BasicDataSourceModuleTest {
 	private final Properties domaProperties = new Properties();
 
-	public BasicDataSourceProviderTest() {
+	public BasicDataSourceModuleTest() {
 		domaProperties.setProperty("JDBC.url", "jdbc:h2:mem:mydb");
 		domaProperties.setProperty("JDBC.username", "foo");
 		domaProperties.setProperty("JDBC.password", "bar");
@@ -48,11 +48,11 @@ public class BasicDataSourceProviderTest {
 				Names.bindProperties(binder, domaProperties);
 			}
 		};
-		Module m2 = new DomaModule.Builder()
-				.setDataSourceProviderType(BasicDataSourceProvider.class)
-				.addDaoTypes(HogeDao.class).create();
+		Module m2 = new BasicDataSourceModule();
+		Module m3 = new DomaModule.Builder().addDaoTypes(HogeDao.class)
+				.create();
 
-		Injector injector = Guice.createInjector(m1, m2);
+		Injector injector = Guice.createInjector(m1, m2, m3);
 		TestService service = injector.getInstance(TestService.class);
 		service.test();
 		Hoge hoge = service.get(1);
@@ -68,11 +68,11 @@ public class BasicDataSourceProviderTest {
 				Names.bindProperties(binder, domaProperties);
 			}
 		};
-		Module m2 = new DomaModule.Builder()
-				.setDataSourceProviderType(BasicDataSourceProvider.class)
-				.addDaoTypes(HogeDao.class).create();
+		Module m2 = new BasicDataSourceModule();
+		Module m3 = new DomaModule.Builder().addDaoTypes(HogeDao.class)
+				.create();
 
-		Injector injector = Guice.createInjector(m1, m2);
+		Injector injector = Guice.createInjector(m1, m2, m3);
 		TestService service = injector.getInstance(TestService.class);
 		try {
 			service.throwException();

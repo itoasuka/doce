@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import jp.osd.doma.guice.internal.DialectProvider;
+
 import org.junit.Test;
 import org.seasar.doma.jdbc.GreedyCacheSqlFileRepository;
 import org.seasar.doma.jdbc.NullRequiresNewController;
@@ -48,8 +50,8 @@ public class DomaModuleTest {
 				Names.bindProperties(binder, domaProperties);
 			}
 		};
-		Module m2 = new DomaModule.Builder()
-				.setDataSourceProviderType(SimpleDataSouceProvider.class)
+		Module m2 = new SimpleDataSourceModule();
+		Module m3 = new DomaModule.Builder()
 				.setJdbcLoggerType(UtilLoggingJdbcLogger.class)
 				.setRequiresNewControllerType(NullRequiresNewController.class)
 				.setSqlFileRepositoryType(GreedyCacheSqlFileRepository.class)
@@ -57,7 +59,7 @@ public class DomaModuleTest {
 				.setDaoPackage("").setDaoSubpackage("").setDaoSuffix("Impl")
 				.addDaoTypes(HogeDao.class).addDaoTypes(list).create();
 
-		Injector injector = Guice.createInjector(m1, m2);
+		Injector injector = Guice.createInjector(m1, m2, m3);
 
 		injector.getInstance(TestService.class);
 	}
