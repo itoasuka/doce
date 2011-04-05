@@ -8,8 +8,6 @@ import java.util.Properties;
 
 import jp.osd.doma.guice.DomaModule;
 import jp.osd.doma.guice.SimpleDataSourceModule;
-import jp.osd.doma.guice.DomaModule.Builder;
-import junit.framework.Assert;
 
 import org.junit.Test;
 import org.seasar.doma.jdbc.dialect.H2Dialect;

@@ -2,16 +2,10 @@ package jp.osd.doma.guice;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
-import static org.junit.Assert.*;
 
 import java.util.Properties;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
-import org.seasar.doma.jdbc.GreedyCacheSqlFileRepository;
-import org.seasar.doma.jdbc.NullRequiresNewController;
-import org.seasar.doma.jdbc.UtilLoggingJdbcLogger;
 
 import test.dao.HogeDao;
 import test.entity.Hoge;

@@ -15,7 +15,6 @@ import javax.transaction.UserTransaction;
 import jp.osd.doma.guice.internal.JtaUserTransaction;
 import junit.framework.Assert;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 import org.seasar.doma.jdbc.SimpleDataSource;
 import org.seasar.doma.jdbc.dialect.H2Dialect;
