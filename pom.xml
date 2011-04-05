@@ -12,13 +12,13 @@
 
 	<!-- プロジェクトの開始年（著作権表示等に使用） -->
 	<inceptionYear>2011</inceptionYear>
-	
+
 	<!-- プロジェクト推進団体（著作権表示等に使用） -->
 	<organization>
 		<name>OSD</name>
 		<url>http://www.osd.jp/</url>
 	</organization>
-	
+
 	<!-- ライセンス -->
 	<licenses>
 		<license>
@@ -64,14 +64,14 @@
 			<artifactId>doma</artifactId>
 			<version>1.14.0</version>
 		</dependency>
-		
+
 		<!-- Guice 関連 -->
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 			<version>3.0</version>
-		</dependency>		
-		
+		</dependency>
+
 		<!-- Commons DBCP（オプション） -->
 		<dependency>
 			<groupId>commons-dbcp</groupId>
@@ -80,13 +80,14 @@
 			<optional>true</optional>
 		</dependency>
 
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>jta</artifactId>
-            <version>1.1</version>
-            <scope>provided</scope>
-        </dependency>
-		
+		<!-- JTA 関連 -->
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>jta</artifactId>
+			<version>1.1</version>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- テスト関連 -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -94,13 +95,14 @@
 			<version>4.8.2</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <version>3.0</version>
-            <scope>test</scope>
-        </dependency>
 		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>3.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<!-- テストで用いる DB -->
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<version>1.3.153</version>
@@ -130,7 +132,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<!-- compiler: http://maven.apache.org/plugins/maven-compiler-plugin/ -->
 			<plugin>
 				<inherited>true</inherited>
@@ -153,7 +155,7 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
-			
+
 			<!-- テストプラグインの設定 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -260,12 +262,12 @@
 						<link>http://atinject.googlecode.com/svn/trunk/javadoc/</link>
 						<!-- Doma -->
 						<link>http://doma.seasar.org/apidocs/</link>
-						<!--  Commons DBCP 1.4 -->
+						<!-- Commons DBCP 1.4 -->
 						<link>http://commons.apache.org/dbcp/api-1.4/</link>
 					</links>
 				</configuration>
 			</plugin>
-						
+
 			<!-- インストールプラグインの設定 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -287,8 +289,8 @@
 					<!-- 設定ファイルのありか -->
 					<configLocation>https://github.com/itoasuka/checkstyle/raw/master/standard.xml</configLocation>
 				</configuration>
-			</plugin> 
-			
+			</plugin>
+
 			<!-- site: http://maven.apache.org/plugins/maven-site-plugin/ -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -347,7 +349,7 @@
 					<outputEncoding>${project.reporting.outputEncoding}</outputEncoding>
 				</configuration>
 			</plugin>
-			
+
 			<!-- cobertura: http://mojo.codehaus.org/cobertura-maven-plugin/ -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -417,23 +419,19 @@
 			</plugin>
 
 			<!-- dashboard: http://maven.apache.org/plugins/dashboard-maven-plugin/ -->
-			<!-- 
-			<plugin> 
-				<groupId>org.codehaus.mojo</groupId> 
-				<artifactId>dashboard-maven-plugin</artifactId> 
-			</plugin> 
-			-->
+			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>dashboard-maven-plugin</artifactId> 
+				</plugin> -->
 
-            <!-- checkstyle: http://maven.apache.org/plugins/maven-checkstyle-plugin/ -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <!-- 設定ファイルのありか -->
-                    <configLocation>https://github.com/itoasuka/checkstyle/raw/master/standard.xml</configLocation>
-                </configuration>
-            </plugin> 
+			<!-- checkstyle: http://maven.apache.org/plugins/maven-checkstyle-plugin/ -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<!-- 設定ファイルのありか -->
+					<configLocation>https://github.com/itoasuka/checkstyle/raw/master/standard.xml</configLocation>
+				</configuration>
+			</plugin>
 
 			<!-- タグリストプラグイン -->
 			<plugin>
