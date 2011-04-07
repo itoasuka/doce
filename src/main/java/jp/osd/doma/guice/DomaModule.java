@@ -1,10 +1,11 @@
 package jp.osd.doma.guice;
 
+import static jp.osd.doma.guice.BindingRule.to;
+import static jp.osd.doma.guice.BindingRule.toProvider;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import javax.inject.Provider;
 
 import jp.osd.doma.guice.internal.ClassUtils;
 import jp.osd.doma.guice.internal.DialectProvider;
@@ -33,11 +34,10 @@ import com.google.inject.matcher.Matchers;
  */
 public class DomaModule extends AbstractModule {
 	private final List<Class<?>> daoTypes;
-	private final Class<? extends SqlFileRepository> sqlFileRepositoryType;
-	private final Class<? extends JdbcLogger> jdbcLoggerType;
-	private final Class<? extends RequiresNewController> requiresNewControllerType;
-	private final Class<? extends Provider<Dialect>> dialectProviderType;
-	private final Class<? extends Dialect> dialectType;
+	private final BindingRule<? extends SqlFileRepository> sqlFileRepositoryBindingRule;
+	private final BindingRule<? extends JdbcLogger> jdbcLoggerBindingRule;
+	private final BindingRule<? extends RequiresNewController> requiresNewControllerBindingRule;
+	private final BindingRule<? extends Dialect> dialectBindingRule;
 	private final String daoPackage;
 	private final String daoSubpackage;
 	private final String daoSuffix;
@@ -50,20 +50,16 @@ public class DomaModule extends AbstractModule {
 		requestInjection(this);
 
 		// SQL ファイルリポジトリの設定
-		bind(SqlFileRepository.class).to(sqlFileRepositoryType).in(
-				Scopes.SINGLETON);
+		sqlFileRepositoryBindingRule.apply(bind(SqlFileRepository.class));
 		// JDBC ロガーの設定
-		bind(JdbcLogger.class).to(jdbcLoggerType).in(Scopes.SINGLETON);
+		jdbcLoggerBindingRule.apply(bind(JdbcLogger.class));
 		// Requires new controller の設定
-		bind(RequiresNewController.class).to(requiresNewControllerType).in(
-				Scopes.SINGLETON);
+		requiresNewControllerBindingRule
+				.apply(bind(RequiresNewController.class));
 
 		// Dialect の設定
-		if (dialectType == null) {
-			bind(Dialect.class).toProvider(dialectProviderType);
-		} else {
-			bind(Dialect.class).to(dialectType);
-		}
+		dialectBindingRule.apply(bind(Dialect.class));
+
 		// Doma 用 Config クラスの設定
 		bind(Config.class).to(GuiceManagedConfig.class).in(Scopes.SINGLETON);
 
@@ -79,19 +75,18 @@ public class DomaModule extends AbstractModule {
 		}
 	}
 
-	private DomaModule(List<Class<?>> daoTypes,
-			Class<? extends SqlFileRepository> sqlFileRepositoryType,
-			Class<? extends JdbcLogger> jdbcLoggerType,
-			Class<? extends RequiresNewController> requiresNewControllerType,
-			Class<? extends Provider<Dialect>> dialectProviderType,
-			Class<? extends Dialect> dialectType, String daoPackage,
-			String daoSubpackage, String daoSuffix) {
+	private DomaModule(
+			List<Class<?>> daoTypes,
+			BindingRule<? extends SqlFileRepository> sqlFileRepositoryBindingRule,
+			BindingRule<? extends JdbcLogger> jdbcLoggerBindingRule,
+			BindingRule<? extends RequiresNewController> requiresNewControllerBindingRule,
+			BindingRule<? extends Dialect> dialectBindingRule,
+			String daoPackage, String daoSubpackage, String daoSuffix) {
 		this.daoTypes = daoTypes;
-		this.sqlFileRepositoryType = sqlFileRepositoryType;
-		this.jdbcLoggerType = jdbcLoggerType;
-		this.requiresNewControllerType = requiresNewControllerType;
-		this.dialectProviderType = dialectProviderType;
-		this.dialectType = dialectType;
+		this.sqlFileRepositoryBindingRule = sqlFileRepositoryBindingRule;
+		this.jdbcLoggerBindingRule = jdbcLoggerBindingRule;
+		this.requiresNewControllerBindingRule = requiresNewControllerBindingRule;
+		this.dialectBindingRule = dialectBindingRule;
 		this.daoPackage = daoPackage;
 		this.daoSubpackage = daoSubpackage;
 		this.daoSuffix = daoSuffix;
@@ -118,11 +113,10 @@ public class DomaModule extends AbstractModule {
 	 */
 	public static final class Builder {
 		private final List<Class<?>> daoTypes = new ArrayList<Class<?>>();
-		private Class<? extends SqlFileRepository> sqlFileRepositoryType = GreedyCacheSqlFileRepository.class;
-		private Class<? extends JdbcLogger> jdbcLoggerType = UtilLoggingJdbcLogger.class;
-		private Class<? extends RequiresNewController> requiresNewControllerType = NullRequiresNewController.class;
-		private Class<? extends Provider<Dialect>> dialectProviderType = DialectProvider.class;
-		private Class<? extends Dialect> dialectType = null;
+		private BindingRule<? extends SqlFileRepository> sqlFileRepositoryBindingRule = to(GreedyCacheSqlFileRepository.class);
+		private BindingRule<? extends JdbcLogger> jdbcLoggerBindingRule = to(UtilLoggingJdbcLogger.class);
+		private BindingRule<? extends RequiresNewController> requiresNewControllerBindingRule = to(NullRequiresNewController.class);
+		private BindingRule<? extends Dialect> dialectBindingRule = toProvider(DialectProvider.class);
 		private String daoPackage = "";
 		private String daoSubpackage = "";
 		private String daoSuffix = "Impl";
@@ -134,82 +128,72 @@ public class DomaModule extends AbstractModule {
 		}
 
 		/**
-		 * {@link Config} が返す SQL ファイルリポジトリの型を設定します。
+		 * {@link Config} が返す SQL ファイルリポジトリをバインドするルールを設定します。
 		 * <P>
-		 * このメソッドで SQL ファイルリポジトリの型を指定しなかった場合、デフォルト値として
-		 * {@link GreedyCacheSqlFileRepository} が使用されます。
+		 * このメソッドで SQL ファイルリポジトリのバインドルールを指定しなかった場合、デフォルト値として
+		 * {@link GreedyCacheSqlFileRepository} がバインドされます。
 		 * 
-		 * @param sqlFileRepositoryType
-		 *            SQL ファイルリポジトリの型
+		 * @param sqlFileRepositoryBindingRule
+		 *            SQL ファイルリポジトリのバインドルール
 		 * @return このメソッドのレシーバオブジェクト
 		 * @see Config#getSqlFileRepository()
 		 */
-		public Builder setSqlFileRepositoryType(
-				Class<? extends SqlFileRepository> sqlFileRepositoryType) {
-			this.sqlFileRepositoryType = sqlFileRepositoryType;
+		public Builder setSqlFileRepositoryBindingRule(
+				BindingRule<? extends SqlFileRepository> sqlFileRepositoryBindingRule) {
+			this.sqlFileRepositoryBindingRule = sqlFileRepositoryBindingRule;
 			return this;
 		}
 
 		/**
-		 * {@link Config} が返す JDBC ロガーの型を設定します。
+		 * {@link Config} が返す JDBC ロガーをバインドするルールを設定します。
 		 * <P>
-		 * このメソッドで JDBC ロガーの型を指定しなかった場合、デフォルト値として {@link UtilLoggingJdbcLogger}
-		 * が使用されます。
+		 * このメソッドで JDBC ロガーのバインドルールを指定しなかった場合、デフォルト値として
+		 * {@link UtilLoggingJdbcLogger} がバインドされます。
 		 * 
-		 * @param jdbcLoggerType
-		 *            JDBC ロガーの型
+		 * @param jdbcLoggerBindingRule
+		 *            JDBC ロガーのバインドルール
 		 * @return このメソッドのレシーバオブジェクト
 		 * @see Config#getJdbcLogger()
 		 */
-		public Builder setJdbcLoggerType(
-				Class<? extends JdbcLogger> jdbcLoggerType) {
-			this.jdbcLoggerType = jdbcLoggerType;
+		public Builder setJdbcLoggerBindingRule(
+				BindingRule<? extends JdbcLogger> jdbcLoggerBindingRule) {
+			this.jdbcLoggerBindingRule = jdbcLoggerBindingRule;
 			return this;
 		}
 
 		/**
-		 * {@link Config} が返す REQUIRES_NEW の属性をもつトランザクションを制御するコントローラの型を設定します。
+		 * {@link Config} が返す REQUIRES_NEW
+		 * の属性をもつトランザクションを制御するコントローラをバインドするルールを設定します。
 		 * <P>
-		 * このメソッドで REQUIRES_NEW の属性をもつトランザクションを制御するコントローラの型を指定しなかった場合、デフォルト値として
-		 * {@link NullRequiresNewController} が使用されます。
+		 * このメソッドで REQUIRES_NEW
+		 * の属性をもつトランザクションを制御するコントローラのバインドルールを指定しなかった場合、デフォルト値として
+		 * {@link NullRequiresNewController} がバインドされます。
 		 * 
-		 * @param requiresNewControllerType
-		 *            REQUIRES_NEW の属性をもつトランザクションを制御するコントローラの型
+		 * @param requiresNewControllerBindingRule
+		 *            REQUIRES_NEW の属性をもつトランザクションを制御するコントローラのバインドルール
 		 * @return このメソッドのレシーバオブジェクト
 		 * @see Config#getRequiresNewController()
 		 */
-		public Builder setRequiresNewControllerType(
-				Class<? extends RequiresNewController> requiresNewControllerType) {
-			this.requiresNewControllerType = requiresNewControllerType;
+		public Builder setRequiresNewControllerBindingRule(
+				BindingRule<? extends RequiresNewController> requiresNewControllerBindingRule) {
+			this.requiresNewControllerBindingRule = requiresNewControllerBindingRule;
 			return this;
 		}
 
 		/**
-		 * {@link Dialect} オブジェクトを提供するプロバイダの型を設定します。
+		 * {@link Dialect} オブジェクトをバインドするルールを設定します。
 		 * <P>
-		 * このメソッドでプロバイダの型を指定しなかった場合、{@link Dialect} オブジェクトの提供には
+		 * このメソッドでルールを指定しなかった場合、{@link Dialect} オブジェクトのバインドには
 		 * {@link DialectProvider} が使用されます。
 		 * 
-		 * @param dialectProviderType
-		 *            {@link Dialect} オブジェクトを提供するプロバイダの型を設定
+		 * @param dialectBindingRule
+		 *            {@link Dialect} オブジェクトをバインドするルール
 		 * @return このメソッドのレシーバオブジェクト
 		 * @see Config#getDialect()
 		 */
-		public Builder setDialectProviderType(
-				Class<? extends Provider<Dialect>> dialectProviderType) {
-			this.dialectProviderType = dialectProviderType;
-			return this;
-		}
-		
-		/**
-		 * {@link Dialect} の実装型を指定します。このメソッドで実装型を指定したとき、{@link #setDialectProviderType(Class)} の設定は無視されます。
-		 *
-		 * @param dialectType {@link Dialect} の実装型
-		 * @return このメソッドのレシーバオブジェクト
-		 * @see Config#getDialect()
-		 */
-		public Builder setDialectType(Class<? extends Dialect> dialectType) {
-			this.dialectType = dialectType;
+		public Builder setDialectBindingRule(
+				BindingRule<? extends Dialect> dialectBindingRule) {
+			this.dialectBindingRule = dialectBindingRule;
 			return this;
 		}
 
@@ -294,9 +278,9 @@ public class DomaModule extends AbstractModule {
 		 * @return {@link DomaModule} オブジェクト
 		 */
 		public DomaModule create() {
-			return new DomaModule(daoTypes, sqlFileRepositoryType,
-					jdbcLoggerType, requiresNewControllerType,
-					dialectProviderType, dialectType, daoPackage, daoSubpackage, daoSuffix);
+			return new DomaModule(daoTypes, sqlFileRepositoryBindingRule,
+					jdbcLoggerBindingRule, requiresNewControllerBindingRule,
+					dialectBindingRule, daoPackage, daoSubpackage, daoSuffix);
 		}
 	}
 }

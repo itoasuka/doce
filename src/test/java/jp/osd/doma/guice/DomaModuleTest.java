@@ -1,5 +1,7 @@
 package jp.osd.doma.guice;
 
+import static jp.osd.doma.guice.BindingRule.to;
+import static jp.osd.doma.guice.BindingRule.toProvider;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
@@ -52,10 +54,12 @@ public class DomaModuleTest {
 		};
 		Module m2 = new SimpleDataSourceModule();
 		Module m3 = new DomaModule.Builder()
-				.setJdbcLoggerType(UtilLoggingJdbcLogger.class)
-				.setRequiresNewControllerType(NullRequiresNewController.class)
-				.setSqlFileRepositoryType(GreedyCacheSqlFileRepository.class)
-				.setDialectProviderType(DialectProvider.class)
+				.setJdbcLoggerBindingRule(to(UtilLoggingJdbcLogger.class))
+				.setRequiresNewControllerBindingRule(
+						to(NullRequiresNewController.class))
+				.setSqlFileRepositoryBindingRule(
+						to(GreedyCacheSqlFileRepository.class))
+				.setDialectBindingRule(toProvider(DialectProvider.class))
 				.setDaoPackage("").setDaoSubpackage("").setDaoSuffix("Impl")
 				.addDaoTypes(HogeDao.class).addDaoTypes(list).create();
 

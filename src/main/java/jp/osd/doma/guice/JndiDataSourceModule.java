@@ -1,5 +1,7 @@
 package jp.osd.doma.guice;
 
+import static jp.osd.doma.guice.BindingRule.to;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
@@ -12,7 +14,6 @@ import jp.osd.doma.guice.internal.LocalTransaction;
 import jp.osd.doma.guice.internal.UserTransactionProvider;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
 import com.google.inject.Scopes;
 
 /**
@@ -24,13 +25,13 @@ import com.google.inject.Scopes;
  * @author asuka
  */
 public class JndiDataSourceModule extends AbstractModule {
-	private final Class<? extends Provider<? extends Context>> namingContextProviderType;
+	private final BindingRule<? extends Context> namingContextBindingRule;
 	private final boolean localTransaction;
 
 	private JndiDataSourceModule(
-			Class<? extends Provider<? extends Context>> namingContextProviderType,
+			BindingRule<? extends Context> namingContextBindingRule,
 			boolean localTransaction) {
-		this.namingContextProviderType = namingContextProviderType;
+		this.namingContextBindingRule = namingContextBindingRule;
 		this.localTransaction = localTransaction;
 	}
 
@@ -39,12 +40,8 @@ public class JndiDataSourceModule extends AbstractModule {
 	 */
 	@Override
 	protected void configure() {
-		if (namingContextProviderType == null) {
-			bind(Context.class).to(InitialContext.class).in(Scopes.SINGLETON);
-		} else {
-			bind(Context.class).toProvider(namingContextProviderType).in(
-					Scopes.SINGLETON);
-		}
+		namingContextBindingRule.apply(bind(Context.class));
+
 		if (localTransaction) {
 			// ローカルトランザクションを使用する場合
 			bind(DataSource.class).toProvider(
@@ -68,21 +65,22 @@ public class JndiDataSourceModule extends AbstractModule {
 	 * @author asuka
 	 */
 	public static class Builder {
-		private Class<? extends Provider<? extends Context>> namingContextProviderType = null;
+		private BindingRule<? extends Context> namingContextBindingRule = to(InitialContext.class);
 		private boolean localTransaction = true;
 
 		/**
-		 * {@link Context} オブジェクトを提供するプロバイダの型を設定します。
+		 * {@link Context} オブジェクトをバインドするルールを設定します。
 		 * <P>
-		 * このメソッドでプロバイダの型を指定しなかった場合、{@link Context} の実装型は {@link InitialContext} になります。
+		 * このメソッドでプロバイダの型を指定しなかった場合、{@link Context} の実装型は {@link InitialContext}
+		 * になります。
 		 * 
-		 * @param namingContextProviderType
-		 *            {@link Context} オブジェクトを提供するプロバイダの型を設定
+		 * @param namingContextBindingRule
+		 *            {@link Context} オブジェクトをバインドするルール
 		 * @return このメソッドのレシーバオブジェクト
 		 */
-		public Builder setNamingContextProviderType(
-				Class<? extends Provider<? extends Context>> namingContextProviderType) {
-			this.namingContextProviderType = namingContextProviderType;
+		public Builder setNamingContextBindingRule(
+				BindingRule<? extends Context> namingContextBindingRule) {
+			this.namingContextBindingRule = namingContextBindingRule;
 			return this;
 		}
 
@@ -102,7 +100,7 @@ public class JndiDataSourceModule extends AbstractModule {
 		 * @return {@link JndiDataSourceModule} オブジェクト
 		 */
 		public JndiDataSourceModule create() {
-			return new JndiDataSourceModule(namingContextProviderType,
+			return new JndiDataSourceModule(namingContextBindingRule,
 					localTransaction);
 		}
 	}

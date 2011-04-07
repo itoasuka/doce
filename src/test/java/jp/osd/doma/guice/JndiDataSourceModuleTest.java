@@ -1,5 +1,8 @@
 package jp.osd.doma.guice;
 
+import static jp.osd.doma.guice.BindingRule.to;
+import static jp.osd.doma.guice.BindingRule.toInstance;
+import static jp.osd.doma.guice.BindingRule.toProvider;
 import static junit.framework.Assert.assertEquals;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -41,10 +44,10 @@ public class JndiDataSourceModuleTest {
 			}
 		};
 		Module m2 = new JndiDataSourceModule.Builder()
-				.setNamingContextProviderType(TestContextProvider.class)
+		.setNamingContextBindingRule(toProvider(new TestContextProvider()))
 				.create();
-		Module m3 = new DomaModule.Builder().setDialectType(H2Dialect.class)
-				.create();
+		Module m3 = new DomaModule.Builder().setDialectBindingRule(
+				to(H2Dialect.class)).create();
 
 		Injector injector = Guice.createInjector(m1, m2, m3);
 		DataSource ds = injector.getInstance(DataSource.class);
@@ -64,10 +67,10 @@ public class JndiDataSourceModuleTest {
 			}
 		};
 		Module m2 = new JndiDataSourceModule.Builder()
-				.setNamingContextProviderType(TestContextProvider.class)
+				.setNamingContextBindingRule(toProvider(new TestContextProvider()))
 				.jndiUserTransaction().create();
-		Module m3 = new DomaModule.Builder().setDialectType(H2Dialect.class)
-				.create();
+		Module m3 = new DomaModule.Builder().setDialectBindingRule(
+				toInstance(new H2Dialect())).create();
 
 		Injector injector = Guice.createInjector(m1, m2, m3);
 		DataSource ds = injector.getInstance(DataSource.class);
@@ -89,8 +92,8 @@ public class JndiDataSourceModuleTest {
 			}
 		};
 		Module m2 = new JndiDataSourceModule.Builder().create();
-		Module m3 = new DomaModule.Builder().setDialectType(H2Dialect.class)
-				.create();
+		Module m3 = new DomaModule.Builder().setDialectBindingRule(
+				toInstance(new H2Dialect())).create();
 
 		try {
 			Guice.createInjector(m1, m2, m3);

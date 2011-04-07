@@ -50,7 +50,7 @@ import com.google.inject.Scopes;
  * </TABLE>
  * 
  * @author asuka
- * @see SimpleDataSouceProvider
+ * @see SimpleDataSourceProvider
  */
 public class SimpleDataSourceModule extends AbstractModule {
 
