@@ -12,13 +12,13 @@ import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
 import jp.osd.doma.guice.internal.JtaUserTransaction;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.seasar.doma.jdbc.Config;
 import org.seasar.doma.jdbc.SimpleDataSource;
 import org.seasar.doma.jdbc.dialect.H2Dialect;
 import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
@@ -44,14 +44,15 @@ public class JndiDataSourceModuleTest {
 			}
 		};
 		Module m2 = new JndiDataSourceModule.Builder()
-		.setNamingContextBindingRule(toProvider(new TestContextProvider()))
-				.create();
+				.setNamingContextBindingRule(
+						toProvider(new TestContextProvider())).create();
 		Module m3 = new DomaModule.Builder().setDialectBindingRule(
 				to(H2Dialect.class)).create();
 
 		Injector injector = Guice.createInjector(m1, m2, m3);
-		DataSource ds = injector.getInstance(DataSource.class);
-		Assert.assertEquals(LocalTransactionalDataSource.class, ds.getClass());
+		Config config = injector.getInstance(Config.class);
+		Assert.assertEquals(LocalTransactionalDataSource.class, config
+				.getDataSource().getClass());
 	}
 
 	@Test
@@ -67,14 +68,15 @@ public class JndiDataSourceModuleTest {
 			}
 		};
 		Module m2 = new JndiDataSourceModule.Builder()
-				.setNamingContextBindingRule(toProvider(new TestContextProvider()))
+				.setNamingContextBindingRule(
+						toProvider(new TestContextProvider()))
 				.jndiUserTransaction().create();
 		Module m3 = new DomaModule.Builder().setDialectBindingRule(
 				toInstance(new H2Dialect())).create();
 
 		Injector injector = Guice.createInjector(m1, m2, m3);
-		DataSource ds = injector.getInstance(DataSource.class);
-		assertEquals(SimpleDataSource.class, ds.getClass());
+		Config config = injector.getInstance(Config.class);
+		assertEquals(SimpleDataSource.class, config.getDataSource().getClass());
 		Transaction tx = injector.getInstance(Transaction.class);
 		assertEquals(JtaUserTransaction.class, tx.getClass());
 

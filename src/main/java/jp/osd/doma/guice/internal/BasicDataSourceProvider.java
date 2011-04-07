@@ -3,9 +3,7 @@ package jp.osd.doma.guice.internal;
 import javax.inject.Named;
 import javax.sql.DataSource;
 
-
 import org.apache.commons.dbcp.BasicDataSource;
-import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -53,7 +51,7 @@ public class BasicDataSourceProvider implements Provider<DataSource> {
 	 */
 	@Override
 	public DataSource get() {
-		return new LocalTransactionalDataSource(dataSource);
+		return dataSource;
 	}
 
 	/**

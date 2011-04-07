@@ -5,12 +5,11 @@ import javax.inject.Provider;
 import javax.sql.DataSource;
 
 import org.seasar.doma.jdbc.SimpleDataSource;
-import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
 
 import com.google.inject.Inject;
 
 /**
- * {@link DataSource} として {@link SimpleDataSource} を提供するプロバイダです。厳密には Doma が提供するローカルトランザクションを利用するため {@link LocalTransactionalDataSource} でラップされています。
+ * {@link DataSource} として {@link SimpleDataSource} を提供するプロバイダです。
  * <P>
  *  {@link SimpleDataSource} に対するパラメータは、Guice の定数バインドで指定します。
  *  <P>
@@ -53,8 +52,8 @@ public class SimpleDataSourceProvider implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	public LocalTransactionalDataSource get() {
-		return new LocalTransactionalDataSource(dataSource);
+	public DataSource get() {
+		return dataSource;
 	}
 
 	/**

@@ -28,7 +28,8 @@ public class LocalTransaction implements Transaction {
 	 *            JDBC ロガー
 	 */
 	@Inject
-	public LocalTransaction(DataSource dataSource, JdbcLogger jdbcLogger) {
+	public LocalTransaction(DataSource dataSource,
+			JdbcLogger jdbcLogger) {
 		this.dataSource = (LocalTransactionalDataSource) dataSource;
 		this.jdbcLogger = jdbcLogger;
 	}

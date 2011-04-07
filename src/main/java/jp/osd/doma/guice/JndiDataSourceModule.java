@@ -8,9 +8,10 @@ import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
 import jp.osd.doma.guice.internal.JndiDataSourceProvider;
-import jp.osd.doma.guice.internal.JndiLocalTransactionDataSourceProvider;
 import jp.osd.doma.guice.internal.JtaUserTransaction;
 import jp.osd.doma.guice.internal.LocalTransaction;
+import jp.osd.doma.guice.internal.LocalTransactionalDataSourceProvider;
+import jp.osd.doma.guice.internal.Plain;
 import jp.osd.doma.guice.internal.UserTransactionProvider;
 
 import com.google.inject.AbstractModule;
@@ -44,8 +45,11 @@ public class JndiDataSourceModule extends AbstractModule {
 
 		if (localTransaction) {
 			// ローカルトランザクションを使用する場合
+			bind(DataSource.class).annotatedWith(Plain.class)
+					.toProvider(JndiDataSourceProvider.class)
+					.in(Scopes.SINGLETON);
 			bind(DataSource.class).toProvider(
-					JndiLocalTransactionDataSourceProvider.class).in(
+					LocalTransactionalDataSourceProvider.class).in(
 					Scopes.SINGLETON);
 			bind(Transaction.class).to(LocalTransaction.class);
 		} else {
