@@ -44,7 +44,7 @@ public class BasicDataSourceModuleTest {
 		};
 		Module m2 = new BasicDataSourceModule();
 		Module m3 = new DomaModule.Builder().addDaoTypes(HogeDao.class)
-				.create();
+				.useTransactionInterceptor().create();
 
 		Injector injector = Guice.createInjector(m1, m2, m3);
 		TestService service = injector.getInstance(TestService.class);
@@ -64,7 +64,7 @@ public class BasicDataSourceModuleTest {
 		};
 		Module m2 = new BasicDataSourceModule();
 		Module m3 = new DomaModule.Builder().addDaoTypes(HogeDao.class)
-				.create();
+				.useTransactionInterceptor().create();
 
 		Injector injector = Guice.createInjector(m1, m2, m3);
 		TestService service = injector.getInstance(TestService.class);

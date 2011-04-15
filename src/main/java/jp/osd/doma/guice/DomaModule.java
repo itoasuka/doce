@@ -7,8 +7,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import jp.osd.doma.guice.internal.ClassUtils;
 import jp.osd.doma.guice.internal.DialectProvider;
+import jp.osd.doma.guice.internal.DomaDataSource;
+import jp.osd.doma.guice.internal.DomaDataSourceProvider;
 import jp.osd.doma.guice.internal.GuiceManagedConfig;
 import jp.osd.doma.guice.internal.TransactionInterceptor;
 
@@ -29,7 +33,7 @@ import com.google.inject.matcher.Matchers;
  * Doma と Guice を連携させるための Guice モジュールクラスです。
  * <P>
  * このクラスはコンストラクタが非公開であるため、{@link DomaModule.Builder} を使用してオブジェクトを生成してください。
- * 
+ *
  * @author asuka
  */
 public class DomaModule extends AbstractModule {
@@ -41,6 +45,7 @@ public class DomaModule extends AbstractModule {
 	private final String daoPackage;
 	private final String daoSubpackage;
 	private final String daoSuffix;
+	private final boolean useTransactionInterceptor;
 
 	/**
 	 * {@inheritDoc}
@@ -48,6 +53,10 @@ public class DomaModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		requestInjection(this);
+
+		// データソースプロバイダの設定
+		bind(DataSource.class).annotatedWith(DomaDataSource.class).toProvider(
+				DomaDataSourceProvider.class);
 
 		// SQL ファイルリポジトリの設定
 		sqlFileRepositoryBindingRule.apply(bind(SqlFileRepository.class));
@@ -63,11 +72,13 @@ public class DomaModule extends AbstractModule {
 		// Doma 用 Config クラスの設定
 		bind(Config.class).to(GuiceManagedConfig.class).in(Scopes.SINGLETON);
 
-		// ローカルトランザクションインタセプタの設定
-		TransactionInterceptor lti = new TransactionInterceptor();
-		requestInjection(lti);
-		bindInterceptor(Matchers.any(),
-				Matchers.annotatedWith(Transactional.class), lti);
+		// トランザクションインタセプタの設定
+		if (useTransactionInterceptor) {
+			TransactionInterceptor lti = new TransactionInterceptor();
+			requestInjection(lti);
+			bindInterceptor(Matchers.any(),
+					Matchers.annotatedWith(Transactional.class), lti);
+		}
 
 		// Dao の設定
 		for (Class<?> daoType : daoTypes) {
@@ -81,7 +92,8 @@ public class DomaModule extends AbstractModule {
 			BindingRule<? extends JdbcLogger> jdbcLoggerBindingRule,
 			BindingRule<? extends RequiresNewController> requiresNewControllerBindingRule,
 			BindingRule<? extends Dialect> dialectBindingRule,
-			String daoPackage, String daoSubpackage, String daoSuffix) {
+			String daoPackage, String daoSubpackage, String daoSuffix,
+			boolean useTransactionInterceptor) {
 		this.daoTypes = daoTypes;
 		this.sqlFileRepositoryBindingRule = sqlFileRepositoryBindingRule;
 		this.jdbcLoggerBindingRule = jdbcLoggerBindingRule;
@@ -90,6 +102,7 @@ public class DomaModule extends AbstractModule {
 		this.daoPackage = daoPackage;
 		this.daoSubpackage = daoSubpackage;
 		this.daoSuffix = daoSuffix;
+		this.useTransactionInterceptor = useTransactionInterceptor;
 	}
 
 	private <T> void bindDao(Class<T> daoType) {
@@ -108,7 +121,7 @@ public class DomaModule extends AbstractModule {
 
 	/**
 	 * {@link DomaModule} オブジェクトを作成するためのビルダクラスです。
-	 * 
+	 *
 	 * @author asuka
 	 */
 	public static final class Builder {
@@ -120,6 +133,7 @@ public class DomaModule extends AbstractModule {
 		private String daoPackage = "";
 		private String daoSubpackage = "";
 		private String daoSuffix = "Impl";
+		private boolean useTransactionInterceptor = false;
 
 		/**
 		 * 新たにオブジェクトを構築します。
@@ -132,7 +146,7 @@ public class DomaModule extends AbstractModule {
 		 * <P>
 		 * このメソッドで SQL ファイルリポジトリのバインドルールを指定しなかった場合、デフォルト値として
 		 * {@link GreedyCacheSqlFileRepository} がバインドされます。
-		 * 
+		 *
 		 * @param sqlFileRepositoryBindingRule
 		 *            SQL ファイルリポジトリのバインドルール
 		 * @return このメソッドのレシーバオブジェクト
@@ -149,7 +163,7 @@ public class DomaModule extends AbstractModule {
 		 * <P>
 		 * このメソッドで JDBC ロガーのバインドルールを指定しなかった場合、デフォルト値として
 		 * {@link UtilLoggingJdbcLogger} がバインドされます。
-		 * 
+		 *
 		 * @param jdbcLoggerBindingRule
 		 *            JDBC ロガーのバインドルール
 		 * @return このメソッドのレシーバオブジェクト
@@ -168,7 +182,7 @@ public class DomaModule extends AbstractModule {
 		 * このメソッドで REQUIRES_NEW
 		 * の属性をもつトランザクションを制御するコントローラのバインドルールを指定しなかった場合、デフォルト値として
 		 * {@link NullRequiresNewController} がバインドされます。
-		 * 
+		 *
 		 * @param requiresNewControllerBindingRule
 		 *            REQUIRES_NEW の属性をもつトランザクションを制御するコントローラのバインドルール
 		 * @return このメソッドのレシーバオブジェクト
@@ -185,7 +199,7 @@ public class DomaModule extends AbstractModule {
 		 * <P>
 		 * このメソッドでルールを指定しなかった場合、{@link Dialect} オブジェクトのバインドには
 		 * {@link DialectProvider} が使用されます。
-		 * 
+		 *
 		 * @param dialectBindingRule
 		 *            {@link Dialect} オブジェクトをバインドするルール
 		 * @return このメソッドのレシーバオブジェクト
@@ -203,7 +217,7 @@ public class DomaModule extends AbstractModule {
 		 * これにより javac のバグ（Bug ID <a
 		 * href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403465"
 		 * >6403465</a>）によるコンパイル時のエラーメッセージを抑制することができます。
-		 * 
+		 *
 		 * @param daoTypes
 		 *            Dao インタフェースの型
 		 * @return このメソッドのレシーバオブジェクト
@@ -221,7 +235,7 @@ public class DomaModule extends AbstractModule {
 		 * これにより javac のバグ（Bug ID <a
 		 * href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403465"
 		 * >6403465</a>）によるコンパイル時のエラーメッセージを抑制することができます。
-		 * 
+		 *
 		 * @param daoTypes
 		 *            Dao インタフェースの型のコレクション
 		 * @return このメソッドのレシーバオブジェクト
@@ -236,7 +250,7 @@ public class DomaModule extends AbstractModule {
 		 * Dao の実装クラスのパッケージ名を設定します。これは Dao のインタフェースと実装クラスの実行時のひもづけに使用されます。
 		 * <P>
 		 * 設定しない場合、Dao インターフェース型と同じパッケージ名が使用されます。
-		 * 
+		 *
 		 * @param daoPackage
 		 *            Dao の実装クラスのパッケージ名
 		 * @return このメソッドのレシーバオブジェクト
@@ -248,7 +262,7 @@ public class DomaModule extends AbstractModule {
 
 		/**
 		 * Dao の実装クラスのサブパッケージ名を設定します。これは Dao のインタフェースと実装クラスの実行時のひもづけに使用されます。
-		 * 
+		 *
 		 * @param daoSubpackage
 		 *            Dao の実装クラスのサブパッケージ名
 		 * @return このメソッドのレシーバオブジェクト
@@ -262,7 +276,7 @@ public class DomaModule extends AbstractModule {
 		 * Dao の実装クラスのクラス名のサフィックスを設定します。これは Dao のインタフェースと実装クラスの実行時のひもづけに使用されます。
 		 * <P>
 		 * 設定しない場合、{@literal "Impl"} が使用されます。
-		 * 
+		 *
 		 * @param daoSuffix
 		 *            Dao の実装クラスのクラス名のサフィックス
 		 * @return このメソッドのレシーバオブジェクト
@@ -273,14 +287,25 @@ public class DomaModule extends AbstractModule {
 		}
 
 		/**
+		 * アノテーション {@link Transactional} による宣言的トランザクションの利用を有効にします。
+		 *
+		 * @return このメソッドのレシーバオブジェクト
+		 */
+		public Builder useTransactionInterceptor() {
+			useTransactionInterceptor = true;
+			return this;
+		}
+
+		/**
 		 * 設定に基づいて {@link DomaModule} オブジェクトを作成します。
-		 * 
+		 *
 		 * @return {@link DomaModule} オブジェクト
 		 */
 		public DomaModule create() {
 			return new DomaModule(daoTypes, sqlFileRepositoryBindingRule,
 					jdbcLoggerBindingRule, requiresNewControllerBindingRule,
-					dialectBindingRule, daoPackage, daoSubpackage, daoSuffix);
+					dialectBindingRule, daoPackage, daoSubpackage, daoSuffix,
+					useTransactionInterceptor);
 		}
 	}
 }

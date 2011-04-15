@@ -61,7 +61,8 @@ public class DomaModuleTest {
 						to(GreedyCacheSqlFileRepository.class))
 				.setDialectBindingRule(toProvider(DialectProvider.class))
 				.setDaoPackage("").setDaoSubpackage("").setDaoSuffix("Impl")
-				.addDaoTypes(HogeDao.class).addDaoTypes(list).create();
+				.addDaoTypes(HogeDao.class).addDaoTypes(list)
+				.useTransactionInterceptor().create();
 
 		Injector injector = Guice.createInjector(m1, m2, m3);
 

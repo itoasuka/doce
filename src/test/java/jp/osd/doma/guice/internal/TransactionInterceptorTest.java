@@ -38,7 +38,8 @@ public class TransactionInterceptorTest {
 				Names.bindProperties(binder, domaProperties);
 			}
 		}, new SimpleDataSourceModule(),
-				new DomaModule.Builder().addDaoTypes(HogeDao.class).create());
+				new DomaModule.Builder().addDaoTypes(HogeDao.class)
+						.useTransactionInterceptor().create());
 	}
 
 	@Test

@@ -14,18 +14,41 @@ import com.google.inject.Inject;
 /**
  * Guice で管理される Doma 設定クラスです。
  * <P>
- *  Guice の定数バインドで設定値を指定することができます。
- *  <P>
- *  <TABLE BORDER=1>
- *  <THEAD><TR><TH>Named</TH><TH>必須</TH><TH>説明</TH></THEAD>
- *  <TBODY>
- *  <TR><TD>Doma.maxRows</TD><TD><BR></TD><TD>最大行数制限。{@link Config#getMaxRows()} の戻り値に使用。</TD></TR>
- *  <TR><TD>Doma.fetchSize</TD><TD><BR></TD><TD>フェッチサイズ。{@link Config#getFetchSize()} の戻り値に使用。</TD></TR>
- *  <TR><TD>Doma.queryTimeout</TD><TD><BR></TD><TD>クエリタイムアウト（秒）。{@link Config#getQueryTimeout()} の戻り値に使用。</TD></TR>
- *  <TR><TD>Doma.batchSize</TD><TD><BR></TD><TD>バッチサイズ。{@link Config#getBatchSize()} の戻り値に使用。</TD></TR>
- *  </TBODY>
- *  </TABLE>
-
+ * Guice の定数バインドで設定値を指定することができます。
+ * <P>
+ * <TABLE BORDER=1>
+ * <THEAD>
+ * <TR>
+ * <TH>Named</TH>
+ * <TH>必須</TH>
+ * <TH>説明</TH></THEAD> <TBODY>
+ * <TR>
+ * <TD>Doma.maxRows</TD>
+ * <TD><BR>
+ * </TD>
+ * <TD>最大行数制限。{@link Config#getMaxRows()} の戻り値に使用。</TD>
+ * </TR>
+ * <TR>
+ * <TD>Doma.fetchSize</TD>
+ * <TD><BR>
+ * </TD>
+ * <TD>フェッチサイズ。{@link Config#getFetchSize()} の戻り値に使用。</TD>
+ * </TR>
+ * <TR>
+ * <TD>Doma.queryTimeout</TD>
+ * <TD><BR>
+ * </TD>
+ * <TD>クエリタイムアウト（秒）。{@link Config#getQueryTimeout()} の戻り値に使用。</TD>
+ * </TR>
+ * <TR>
+ * <TD>Doma.batchSize</TD>
+ * <TD><BR>
+ * </TD>
+ * <TD>バッチサイズ。{@link Config#getBatchSize()} の戻り値に使用。</TD>
+ * </TR>
+ * </TBODY>
+ * </TABLE>
+ *
  * @author asuka
  */
 public class GuiceManagedConfig implements Config {
@@ -41,17 +64,22 @@ public class GuiceManagedConfig implements Config {
 
 	/**
 	 * 新たにオブジェクトを構築します。
-	 * 
-	 * @param dataSource データソース
-	 * @param dialect Dialect
-	 * @param sqlFileRepository SQL ファイルリポジトリ
-	 * @param jdbcLogger JDBC ロガー
-	 * @param requiresNewController REQUIRES_NEW の属性をもつトランザクションを制御するコントローラ
+	 *
+	 * @param dataSource
+	 *            データソース
+	 * @param dialect
+	 *            Dialect
+	 * @param sqlFileRepository
+	 *            SQL ファイルリポジトリ
+	 * @param jdbcLogger
+	 *            JDBC ロガー
+	 * @param requiresNewController
+	 *            REQUIRES_NEW の属性をもつトランザクションを制御するコントローラ
 	 */
 	@Inject
-	public GuiceManagedConfig(DataSource dataSource, Dialect dialect,
-			SqlFileRepository sqlFileRepository, JdbcLogger jdbcLogger,
-			RequiresNewController requiresNewController) {
+	public GuiceManagedConfig(@DomaDataSource DataSource dataSource,
+			Dialect dialect, SqlFileRepository sqlFileRepository,
+			JdbcLogger jdbcLogger, RequiresNewController requiresNewController) {
 		this.dataSource = dataSource;
 		this.dialect = dialect;
 		this.sqlFileRepository = sqlFileRepository;
@@ -141,8 +169,9 @@ public class GuiceManagedConfig implements Config {
 
 	/**
 	 * 最大行数の制限値を設定します。
-	 * 
-	 * @param maxRows 最大行数の制限値
+	 *
+	 * @param maxRows
+	 *            最大行数の制限値
 	 */
 	@Inject(optional = true)
 	public void setMaxRows(@Named("Doma.maxRows") int maxRows) {
@@ -151,8 +180,9 @@ public class GuiceManagedConfig implements Config {
 
 	/**
 	 * フェッチサイズを設定します。
-	 * 
-	 * @param fetchSize フェッチサイズ
+	 *
+	 * @param fetchSize
+	 *            フェッチサイズ
 	 */
 	@Inject(optional = true)
 	public void setFetchSize(@Named("Doma.fetchSize") int fetchSize) {
@@ -161,8 +191,9 @@ public class GuiceManagedConfig implements Config {
 
 	/**
 	 * クエリタイムアウト（秒）を設定します。
-	 * 
-	 * @param queryTimeout クエリタイムアウト（秒）
+	 *
+	 * @param queryTimeout
+	 *            クエリタイムアウト（秒）
 	 */
 	@Inject(optional = true)
 	public void setQueryTimeout(@Named("Doma.queryTimeout") int queryTimeout) {
@@ -171,8 +202,9 @@ public class GuiceManagedConfig implements Config {
 
 	/**
 	 * バッチサイズを設定します。
-	 * 
-	 * @param batchSize バッチサイズ
+	 *
+	 * @param batchSize
+	 *            バッチサイズ
 	 */
 	@Inject(optional = true)
 	public void setBatchSize(@Named("Doma.batchSize") int batchSize) {
