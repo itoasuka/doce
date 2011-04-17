@@ -1,28 +1,33 @@
 package jp.osd.doma.guice;
 
-import static jp.osd.doma.guice.BindingRule.to;
-import static jp.osd.doma.guice.BindingRule.toProvider;
+import static com.google.inject.Scopes.SINGLETON;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.naming.Context;
 import javax.sql.DataSource;
 
+import jp.osd.doma.guice.internal.AutoDataSourceProvider;
 import jp.osd.doma.guice.internal.ClassUtils;
-import jp.osd.doma.guice.internal.DialectProvider;
-import jp.osd.doma.guice.internal.DomaDataSource;
-import jp.osd.doma.guice.internal.DomaDataSourceProvider;
+import jp.osd.doma.guice.internal.DefaultContextProvider;
+import jp.osd.doma.guice.internal.DefaultDataSourceProvider;
+import jp.osd.doma.guice.internal.DefaultDialectProvider;
+import jp.osd.doma.guice.internal.DefaultJdbcLoggerProvider;
+import jp.osd.doma.guice.internal.DefaultRequiresNewControllerProvider;
+import jp.osd.doma.guice.internal.DefaultSqlFileRepositoryProvider;
+import jp.osd.doma.guice.internal.Doma;
 import jp.osd.doma.guice.internal.GuiceManagedConfig;
+import jp.osd.doma.guice.internal.JtaUserTransaction;
+import jp.osd.doma.guice.internal.LocalTransaction;
+import jp.osd.doma.guice.internal.LocalTransactionalDataSourceProvider;
 import jp.osd.doma.guice.internal.TransactionInterceptor;
 
 import org.seasar.doma.jdbc.Config;
-import org.seasar.doma.jdbc.GreedyCacheSqlFileRepository;
 import org.seasar.doma.jdbc.JdbcLogger;
-import org.seasar.doma.jdbc.NullRequiresNewController;
 import org.seasar.doma.jdbc.RequiresNewController;
 import org.seasar.doma.jdbc.SqlFileRepository;
-import org.seasar.doma.jdbc.UtilLoggingJdbcLogger;
 import org.seasar.doma.jdbc.dialect.Dialect;
 
 import com.google.inject.AbstractModule;
@@ -38,14 +43,11 @@ import com.google.inject.matcher.Matchers;
  */
 public class DomaModule extends AbstractModule {
 	private final List<Class<?>> daoTypes;
-	private final BindingRule<? extends SqlFileRepository> sqlFileRepositoryBindingRule;
-	private final BindingRule<? extends JdbcLogger> jdbcLoggerBindingRule;
-	private final BindingRule<? extends RequiresNewController> requiresNewControllerBindingRule;
-	private final BindingRule<? extends Dialect> dialectBindingRule;
 	private final String daoPackage;
 	private final String daoSubpackage;
 	private final String daoSuffix;
-	private final boolean useTransactionInterceptor;
+	private final boolean transactionInterceptorEnabled;
+	private final boolean localTransactionEnabled;
 
 	/**
 	 * {@inheritDoc}
@@ -54,30 +56,62 @@ public class DomaModule extends AbstractModule {
 	protected void configure() {
 		requestInjection(this);
 
+		// ネーミングコンテキストの設定
+		bind(Context.class).toProvider(DefaultContextProvider.class).in(
+				SINGLETON);
+
 		// データソースプロバイダの設定
-		bind(DataSource.class).annotatedWith(DomaDataSource.class).toProvider(
-				DomaDataSourceProvider.class);
+		// プリミティブ
+		bind(DataSource.class).toProvider(AutoDataSourceProvider.class).in(
+				SINGLETON);
+
+		// （ラッパ）
+		if (localTransactionEnabled) {
+			bind(DataSource.class).annotatedWith(Doma.class)
+					.toProvider(LocalTransactionalDataSourceProvider.class)
+					.in(SINGLETON);
+		} else {
+			bind(DataSource.class).annotatedWith(Doma.class).toProvider(
+					DefaultDataSourceProvider.class);
+		}
 
 		// SQL ファイルリポジトリの設定
-		sqlFileRepositoryBindingRule.apply(bind(SqlFileRepository.class));
+		bind(SqlFileRepository.class).annotatedWith(Doma.class)
+				.toProvider(DefaultSqlFileRepositoryProvider.class)
+				.in(Scopes.SINGLETON);
 		// JDBC ロガーの設定
-		jdbcLoggerBindingRule.apply(bind(JdbcLogger.class));
+		bind(JdbcLogger.class).annotatedWith(Doma.class)
+				.toProvider(DefaultJdbcLoggerProvider.class)
+				.in(Scopes.SINGLETON);
 		// Requires new controller の設定
-		requiresNewControllerBindingRule
-				.apply(bind(RequiresNewController.class));
+		bind(RequiresNewController.class).annotatedWith(Doma.class)
+				.toProvider(DefaultRequiresNewControllerProvider.class)
+				.in(Scopes.SINGLETON);
 
 		// Dialect の設定
-		dialectBindingRule.apply(bind(Dialect.class));
+		bind(Dialect.class).annotatedWith(Doma.class)
+				.toProvider(DefaultDialectProvider.class).in(Scopes.SINGLETON);
 
 		// Doma 用 Config クラスの設定
 		bind(Config.class).to(GuiceManagedConfig.class).in(Scopes.SINGLETON);
 
+		// トランザクションの設定
+		if (localTransactionEnabled) {
+			bind(Transaction.class).to(LocalTransaction.class).in(
+					Scopes.SINGLETON);
+		} else {
+			bind(Transaction.class).to(JtaUserTransaction.class).in(
+					Scopes.SINGLETON);
+		}
+
 		// トランザクションインタセプタの設定
-		if (useTransactionInterceptor) {
+		if (transactionInterceptorEnabled) {
 			TransactionInterceptor lti = new TransactionInterceptor();
 			requestInjection(lti);
 			bindInterceptor(Matchers.any(),
 					Matchers.annotatedWith(Transactional.class), lti);
+			bindInterceptor(Matchers.annotatedWith(Transactional.class),
+					Matchers.any(), lti);
 		}
 
 		// Dao の設定
@@ -86,23 +120,16 @@ public class DomaModule extends AbstractModule {
 		}
 	}
 
-	private DomaModule(
-			List<Class<?>> daoTypes,
-			BindingRule<? extends SqlFileRepository> sqlFileRepositoryBindingRule,
-			BindingRule<? extends JdbcLogger> jdbcLoggerBindingRule,
-			BindingRule<? extends RequiresNewController> requiresNewControllerBindingRule,
-			BindingRule<? extends Dialect> dialectBindingRule,
-			String daoPackage, String daoSubpackage, String daoSuffix,
-			boolean useTransactionInterceptor) {
+	private DomaModule(List<Class<?>> daoTypes, String daoPackage,
+			String daoSubpackage, String daoSuffix,
+			boolean transactionInterceptorEnabled,
+			boolean localTransactionEnabled) {
 		this.daoTypes = daoTypes;
-		this.sqlFileRepositoryBindingRule = sqlFileRepositoryBindingRule;
-		this.jdbcLoggerBindingRule = jdbcLoggerBindingRule;
-		this.requiresNewControllerBindingRule = requiresNewControllerBindingRule;
-		this.dialectBindingRule = dialectBindingRule;
 		this.daoPackage = daoPackage;
 		this.daoSubpackage = daoSubpackage;
 		this.daoSuffix = daoSuffix;
-		this.useTransactionInterceptor = useTransactionInterceptor;
+		this.transactionInterceptorEnabled = transactionInterceptorEnabled;
+		this.localTransactionEnabled = localTransactionEnabled;
 	}
 
 	private <T> void bindDao(Class<T> daoType) {
@@ -126,89 +153,16 @@ public class DomaModule extends AbstractModule {
 	 */
 	public static final class Builder {
 		private final List<Class<?>> daoTypes = new ArrayList<Class<?>>();
-		private BindingRule<? extends SqlFileRepository> sqlFileRepositoryBindingRule = to(GreedyCacheSqlFileRepository.class);
-		private BindingRule<? extends JdbcLogger> jdbcLoggerBindingRule = to(UtilLoggingJdbcLogger.class);
-		private BindingRule<? extends RequiresNewController> requiresNewControllerBindingRule = to(NullRequiresNewController.class);
-		private BindingRule<? extends Dialect> dialectBindingRule = toProvider(DialectProvider.class);
 		private String daoPackage = "";
 		private String daoSubpackage = "";
 		private String daoSuffix = "Impl";
-		private boolean useTransactionInterceptor = false;
+		private boolean transactionInterceptorEnabled = true;
+		private boolean localTransactionEnabled = true;
 
 		/**
 		 * 新たにオブジェクトを構築します。
 		 */
 		public Builder() {
-		}
-
-		/**
-		 * {@link Config} が返す SQL ファイルリポジトリをバインドするルールを設定します。
-		 * <P>
-		 * このメソッドで SQL ファイルリポジトリのバインドルールを指定しなかった場合、デフォルト値として
-		 * {@link GreedyCacheSqlFileRepository} がバインドされます。
-		 *
-		 * @param sqlFileRepositoryBindingRule
-		 *            SQL ファイルリポジトリのバインドルール
-		 * @return このメソッドのレシーバオブジェクト
-		 * @see Config#getSqlFileRepository()
-		 */
-		public Builder setSqlFileRepositoryBindingRule(
-				BindingRule<? extends SqlFileRepository> sqlFileRepositoryBindingRule) {
-			this.sqlFileRepositoryBindingRule = sqlFileRepositoryBindingRule;
-			return this;
-		}
-
-		/**
-		 * {@link Config} が返す JDBC ロガーをバインドするルールを設定します。
-		 * <P>
-		 * このメソッドで JDBC ロガーのバインドルールを指定しなかった場合、デフォルト値として
-		 * {@link UtilLoggingJdbcLogger} がバインドされます。
-		 *
-		 * @param jdbcLoggerBindingRule
-		 *            JDBC ロガーのバインドルール
-		 * @return このメソッドのレシーバオブジェクト
-		 * @see Config#getJdbcLogger()
-		 */
-		public Builder setJdbcLoggerBindingRule(
-				BindingRule<? extends JdbcLogger> jdbcLoggerBindingRule) {
-			this.jdbcLoggerBindingRule = jdbcLoggerBindingRule;
-			return this;
-		}
-
-		/**
-		 * {@link Config} が返す REQUIRES_NEW
-		 * の属性をもつトランザクションを制御するコントローラをバインドするルールを設定します。
-		 * <P>
-		 * このメソッドで REQUIRES_NEW
-		 * の属性をもつトランザクションを制御するコントローラのバインドルールを指定しなかった場合、デフォルト値として
-		 * {@link NullRequiresNewController} がバインドされます。
-		 *
-		 * @param requiresNewControllerBindingRule
-		 *            REQUIRES_NEW の属性をもつトランザクションを制御するコントローラのバインドルール
-		 * @return このメソッドのレシーバオブジェクト
-		 * @see Config#getRequiresNewController()
-		 */
-		public Builder setRequiresNewControllerBindingRule(
-				BindingRule<? extends RequiresNewController> requiresNewControllerBindingRule) {
-			this.requiresNewControllerBindingRule = requiresNewControllerBindingRule;
-			return this;
-		}
-
-		/**
-		 * {@link Dialect} オブジェクトをバインドするルールを設定します。
-		 * <P>
-		 * このメソッドでルールを指定しなかった場合、{@link Dialect} オブジェクトのバインドには
-		 * {@link DialectProvider} が使用されます。
-		 *
-		 * @param dialectBindingRule
-		 *            {@link Dialect} オブジェクトをバインドするルール
-		 * @return このメソッドのレシーバオブジェクト
-		 * @see Config#getDialect()
-		 */
-		public Builder setDialectBindingRule(
-				BindingRule<? extends Dialect> dialectBindingRule) {
-			this.dialectBindingRule = dialectBindingRule;
-			return this;
 		}
 
 		/**
@@ -287,12 +241,27 @@ public class DomaModule extends AbstractModule {
 		}
 
 		/**
-		 * アノテーション {@link Transactional} による宣言的トランザクションの利用を有効にします。
+		 * アノテーション {@link Transactional} による宣言的トランザクションの利用を有効にするかを設定します。
 		 *
+		 * @param transactionInterceptorEnabled
+		 *            有効にする時 <code>true</code>
 		 * @return このメソッドのレシーバオブジェクト
 		 */
-		public Builder useTransactionInterceptor() {
-			useTransactionInterceptor = true;
+		public Builder setTransactionInterceptorEnabled(
+				boolean transactionInterceptorEnabled) {
+			this.transactionInterceptorEnabled = transactionInterceptorEnabled;
+			return this;
+		}
+
+		/**
+		 * ローカルトランザクションを有効にするかを設定します。
+		 *
+		 * @param localTransactionEnabled ローカルトランザクションを有効にする時 <code>true</code>
+		 * @return このメソッドのレシーバオブジェクト
+		 */
+		public Builder setLocalTransactionEnabled(
+				boolean localTransactionEnabled) {
+			this.localTransactionEnabled = localTransactionEnabled;
 			return this;
 		}
 
@@ -302,10 +271,9 @@ public class DomaModule extends AbstractModule {
 		 * @return {@link DomaModule} オブジェクト
 		 */
 		public DomaModule create() {
-			return new DomaModule(daoTypes, sqlFileRepositoryBindingRule,
-					jdbcLoggerBindingRule, requiresNewControllerBindingRule,
-					dialectBindingRule, daoPackage, daoSubpackage, daoSuffix,
-					useTransactionInterceptor);
+			return new DomaModule(daoTypes, daoPackage, daoSubpackage,
+					daoSuffix, transactionInterceptorEnabled,
+					localTransactionEnabled);
 		}
 	}
 }

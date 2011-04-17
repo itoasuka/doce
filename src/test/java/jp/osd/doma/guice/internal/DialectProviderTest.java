@@ -1,7 +1,7 @@
 package jp.osd.doma.guice.internal;
 
 import static junit.framework.Assert.assertTrue;
-import jp.osd.doma.guice.internal.DialectProvider;
+import jp.osd.doma.guice.internal.DefaultDialectProvider;
 
 import org.junit.Test;
 import org.seasar.doma.jdbc.dialect.Db2Dialect;
@@ -29,7 +29,7 @@ public class DialectProviderTest {
 
 		@Override
 		protected void configure() {
-			bind(Dialect.class).toProvider(DialectProvider.class);
+			bind(Dialect.class).toProvider(DefaultDialectProvider.class);
 			bindConstant().annotatedWith(Names.named("JDBC.url")).to(url);
 		}
 	}

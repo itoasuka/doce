@@ -8,9 +8,9 @@ import com.google.inject.Inject;
 
 /**
  * Doma Dao に Guice によるインジェクションによって設定ファイルをインジェクトするためのアノテーションです。
- * 
+ *
  * @author asuka
- * 
+ *
  */
 @AnnotateWith(annotations = { @Annotation(target = AnnotationTarget.CONSTRUCTOR, type = Inject.class) })
 public @interface InjectConfig {

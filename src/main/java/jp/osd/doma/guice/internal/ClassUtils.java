@@ -8,7 +8,7 @@ package jp.osd.doma.guice.internal;
 public class ClassUtils {
 	/**
 	 * 実装クラス名を取得します。
-	 * 
+	 *
 	 * @param interfaceClass 実装クラスに対するインタフェースの型
 	 * @param packageName 実装クラスのパッケージ名。長さ 0 の場合は <code>interfaceClass</code> のパッケージ名を使用する。
 	 * @param subpackageName 実装クラスのサブパッケージ名
@@ -32,6 +32,21 @@ public class ClassUtils {
 		sb.append(suffix);
 
 		return sb.toString();
+	}
+
+	/**
+	 * 指定したクラスがクラスパス上にあり、ロード可能かを取得します。
+	 *
+	 * @param className クラス名
+	 * @return ロード可能なとき <code>true</code>
+	 */
+	public static boolean isLoadable(String className) {
+		try {
+			Class.forName(className);
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
+		return true;
 	}
 
 	private ClassUtils() {

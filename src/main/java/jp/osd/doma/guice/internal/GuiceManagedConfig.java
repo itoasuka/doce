@@ -77,9 +77,10 @@ public class GuiceManagedConfig implements Config {
 	 *            REQUIRES_NEW の属性をもつトランザクションを制御するコントローラ
 	 */
 	@Inject
-	public GuiceManagedConfig(@DomaDataSource DataSource dataSource,
-			Dialect dialect, SqlFileRepository sqlFileRepository,
-			JdbcLogger jdbcLogger, RequiresNewController requiresNewController) {
+	public GuiceManagedConfig(@Doma DataSource dataSource,
+			@Doma Dialect dialect, @Doma SqlFileRepository sqlFileRepository,
+			@Doma JdbcLogger jdbcLogger,
+			@Doma RequiresNewController requiresNewController) {
 		this.dataSource = dataSource;
 		this.dialect = dialect;
 		this.sqlFileRepository = sqlFileRepository;

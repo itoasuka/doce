@@ -1,3 +1,6 @@
+/*
+ * 作成日 : 2011/04/17
+ */
 package jp.osd.doma.guice.internal;
 
 import javax.inject.Named;
@@ -6,41 +9,35 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 /**
- * <A HREF="http://commons.apache.org/dbcp/" TARGET="_blank">Common DBCP</A> の {@link BasicDataSource} を用いたデータソースを提供するプロバイダです。
- * 
  * @author asuka
  */
-public class BasicDataSourceProvider implements Provider<DataSource> {
+public class BasicDataSourceFactoryImpl implements BasicDataSourceFactory {
 	private final BasicDataSource dataSource = new BasicDataSource();
 
 	/**
 	 * 新たにオブジェクトを構築します。
-	 * 
+	 *
 	 * @param url
 	 *            接続先のデータベースの URL
 	 * @param username
 	 *            データベースへログインするためのユーザ名
 	 * @param password
 	 *            データベースへログインするためのパスワード
-	 * @param settingHelper
-	 *            設定ヘルパ
 	 * @see BasicDataSource#setUrl(String)
 	 * @see BasicDataSource#setUsername(String)
 	 * @see BasicDataSource#setPassword(String)
 	 * @see BasicDataSource#setDriverClassName(String)
 	 */
 	@Inject
-	public BasicDataSourceProvider(@Named("JDBC.url") final String url,
+	public BasicDataSourceFactoryImpl(@Named("JDBC.url") final String url,
 			@Named("JDBC.username") final String username,
-			@Named("JDBC.password") final String password,
-			SettingHelper settingHelper) {
+			@Named("JDBC.password") final String password) {
 		dataSource.setUrl(url);
 		dataSource.setUsername(username);
 		dataSource.setPassword(password);
-		dataSource.setDriverClassName(settingHelper.getDriverClassName());
+		dataSource.setDriverClassName(JdbcUtils.getDriverClassName(url));
 
 		// 自動コミットはさせない
 		dataSource.setDefaultAutoCommit(false);
@@ -50,14 +47,15 @@ public class BasicDataSourceProvider implements Provider<DataSource> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public DataSource get() {
+	public DataSource create() {
 		return dataSource;
 	}
 
 	/**
 	 * {@link BasicDataSource} の initialSize プロパティを設定します。
-	 * 
-	 * @param initialSize initialSize プロパティの値
+	 *
+	 * @param initialSize
+	 *            initialSize プロパティの値
 	 * @see BasicDataSource#setInitialSize(int)
 	 */
 	@Inject(optional = true)
@@ -67,8 +65,9 @@ public class BasicDataSourceProvider implements Provider<DataSource> {
 
 	/**
 	 * {@link BasicDataSource} の maxActive プロパティを設定します。
-	 * 
-	 * @param maxActive maxActive プロパティの値
+	 *
+	 * @param maxActive
+	 *            maxActive プロパティの値
 	 * @see BasicDataSource#setMaxActive(int)
 	 */
 	@Inject(optional = true)
@@ -78,8 +77,9 @@ public class BasicDataSourceProvider implements Provider<DataSource> {
 
 	/**
 	 * {@link BasicDataSource} の maxIdle プロパティを設定します。
-	 * 
-	 * @param maxIdle maxIdle プロパティの値
+	 *
+	 * @param maxIdle
+	 *            maxIdle プロパティの値
 	 * @see BasicDataSource#setMaxIdle(int)
 	 */
 	@Inject(optional = true)
@@ -89,8 +89,9 @@ public class BasicDataSourceProvider implements Provider<DataSource> {
 
 	/**
 	 * {@link BasicDataSource} の maxOpenPreparedStatements プロパティを設定します。
-	 * 
-	 * @param maxOpenPreparedStatements maxOpenPreparedStatements プロパティの値
+	 *
+	 * @param maxOpenPreparedStatements
+	 *            maxOpenPreparedStatements プロパティの値
 	 * @see BasicDataSource#setMaxOpenPreparedStatements(int)
 	 */
 	@Inject(optional = true)
@@ -101,8 +102,9 @@ public class BasicDataSourceProvider implements Provider<DataSource> {
 
 	/**
 	 * {@link BasicDataSource} の maxWait プロパティを設定します。
-	 * 
-	 * @param maxWait maxWait プロパティの値
+	 *
+	 * @param maxWait
+	 *            maxWait プロパティの値
 	 * @see BasicDataSource#setMaxWait(long)
 	 */
 	@Inject(optional = true)
@@ -112,8 +114,9 @@ public class BasicDataSourceProvider implements Provider<DataSource> {
 
 	/**
 	 * {@link BasicDataSource} の minEvictableIdleTimeMillis プロパティを設定します。
-	 * 
-	 * @param minEvictableIdleTimeMillis minEvictableIdleTimeMillis プロパティの値
+	 *
+	 * @param minEvictableIdleTimeMillis
+	 *            minEvictableIdleTimeMillis プロパティの値
 	 * @see BasicDataSource#setMinEvictableIdleTimeMillis(long)
 	 */
 	@Inject(optional = true)
@@ -121,26 +124,30 @@ public class BasicDataSourceProvider implements Provider<DataSource> {
 			@Named("DBCP.minEvictableIdleTimeMillis") long minEvictableIdleTimeMillis) {
 		dataSource.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
 	}
-	
+
 	/**
 	 * {@link BasicDataSource} の minIdle プロパティを設定します。
-	 * 
-	 * @param minIdle minIdle プロパティの値
+	 *
+	 * @param minIdle
+	 *            minIdle プロパティの値
 	 * @see BasicDataSource#setMinIdle(int)
 	 */
 	@Inject(optional = true)
 	public void setMinIdle(@Named("DBCP.minIdle") int minIdle) {
 		dataSource.setMinIdle(minIdle);
 	}
-	
+
 	/**
 	 * {@link BasicDataSource} の poolPreparedStatements プロパティを設定します。
-	 * 
-	 * @param poolPreparedStatements poolPreparedStatements プロパティの値
+	 *
+	 * @param poolPreparedStatements
+	 *            poolPreparedStatements プロパティの値
 	 * @see BasicDataSource#setPoolPreparedStatements(boolean)
 	 */
 	@Inject(optional = true)
-	public void setPoolPreparedStatements(@Named("DBCP.poolPreparedStatements") boolean poolPreparedStatements) {
+	public void setPoolPreparedStatements(
+			@Named("DBCP.poolPreparedStatements") boolean poolPreparedStatements) {
 		dataSource.setPoolPreparedStatements(poolPreparedStatements);
 	}
+
 }

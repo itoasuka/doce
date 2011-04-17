@@ -7,7 +7,6 @@ import static junit.framework.Assert.fail;
 import java.util.Properties;
 
 import jp.osd.doma.guice.DomaModule;
-import jp.osd.doma.guice.SimpleDataSourceModule;
 
 import org.junit.Test;
 import org.seasar.doma.jdbc.dialect.H2Dialect;
@@ -37,9 +36,7 @@ public class TransactionInterceptorTest {
 			public void configure(Binder binder) {
 				Names.bindProperties(binder, domaProperties);
 			}
-		}, new SimpleDataSourceModule(),
-				new DomaModule.Builder().addDaoTypes(HogeDao.class)
-						.useTransactionInterceptor().create());
+		}, new DomaModule.Builder().addDaoTypes(HogeDao.class).create());
 	}
 
 	@Test

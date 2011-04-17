@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * @author asuka
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ ElementType.TYPE, ElementType.METHOD })
 public @interface Transactional {
 
 }

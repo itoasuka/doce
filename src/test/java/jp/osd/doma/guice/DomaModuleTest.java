@@ -1,7 +1,5 @@
 package jp.osd.doma.guice;
 
-import static jp.osd.doma.guice.BindingRule.to;
-import static jp.osd.doma.guice.BindingRule.toProvider;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
@@ -10,12 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import jp.osd.doma.guice.internal.DialectProvider;
-
 import org.junit.Test;
-import org.seasar.doma.jdbc.GreedyCacheSqlFileRepository;
-import org.seasar.doma.jdbc.NullRequiresNewController;
-import org.seasar.doma.jdbc.UtilLoggingJdbcLogger;
 
 import test.dao.FugaDao;
 import test.dao.HogeDao;
@@ -52,19 +45,13 @@ public class DomaModuleTest {
 				Names.bindProperties(binder, domaProperties);
 			}
 		};
-		Module m2 = new SimpleDataSourceModule();
-		Module m3 = new DomaModule.Builder()
-				.setJdbcLoggerBindingRule(to(UtilLoggingJdbcLogger.class))
-				.setRequiresNewControllerBindingRule(
-						to(NullRequiresNewController.class))
-				.setSqlFileRepositoryBindingRule(
-						to(GreedyCacheSqlFileRepository.class))
-				.setDialectBindingRule(toProvider(DialectProvider.class))
-				.setDaoPackage("").setDaoSubpackage("").setDaoSuffix("Impl")
+		Module m3 = new DomaModule.Builder().setDaoPackage("")
+				.setDaoSubpackage("").setDaoSuffix("Impl")
 				.addDaoTypes(HogeDao.class).addDaoTypes(list)
-				.useTransactionInterceptor().create();
+				.setTransactionInterceptorEnabled(true)
+				.setLocalTransactionEnabled(true).create();
 
-		Injector injector = Guice.createInjector(m1, m2, m3);
+		Injector injector = Guice.createInjector(m1, m3);
 
 		injector.getInstance(TestService.class);
 	}

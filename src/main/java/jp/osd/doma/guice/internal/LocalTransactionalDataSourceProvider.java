@@ -20,7 +20,7 @@ public class LocalTransactionalDataSourceProvider implements
 	 * @param dataSource ラップ対象のデータソース
 	 */
 	@Inject
-	public LocalTransactionalDataSourceProvider(@Plain DataSource dataSource) {
+	public LocalTransactionalDataSourceProvider(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
