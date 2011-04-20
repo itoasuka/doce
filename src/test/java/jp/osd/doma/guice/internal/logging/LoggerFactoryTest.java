@@ -23,8 +23,7 @@ public class LoggerFactoryTest {
 
 	@Test
 	public void testGetLogger_2() throws Exception {
-		LoggerFactory.setJulUsing(true);
-		Logger logger = LoggerFactory.getLogger(LoggerFactoryTest.class);
+		Logger logger = LoggerFactory.getLogger(LoggerFactoryTest.class, false);
 		assertTrue(logger instanceof JulLogger);
 	}
 }
