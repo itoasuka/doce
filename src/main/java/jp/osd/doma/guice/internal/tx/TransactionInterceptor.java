@@ -1,4 +1,4 @@
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.tx;
 
 import jp.osd.doma.guice.Doma;
 import jp.osd.doma.guice.Transaction;

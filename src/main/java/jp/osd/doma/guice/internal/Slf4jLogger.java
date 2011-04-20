@@ -3,6 +3,8 @@ package jp.osd.doma.guice.internal;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
+import jp.osd.doma.guice.internal.logging.Logger;
+
 import org.slf4j.LoggerFactory;
 
 /**

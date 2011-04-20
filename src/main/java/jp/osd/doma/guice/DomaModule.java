@@ -11,7 +11,6 @@ import javax.sql.DataSource;
 
 import jp.osd.doma.guice.internal.ClassUtils;
 import jp.osd.doma.guice.internal.GuiceManagedConfig;
-import jp.osd.doma.guice.internal.TransactionInterceptor;
 import jp.osd.doma.guice.internal.provider.AutoDataSourceProvider;
 import jp.osd.doma.guice.internal.provider.AutoJdbcLoggerProvider;
 import jp.osd.doma.guice.internal.provider.AutoTransactionProvider;
@@ -19,6 +18,7 @@ import jp.osd.doma.guice.internal.provider.DefaultContextProvider;
 import jp.osd.doma.guice.internal.provider.DefaultDialectProvider;
 import jp.osd.doma.guice.internal.provider.DefaultRequiresNewControllerProvider;
 import jp.osd.doma.guice.internal.provider.DefaultSqlFileRepositoryProvider;
+import jp.osd.doma.guice.internal.tx.TransactionInterceptor;
 
 import org.seasar.doma.jdbc.Config;
 import org.seasar.doma.jdbc.JdbcLogger;

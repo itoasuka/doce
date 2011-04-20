@@ -1,4 +1,4 @@
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.logging;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -6,6 +6,8 @@ import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
 import java.sql.SQLException;
+
+import jp.osd.doma.guice.internal.logging.Slf4jJdbcLogger;
 
 import org.junit.Before;
 import org.junit.Test;

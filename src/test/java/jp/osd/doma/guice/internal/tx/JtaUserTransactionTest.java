@@ -1,4 +1,4 @@
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.tx;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -14,6 +14,7 @@ import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 
 import jp.osd.doma.guice.DomaGuiceException;
+import jp.osd.doma.guice.internal.tx.JtaUserTransaction;
 
 import org.junit.After;
 import org.junit.Before;

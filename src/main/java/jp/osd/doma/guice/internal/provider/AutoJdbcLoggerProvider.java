@@ -4,7 +4,7 @@
 package jp.osd.doma.guice.internal.provider;
 
 import jp.osd.doma.guice.internal.SettingHelper;
-import jp.osd.doma.guice.internal.Slf4jJdbcLogger;
+import jp.osd.doma.guice.internal.logging.Slf4jJdbcLogger;
 
 import org.seasar.doma.jdbc.JdbcLogger;
 import org.seasar.doma.jdbc.UtilLoggingJdbcLogger;

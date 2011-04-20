@@ -1,4 +1,4 @@
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.tx;
 
 import javax.inject.Inject;
 import javax.transaction.Status;

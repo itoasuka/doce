@@ -1,11 +1,13 @@
 /*
  * 作成日 : 2011/04/19
  */
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.logging;
 
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
+
+import jp.osd.doma.guice.internal.MessageCodes;
 
 /**
  * ログメッセージにリソースバンドルを用いる Java SE API ロガーラッパーロガーです。

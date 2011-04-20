@@ -1,7 +1,10 @@
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.logging;
 
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+
+import jp.osd.doma.guice.internal.MessageCodes;
+import jp.osd.doma.guice.internal.Slf4jLogger;
 
 import org.seasar.doma.jdbc.JdbcLogger;
 import org.seasar.doma.jdbc.Sql;

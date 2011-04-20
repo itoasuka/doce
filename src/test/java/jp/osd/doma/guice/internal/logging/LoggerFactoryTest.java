@@ -1,9 +1,13 @@
 /*
  * 作成日 : 2011/04/19
  */
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.logging;
 
 import static org.junit.Assert.assertTrue;
+import jp.osd.doma.guice.internal.Slf4jLogger;
+import jp.osd.doma.guice.internal.logging.JulLogger;
+import jp.osd.doma.guice.internal.logging.Logger;
+import jp.osd.doma.guice.internal.logging.LoggerFactory;
 
 import org.junit.Test;
 

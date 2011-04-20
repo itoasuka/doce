@@ -1,4 +1,4 @@
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.tx;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;

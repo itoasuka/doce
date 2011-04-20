@@ -1,9 +1,12 @@
 /*
  * 作成日 : 2011/04/19
  */
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.logging;
 
 import java.util.ResourceBundle;
+
+import jp.osd.doma.guice.internal.SettingHelperImpl;
+import jp.osd.doma.guice.internal.Slf4jLogger;
 
 /**
  * 環境に応じて {@link Logger} 実装を提供するファクトリクラスです。
