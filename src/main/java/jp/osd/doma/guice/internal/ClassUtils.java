@@ -34,21 +34,6 @@ public class ClassUtils {
 		return sb.toString();
 	}
 
-	/**
-	 * 指定したクラスがクラスパス上にあり、ロード可能かを取得します。
-	 *
-	 * @param className クラス名
-	 * @return ロード可能なとき <code>true</code>
-	 */
-	public static boolean isLoadable(String className) {
-		try {
-			Class.forName(className);
-		} catch (ClassNotFoundException e) {
-			return false;
-		}
-		return true;
-	}
-
 	private ClassUtils() {
 		// 何もしない
 	}

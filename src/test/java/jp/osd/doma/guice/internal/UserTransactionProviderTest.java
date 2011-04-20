@@ -25,8 +25,8 @@ public class UserTransactionProviderTest {
 			protected void configure() {
 				try {
 					bind(UserTransaction.class).toProvider(
-							new UserTransactionProvider(new InitialContext(),
-									"tx")).in(Scopes.SINGLETON);
+							new UserTransactionProvider(new InitialContext()))
+							.in(Scopes.SINGLETON);
 				} catch (NamingException e) {
 					throw new RuntimeException(e);
 				}
@@ -36,7 +36,8 @@ public class UserTransactionProviderTest {
 			Guice.createInjector(m).getInstance(UserTransaction.class);
 			fail();
 		} catch (ProvisionException e) {
-			assertEquals("Lookup error : tx", e.getCause().getMessage());
+			assertEquals("Lookup error : java:comp/UserTransaction", e
+					.getCause().getMessage());
 		}
 	}
 

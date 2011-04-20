@@ -10,18 +10,15 @@ import javax.naming.Context;
 import javax.sql.DataSource;
 
 import jp.osd.doma.guice.internal.AutoDataSourceProvider;
+import jp.osd.doma.guice.internal.AutoJdbcLoggerProvider;
+import jp.osd.doma.guice.internal.AutoTransactionProvider;
 import jp.osd.doma.guice.internal.ClassUtils;
 import jp.osd.doma.guice.internal.DefaultContextProvider;
-import jp.osd.doma.guice.internal.DefaultDataSourceProvider;
 import jp.osd.doma.guice.internal.DefaultDialectProvider;
 import jp.osd.doma.guice.internal.DefaultJdbcLoggerProvider;
 import jp.osd.doma.guice.internal.DefaultRequiresNewControllerProvider;
 import jp.osd.doma.guice.internal.DefaultSqlFileRepositoryProvider;
-import jp.osd.doma.guice.internal.Doma;
 import jp.osd.doma.guice.internal.GuiceManagedConfig;
-import jp.osd.doma.guice.internal.JtaUserTransaction;
-import jp.osd.doma.guice.internal.LocalTransaction;
-import jp.osd.doma.guice.internal.LocalTransactionalDataSourceProvider;
 import jp.osd.doma.guice.internal.TransactionInterceptor;
 
 import org.seasar.doma.jdbc.Config;
@@ -42,12 +39,12 @@ import com.google.inject.matcher.Matchers;
  * @author asuka
  */
 public class DomaModule extends AbstractModule {
+	private final DataSourceBinding dataSourceBinding;
+	private final TransactionBinding transactionBinding;
 	private final List<Class<?>> daoTypes;
 	private final String daoPackage;
 	private final String daoSubpackage;
 	private final String daoSuffix;
-	private final boolean transactionInterceptorEnabled;
-	private final boolean localTransactionEnabled;
 
 	/**
 	 * {@inheritDoc}
@@ -57,22 +54,22 @@ public class DomaModule extends AbstractModule {
 		requestInjection(this);
 
 		// ネーミングコンテキストの設定
-		bind(Context.class).toProvider(DefaultContextProvider.class).in(
-				SINGLETON);
+		bind(Context.class).annotatedWith(Doma.class)
+				.toProvider(DefaultContextProvider.class).in(SINGLETON);
+
+		// データソースのバインド方法を設定
+		bindConstant().annotatedWith(Doma.class).to(dataSourceBinding);
+		// トランザクションのバインド方法を設定
+		bindConstant().annotatedWith(Doma.class).to(transactionBinding);
 
 		// データソースプロバイダの設定
-		// プリミティブ
-		bind(DataSource.class).toProvider(AutoDataSourceProvider.class).in(
-				SINGLETON);
-
-		// （ラッパ）
-		if (localTransactionEnabled) {
+		switch (dataSourceBinding) {
+		case NONE:
+			break;
+		default:
 			bind(DataSource.class).annotatedWith(Doma.class)
-					.toProvider(LocalTransactionalDataSourceProvider.class)
-					.in(SINGLETON);
-		} else {
-			bind(DataSource.class).annotatedWith(Doma.class).toProvider(
-					DefaultDataSourceProvider.class);
+					.toProvider(AutoDataSourceProvider.class).in(SINGLETON);
+			break;
 		}
 
 		// SQL ファイルリポジトリの設定
@@ -81,7 +78,7 @@ public class DomaModule extends AbstractModule {
 				.in(Scopes.SINGLETON);
 		// JDBC ロガーの設定
 		bind(JdbcLogger.class).annotatedWith(Doma.class)
-				.toProvider(DefaultJdbcLoggerProvider.class)
+				.toProvider(AutoJdbcLoggerProvider.class)
 				.in(Scopes.SINGLETON);
 		// Requires new controller の設定
 		bind(RequiresNewController.class).annotatedWith(Doma.class)
@@ -96,16 +93,18 @@ public class DomaModule extends AbstractModule {
 		bind(Config.class).to(GuiceManagedConfig.class).in(Scopes.SINGLETON);
 
 		// トランザクションの設定
-		if (localTransactionEnabled) {
-			bind(Transaction.class).to(LocalTransaction.class).in(
-					Scopes.SINGLETON);
-		} else {
-			bind(Transaction.class).to(JtaUserTransaction.class).in(
-					Scopes.SINGLETON);
+		switch (transactionBinding) {
+		case NONE:
+			break;
+		default:
+			bind(Transaction.class).annotatedWith(Doma.class)
+					.toProvider(AutoTransactionProvider.class)
+					.in(Scopes.SINGLETON);
+			break;
 		}
 
 		// トランザクションインタセプタの設定
-		if (transactionInterceptorEnabled) {
+		if (transactionBinding != TransactionBinding.NONE) {
 			TransactionInterceptor lti = new TransactionInterceptor();
 			requestInjection(lti);
 			bindInterceptor(Matchers.any(),
@@ -120,16 +119,15 @@ public class DomaModule extends AbstractModule {
 		}
 	}
 
-	private DomaModule(List<Class<?>> daoTypes, String daoPackage,
-			String daoSubpackage, String daoSuffix,
-			boolean transactionInterceptorEnabled,
-			boolean localTransactionEnabled) {
+	private DomaModule(DataSourceBinding dataSourceBinding,
+			TransactionBinding transactionBinding, List<Class<?>> daoTypes,
+			String daoPackage, String daoSubpackage, String daoSuffix) {
+		this.dataSourceBinding = dataSourceBinding;
+		this.transactionBinding = transactionBinding;
 		this.daoTypes = daoTypes;
 		this.daoPackage = daoPackage;
 		this.daoSubpackage = daoSubpackage;
 		this.daoSuffix = daoSuffix;
-		this.transactionInterceptorEnabled = transactionInterceptorEnabled;
-		this.localTransactionEnabled = localTransactionEnabled;
 	}
 
 	private <T> void bindDao(Class<T> daoType) {
@@ -152,17 +150,40 @@ public class DomaModule extends AbstractModule {
 	 * @author asuka
 	 */
 	public static final class Builder {
+		private DataSourceBinding dataSourceBinding = DataSourceBinding.AUTO;
+		private TransactionBinding transactionBinding = TransactionBinding.AUTO;
 		private final List<Class<?>> daoTypes = new ArrayList<Class<?>>();
 		private String daoPackage = "";
 		private String daoSubpackage = "";
 		private String daoSuffix = "Impl";
-		private boolean transactionInterceptorEnabled = true;
-		private boolean localTransactionEnabled = true;
 
 		/**
 		 * 新たにオブジェクトを構築します。
 		 */
 		public Builder() {
+		}
+
+		/**
+		 * データソースのバインディング方法を設定します。
+		 *
+		 * @param dataSourceBinding データソースのバインディング方法
+		 * @return このメソッドのレシーバオブジェクト
+		 */
+		public Builder setDataSourceBinding(DataSourceBinding dataSourceBinding) {
+			this.dataSourceBinding = dataSourceBinding;
+			return this;
+		}
+
+		/**
+		 * トランザクションのバインディング方法を設定します。
+		 *
+		 * @param transactionBinding トランザクションのバインディング方法
+		 * @return このメソッドのレシーバオブジェクト
+		 */
+		public Builder setTransactionBinding(
+				TransactionBinding transactionBinding) {
+			this.transactionBinding = transactionBinding;
+			return this;
 		}
 
 		/**
@@ -241,39 +262,13 @@ public class DomaModule extends AbstractModule {
 		}
 
 		/**
-		 * アノテーション {@link Transactional} による宣言的トランザクションの利用を有効にするかを設定します。
-		 *
-		 * @param transactionInterceptorEnabled
-		 *            有効にする時 <code>true</code>
-		 * @return このメソッドのレシーバオブジェクト
-		 */
-		public Builder setTransactionInterceptorEnabled(
-				boolean transactionInterceptorEnabled) {
-			this.transactionInterceptorEnabled = transactionInterceptorEnabled;
-			return this;
-		}
-
-		/**
-		 * ローカルトランザクションを有効にするかを設定します。
-		 *
-		 * @param localTransactionEnabled ローカルトランザクションを有効にする時 <code>true</code>
-		 * @return このメソッドのレシーバオブジェクト
-		 */
-		public Builder setLocalTransactionEnabled(
-				boolean localTransactionEnabled) {
-			this.localTransactionEnabled = localTransactionEnabled;
-			return this;
-		}
-
-		/**
 		 * 設定に基づいて {@link DomaModule} オブジェクトを作成します。
 		 *
 		 * @return {@link DomaModule} オブジェクト
 		 */
 		public DomaModule create() {
-			return new DomaModule(daoTypes, daoPackage, daoSubpackage,
-					daoSuffix, transactionInterceptorEnabled,
-					localTransactionEnabled);
+			return new DomaModule(dataSourceBinding, transactionBinding,
+					daoTypes, daoPackage, daoSubpackage, daoSuffix);
 		}
 	}
 }

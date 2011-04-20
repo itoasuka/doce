@@ -3,82 +3,163 @@
  */
 package jp.osd.doma.guice.internal;
 
-import javax.inject.Provider;
 import javax.naming.Context;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
+
+import jp.osd.doma.guice.DataSourceBinding;
+import jp.osd.doma.guice.Doma;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
+import com.google.inject.Provider;
+import com.google.inject.name.Named;
 
 /**
- * 名前の付けずにバインドしたデータソースを名前付きデータソースとして提供するための Guice プロバイダです。
+ * {@link DataSource} の実装クラスオブジェクトを提供する Guice プロバイダです。
+ * <P>
+ * このプロバイダは、コンストラクタ引数 {@code dataSourceBinding} の値によって提供するオブジェクトが変わります。
+ *
+ * <h4>{@link DataSourceBinding#AUTO} の場合</h4>
+ *
+ * 提供される実装クラスオブジェクトは以下のように決定されます。
+ * <OL>
+ * <LI>{@link #setDataSource(DataSource)} で設定されたデータソースがあればそれを提供します。
+ * <LI>{@link #setJndiDataSourceName(String)} で設定された値があれば {@link JndiDataSourceProvider}
+ * を用いてデータソースを取得して提供します。
+ * <LI>{@code org.apache.commons.dbcp.BasicDataSource} クラスがクラスパス上に存在するとき、
+ * {@link BasicDataSourceProvider} を用いてデータソースを取得して提供します。
+ * <LI>上記のいずれにも当てはまらない場合、{@link SimpleDataSourceProvider} を用いてデータソースを取得して提供します。
+ * </OL>
+ *
+ * <H4>{@link DataSourceBinding#BASIC_DATA_SOURCE} の場合</H4>
+ *
+ * {@link BasicDataSourceProvider} を用いてデータソースを取得して提供します。
+ * {@code org.apache.commons.dbcp.BasicDataSource} クラスがクラスパス上に存在しない場合は
+ * {@link ClassNotFoundException} がスローされます。
+ *
+ * <H4>{@link DataSourceBinding#SIMPLE_DATA_SOURCE} の場合</H4>
+ *
+ * {@link SimpleDataSourceProvider} を用いてデータソースを取得して提供します。
+ *
+ * <H4>{@link DataSourceBinding#JNDI} の場合</H4>
+ *
+ * {@link JndiDataSourceProvider} を用いてデータソースを取得して提供します。
+ *
+ * <H4>上記以外の場合</H4>
+ *
+ * {@link #setDataSource(DataSource)} で設定された値を提供します。
  *
  * @author asuka
+ * @see BasicDataSourceProvider
+ * @see SimpleDataSourceProvider
+ * @see JndiDataSourceProvider
  */
 public class AutoDataSourceProvider implements Provider<DataSource> {
-	private DataSource dataSource;
+	private DataSource dataSource = null;
 
-	private Injector injector;
+	private String jndiDataSourceName = null;
+
+	private final DataSourceBinding dataSourceBinding;
+
+	private final Injector injector;
+
+	private final SettingHelper settingHelper;
 
 	/**
 	 * 新たにオブジェクトを構築します。
 	 *
+	 * @param dataSourceBinding
+	 *            データソースのバインド方法
 	 * @param injector
 	 *            インジェクタ
+	 * @param settingHelper
+	 *            設定ヘルパ
 	 */
 	@Inject
-	public AutoDataSourceProvider(Injector injector) {
+	public AutoDataSourceProvider(@Doma DataSourceBinding dataSourceBinding,
+			Injector injector, SettingHelper settingHelper) {
+		this.dataSourceBinding = dataSourceBinding;
 		this.injector = injector;
+		this.settingHelper = settingHelper;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public DataSource get() {
-		if (dataSource == null) {
-			// JNDI からのデータソースの作成を試みる
-			if (!createJndiDataSource()) {
-				// BasicDataSource の作成を試みる
-				if (!createBasicDataSource()) {
-					createSimpleDataSource();
+		switch (dataSourceBinding) {
+		case AUTO:
+			if (dataSource == null) {
+				// JNDI からのデータソースの作成を試みる
+				if (!createJndiDataSource()) {
+					// BasicDataSource の作成を試みる
+					if (!createBasicDataSource()) {
+						dataSource = injector.getInstance(SimpleDataSourceProvider.class).get();
+					}
 				}
 			}
+			break;
+		case JNDI:
+			dataSource = injector.getInstance(BasicDataSourceProvider.class)
+					.get();
+			break;
+		case BASIC_DATA_SOURCE:
+			dataSource = injector.getInstance(BasicDataSourceProvider.class)
+					.get();
+			break;
+		case SIMPLE_DATA_SOURCE:
+			dataSource = injector.getInstance(SimpleDataSourceProvider.class)
+					.get();
+			break;
+		default:
+			break;
 		}
 		return dataSource;
 	}
 
 	private boolean createJndiDataSource() {
-		Key<String> key = Key.get(String.class, Names.named("JNDI.dataSource"));
-		if (injector.getAllBindings().containsKey(key)) {
-			String jndiDataSource = injector.getInstance(key);
-			Context context = injector.getInstance(Context.class);
-
-			try {
-				dataSource = (DataSource) context.lookup(jndiDataSource);
-			} catch (NamingException e) {
-				throw new RuntimeException(e);
-			}
-
+		if (jndiDataSourceName != null) {
+			dataSource = injector.getInstance(JndiDataSourceProvider.class)
+					.get();
 			return true;
 		}
 		return false;
 	}
 
 	private boolean createBasicDataSource() {
-		if (ClassUtils.isLoadable("org.apache.commons.dbcp.BasicDataSource")) {
-			BasicDataSourceFactory factory = injector
-					.getInstance(BasicDataSourceFactory.class);
-			dataSource = factory.create();
+		if (settingHelper
+				.isClassLoadable("org.apache.commons.dbcp.BasicDataSource")) {
+			dataSource = injector.getInstance(BasicDataSourceProvider.class)
+					.get();
 			return true;
 		}
 		return false;
 	}
 
-	private boolean createSimpleDataSource() {
-		SimpleDataSourceFactory factory = injector
-				.getInstance(SimpleDataSourceFactory.class);
-		dataSource = factory.create();
-		return true;
+	/**
+	 * {@link #get()} で返すデータソースを設定します。このメソッドで設定した値は、すべに優先して {@link #get()}
+	 * の戻り値として採用されます。
+	 *
+	 * @param dataSource
+	 *            データソース
+	 */
+	@Inject(optional = true)
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	/**
+	 * {@link #setDataSource(DataSource)} で値を設定しない場合、JNDI
+	 * を用いてデータソースをルックアップする際に使用するオブジェクトの名前を設定します。
+	 *
+	 * @param jndiDataSourceName
+	 *            検索すデータソースの名前
+	 * @see Context#lookup(String)
+	 */
+	@Inject(optional = true)
+	public void setJndiDataSourceName(
+			@Named("JNDI.dataSource") String jndiDataSourceName) {
+		this.jndiDataSourceName = jndiDataSourceName;
 	}
 }

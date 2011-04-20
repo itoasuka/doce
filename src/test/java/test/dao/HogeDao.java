@@ -14,13 +14,13 @@ import test.entity.Hoge;
 public interface HogeDao {
 	@Script
 	void createTable();
-	
+
 	@Insert
 	int insert(Hoge hoge);
-	
+
 	@Select
 	Hoge findById(int id);
-	
+
 	@Script
 	void dropTable();
 }

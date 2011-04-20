@@ -1,7 +1,7 @@
 /*
  * 作成日 : 2011/04/17
  */
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -11,7 +11,9 @@ import java.lang.annotation.Target;
 import com.google.inject.BindingAnnotation;
 
 /**
- * Doma 用の {@link Config} にインジェクションすることを示す注釈です。
+ * {@link jp.osd.doma.guice.internal.GuiceManagedConfig} にインジェクションすることを示す注釈です。
+ * <P>
+ * {@link DomaModule} で設定したインジェクタで DAO にインジェクションされる列挙体を除く定数以外のオブジェクトはこのアノテーションを付加してバインド定義されています。
  * @author asuka
  */
 @Retention(RetentionPolicy.RUNTIME)

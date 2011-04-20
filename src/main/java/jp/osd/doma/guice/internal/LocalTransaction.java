@@ -3,6 +3,7 @@ package jp.osd.doma.guice.internal;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 
+import jp.osd.doma.guice.Doma;
 import jp.osd.doma.guice.Transaction;
 
 import org.seasar.doma.jdbc.JdbcLogger;

@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
 import org.junit.Test;
 
 import test.dao.FugaDao;
@@ -43,13 +46,14 @@ public class DomaModuleTest {
 			@Override
 			public void configure(Binder binder) {
 				Names.bindProperties(binder, domaProperties);
+				binder.bind(Context.class).to(InitialContext.class);
 			}
 		};
 		Module m3 = new DomaModule.Builder().setDaoPackage("")
 				.setDaoSubpackage("").setDaoSuffix("Impl")
 				.addDaoTypes(HogeDao.class).addDaoTypes(list)
-				.setTransactionInterceptorEnabled(true)
-				.setLocalTransactionEnabled(true).create();
+				.setTransactionBinding(TransactionBinding.LOCAL_TRANSACTION)
+				.create();
 
 		Injector injector = Guice.createInjector(m1, m3);
 

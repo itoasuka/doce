@@ -10,9 +10,10 @@ import com.google.inject.ImplementedBy;
 @ImplementedBy(SettingHelperImpl.class)
 public interface SettingHelper {
 	/**
-	 * データベースへ接続するのに必要なドライバ名を取得します。
-	 * 
-	 * @return ドライバ名
+	 * 指定したクラスがクラスパス上にあり、ロード可能かを取得します。
+	 *
+	 * @param className クラス名
+	 * @return ロード可能なとき <code>true</code>
 	 */
-	String getDriverClassName();
+	boolean isClassLoadable(String className);
 }

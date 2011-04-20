@@ -1,5 +1,5 @@
 /*
- * 作成日 : 2011/04/17
+ * 作成日 : 2011/04/18
  */
 package jp.osd.doma.guice.internal;
 
@@ -7,13 +7,15 @@ import javax.inject.Named;
 import javax.sql.DataSource;
 
 import org.seasar.doma.jdbc.SimpleDataSource;
+import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author asuka
  */
-public class SimpleDataSourceFactoryImpl implements SimpleDataSourceFactory {
+public class SimpleDataSourceProvider implements Provider<DataSource> {
 	private final SimpleDataSource dataSource = new SimpleDataSource();
 
 	/**
@@ -27,7 +29,7 @@ public class SimpleDataSourceFactoryImpl implements SimpleDataSourceFactory {
 	 * @see SimpleDataSource#setPassword(String)
 	 */
 	@Inject
-	public SimpleDataSourceFactoryImpl(@Named("JDBC.url") final String url,
+	public SimpleDataSourceProvider(@Named("JDBC.url") final String url,
 			@Named("JDBC.username") final String username,
 			@Named("JDBC.password") final String password) {
 		dataSource.setUrl(url);
@@ -39,8 +41,8 @@ public class SimpleDataSourceFactoryImpl implements SimpleDataSourceFactory {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public DataSource create() {
-		return dataSource;
+	public DataSource get() {
+		return new LocalTransactionalDataSource(dataSource);
 	}
 
 	/**

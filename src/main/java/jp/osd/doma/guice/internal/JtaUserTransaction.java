@@ -4,12 +4,13 @@ import javax.inject.Inject;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
+import jp.osd.doma.guice.Doma;
 import jp.osd.doma.guice.DomaGuiceException;
 import jp.osd.doma.guice.Transaction;
 
 /**
  * JTA の {@link UserTransaction} をラップするトランザクションクラスです。
- * 
+ *
  * @author asuka
  */
 public class JtaUserTransaction implements Transaction {
@@ -17,12 +18,12 @@ public class JtaUserTransaction implements Transaction {
 
 	/**
 	 * 新たにオブジェクトを構築します。
-	 * 
+	 *
 	 * @param tx
 	 *            ラップ対象のユーザトランザクション
 	 */
 	@Inject
-	public JtaUserTransaction(UserTransaction tx) {
+	public JtaUserTransaction(@Doma UserTransaction tx) {
 		this.tx = tx;
 	}
 
@@ -38,7 +39,7 @@ public class JtaUserTransaction implements Transaction {
 		}
 	}
 
-	/** 
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

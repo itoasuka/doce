@@ -3,6 +3,8 @@ package jp.osd.doma.guice.internal;
 import javax.inject.Named;
 import javax.sql.DataSource;
 
+import jp.osd.doma.guice.Doma;
+
 import org.seasar.doma.jdbc.Config;
 import org.seasar.doma.jdbc.JdbcLogger;
 import org.seasar.doma.jdbc.RequiresNewController;

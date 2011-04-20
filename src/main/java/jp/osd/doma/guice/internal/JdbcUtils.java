@@ -61,6 +61,12 @@ public class JdbcUtils {
 		return driver;
 	}
 
+	/**
+	 * URL から適切なダイアレクトを判定して返します。未知の URL であった場合、{@link StandardDialect} オブジェクトを返します。
+	 *
+	 * @param jdbcUrl 判定に用いる JDBC 接続 URL
+	 * @return 判定して生成したダイアレクト
+	 */
 	public static Dialect getDialect(String jdbcUrl) {
 		Dialect dialect;
 		if (jdbcUrl.matches("jdbc:((datadirect:)?db2|as400):.*")) {
@@ -83,5 +89,9 @@ public class JdbcUtils {
 		}
 
 		return dialect;
+	}
+
+	private JdbcUtils() {
+		// 何もしない
 	}
 }

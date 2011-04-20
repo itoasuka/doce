@@ -7,13 +7,15 @@ import javax.inject.Named;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author asuka
  */
-public class BasicDataSourceFactoryImpl implements BasicDataSourceFactory {
+public class BasicDataSourceProvider implements Provider<DataSource> {
 	private final BasicDataSource dataSource = new BasicDataSource();
 
 	/**
@@ -31,7 +33,7 @@ public class BasicDataSourceFactoryImpl implements BasicDataSourceFactory {
 	 * @see BasicDataSource#setDriverClassName(String)
 	 */
 	@Inject
-	public BasicDataSourceFactoryImpl(@Named("JDBC.url") final String url,
+	public BasicDataSourceProvider(@Named("JDBC.url") final String url,
 			@Named("JDBC.username") final String username,
 			@Named("JDBC.password") final String password) {
 		dataSource.setUrl(url);
@@ -47,8 +49,8 @@ public class BasicDataSourceFactoryImpl implements BasicDataSourceFactory {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public DataSource create() {
-		return dataSource;
+	public DataSource get() {
+		return new LocalTransactionalDataSource(dataSource);
 	}
 
 	/**
