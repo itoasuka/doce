@@ -1,7 +1,7 @@
 /*
  * 作成日 : 2011/04/17
  */
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.provider;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;

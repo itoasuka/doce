@@ -1,6 +1,8 @@
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.provider;
 
 import javax.inject.Provider;
+
+import jp.osd.doma.guice.internal.JdbcUtils;
 
 import org.seasar.doma.jdbc.dialect.Dialect;
 import org.seasar.doma.jdbc.dialect.StandardDialect;

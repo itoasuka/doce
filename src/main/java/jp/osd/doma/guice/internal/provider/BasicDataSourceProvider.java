@@ -1,10 +1,12 @@
 /*
  * 作成日 : 2011/04/17
  */
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.provider;
 
 import javax.inject.Named;
 import javax.sql.DataSource;
+
+import jp.osd.doma.guice.internal.JdbcUtils;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;

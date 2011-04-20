@@ -1,7 +1,7 @@
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.provider;
 
 import static junit.framework.Assert.assertTrue;
-import jp.osd.doma.guice.internal.DefaultDialectProvider;
+import jp.osd.doma.guice.internal.provider.DefaultDialectProvider;
 
 import org.junit.Test;
 import org.seasar.doma.jdbc.dialect.Db2Dialect;
@@ -19,7 +19,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
 
-public class DialectProviderTest {
+public class DefaultDialectProviderTest {
 	public static class URLModule extends AbstractModule {
 		private final String url;
 

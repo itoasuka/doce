@@ -1,4 +1,4 @@
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.provider;
 
 import javax.inject.Named;
 import javax.naming.Context;

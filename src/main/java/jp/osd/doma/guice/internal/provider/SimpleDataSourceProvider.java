@@ -1,7 +1,7 @@
 /*
  * 作成日 : 2011/04/18
  */
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.provider;
 
 import javax.inject.Named;
 import javax.sql.DataSource;

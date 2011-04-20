@@ -1,7 +1,10 @@
 /*
  * 作成日 : 2011/04/19
  */
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.provider;
+
+import jp.osd.doma.guice.internal.SettingHelper;
+import jp.osd.doma.guice.internal.Slf4jJdbcLogger;
 
 import org.seasar.doma.jdbc.JdbcLogger;
 import org.seasar.doma.jdbc.UtilLoggingJdbcLogger;

@@ -1,4 +1,4 @@
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.provider;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -6,6 +6,8 @@ import static org.junit.Assert.fail;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.transaction.UserTransaction;
+
+import jp.osd.doma.guice.internal.provider.UserTransactionProvider;
 
 import org.junit.Test;
 

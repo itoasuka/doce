@@ -1,7 +1,7 @@
 /*
  * 作成日 : 2011/04/19
  */
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.provider;
 
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
@@ -9,6 +9,8 @@ import javax.transaction.UserTransaction;
 import jp.osd.doma.guice.Doma;
 import jp.osd.doma.guice.Transaction;
 import jp.osd.doma.guice.TransactionBinding;
+import jp.osd.doma.guice.internal.JtaUserTransaction;
+import jp.osd.doma.guice.internal.LocalTransaction;
 
 import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
 

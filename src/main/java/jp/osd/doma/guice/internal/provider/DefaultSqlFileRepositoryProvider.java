@@ -1,4 +1,4 @@
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.provider;
 
 import org.seasar.doma.jdbc.GreedyCacheSqlFileRepository;
 import org.seasar.doma.jdbc.SqlFileRepository;

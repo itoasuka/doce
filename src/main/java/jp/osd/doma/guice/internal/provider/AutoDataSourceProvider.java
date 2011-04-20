@@ -1,13 +1,14 @@
 /*
  * 作成日 : 2011/04/17
  */
-package jp.osd.doma.guice.internal;
+package jp.osd.doma.guice.internal.provider;
 
 import javax.naming.Context;
 import javax.sql.DataSource;
 
 import jp.osd.doma.guice.DataSourceBinding;
 import jp.osd.doma.guice.Doma;
+import jp.osd.doma.guice.internal.SettingHelper;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;

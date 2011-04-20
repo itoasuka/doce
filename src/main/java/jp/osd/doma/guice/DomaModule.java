@@ -9,17 +9,16 @@ import java.util.List;
 import javax.naming.Context;
 import javax.sql.DataSource;
 
-import jp.osd.doma.guice.internal.AutoDataSourceProvider;
-import jp.osd.doma.guice.internal.AutoJdbcLoggerProvider;
-import jp.osd.doma.guice.internal.AutoTransactionProvider;
 import jp.osd.doma.guice.internal.ClassUtils;
-import jp.osd.doma.guice.internal.DefaultContextProvider;
-import jp.osd.doma.guice.internal.DefaultDialectProvider;
-import jp.osd.doma.guice.internal.DefaultJdbcLoggerProvider;
-import jp.osd.doma.guice.internal.DefaultRequiresNewControllerProvider;
-import jp.osd.doma.guice.internal.DefaultSqlFileRepositoryProvider;
 import jp.osd.doma.guice.internal.GuiceManagedConfig;
 import jp.osd.doma.guice.internal.TransactionInterceptor;
+import jp.osd.doma.guice.internal.provider.AutoDataSourceProvider;
+import jp.osd.doma.guice.internal.provider.AutoJdbcLoggerProvider;
+import jp.osd.doma.guice.internal.provider.AutoTransactionProvider;
+import jp.osd.doma.guice.internal.provider.DefaultContextProvider;
+import jp.osd.doma.guice.internal.provider.DefaultDialectProvider;
+import jp.osd.doma.guice.internal.provider.DefaultRequiresNewControllerProvider;
+import jp.osd.doma.guice.internal.provider.DefaultSqlFileRepositoryProvider;
 
 import org.seasar.doma.jdbc.Config;
 import org.seasar.doma.jdbc.JdbcLogger;
