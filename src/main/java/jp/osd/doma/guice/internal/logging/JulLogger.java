@@ -3,19 +3,16 @@
  */
 package jp.osd.doma.guice.internal.logging;
 
-import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 
-import jp.osd.doma.guice.internal.MessageCodes;
 
 /**
  * ログメッセージにリソースバンドルを用いる Java SE API ロガーラッパーロガーです。
  *
  * @author asuka
  */
-public class JulLogger implements Logger {
-	private final ResourceBundle bundle;
+public class JulLogger extends Logger {
 	private final java.util.logging.Logger logger;
 
 	/**
@@ -28,14 +25,14 @@ public class JulLogger implements Logger {
 	 * @return ロガー
 	 */
 	public static JulLogger getLogger(String className, ResourceBundle bundle) {
-		java.util.logging.Logger l = java.util.logging.Logger.getLogger(className);
-		return new JulLogger(l, bundle);
+		return new JulLogger(className, bundle);
 	}
 
-	private JulLogger(java.util.logging.Logger logger, ResourceBundle bundle) {
-		this.logger = logger;
-		this.bundle = bundle;
+	private JulLogger(String className, ResourceBundle bundle) {
+		super(bundle);
+		this.logger = java.util.logging.Logger.getLogger(className);
 	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -63,13 +60,5 @@ public class JulLogger implements Logger {
 		if (logger.isLoggable(Level.SEVERE)) {
 			logger.log(Level.SEVERE, getString(codes, arguments), throwable);
 		}
-	}
-
-	private String getString(MessageCodes codes, Object... arguments) {
-		String pattern = bundle.getString(codes.toString());
-		if (arguments.length == 0) {
-			return pattern;
-		}
-		return MessageFormat.format(pattern, arguments);
 	}
 }

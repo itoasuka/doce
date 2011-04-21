@@ -3,12 +3,18 @@
  */
 package jp.osd.doma.guice.internal.provider;
 
+import static jp.osd.doma.guice.JndiProperties.JNDI_DATA_SOURCE;
+
 import javax.naming.Context;
 import javax.sql.DataSource;
 
 import jp.osd.doma.guice.DataSourceBinding;
 import jp.osd.doma.guice.Doma;
+import jp.osd.doma.guice.JndiProperties;
 import jp.osd.doma.guice.internal.SettingHelper;
+import jp.osd.doma.guice.internal.logging.Logger;
+import jp.osd.doma.guice.internal.logging.LoggerFactory;
+import jp.osd.doma.guice.internal.logging.MessageCodes;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -25,8 +31,8 @@ import com.google.inject.name.Named;
  * 提供される実装クラスオブジェクトは以下のように決定されます。
  * <OL>
  * <LI>{@link #setDataSource(DataSource)} で設定されたデータソースがあればそれを提供します。
- * <LI>{@link #setJndiDataSourceName(String)} で設定された値があれば {@link JndiDataSourceProvider}
- * を用いてデータソースを取得して提供します。
+ * <LI>{@link #setJndiDataSourceName(String)} で設定された値があれば
+ * {@link JndiDataSourceProvider} を用いてデータソースを取得して提供します。
  * <LI>{@code org.apache.commons.dbcp.BasicDataSource} クラスがクラスパス上に存在するとき、
  * {@link BasicDataSourceProvider} を用いてデータソースを取得して提供します。
  * <LI>上記のいずれにも当てはまらない場合、{@link SimpleDataSourceProvider} を用いてデータソースを取得して提供します。
@@ -56,6 +62,9 @@ import com.google.inject.name.Named;
  * @see JndiDataSourceProvider
  */
 public class AutoDataSourceProvider implements Provider<DataSource> {
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(AutoDataSourceProvider.class);
+
 	private DataSource dataSource = null;
 
 	private String jndiDataSourceName = null;
@@ -79,6 +88,8 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 	@Inject
 	public AutoDataSourceProvider(@Doma DataSourceBinding dataSourceBinding,
 			Injector injector, SettingHelper settingHelper) {
+		LOGGER.logConstructor(DataSourceBinding.class, Injector.class,
+				SettingHelper.class);
 		this.dataSourceBinding = dataSourceBinding;
 		this.injector = injector;
 		this.settingHelper = settingHelper;
@@ -89,6 +100,7 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 	 */
 	@Override
 	public DataSource get() {
+		LOGGER.debug(MessageCodes.DG002, "DataSourceBinding", dataSourceBinding);
 		switch (dataSourceBinding) {
 		case AUTO:
 			if (dataSource == null) {
@@ -96,7 +108,8 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 				if (!createJndiDataSource()) {
 					// BasicDataSource の作成を試みる
 					if (!createBasicDataSource()) {
-						dataSource = injector.getInstance(SimpleDataSourceProvider.class).get();
+						dataSource = injector.getInstance(
+								SimpleDataSourceProvider.class).get();
 					}
 				}
 			}
@@ -125,6 +138,7 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 					.get();
 			return true;
 		}
+		LOGGER.debug(MessageCodes.DG003);
 		return false;
 	}
 
@@ -135,6 +149,7 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 					.get();
 			return true;
 		}
+		LOGGER.debug(MessageCodes.DG004);
 		return false;
 	}
 
@@ -160,7 +175,7 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 	 */
 	@Inject(optional = true)
 	public void setJndiDataSourceName(
-			@Named("JNDI.dataSource") String jndiDataSourceName) {
+			@Named(JNDI_DATA_SOURCE) String jndiDataSourceName) {
 		this.jndiDataSourceName = jndiDataSourceName;
 	}
 }

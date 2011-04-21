@@ -1,5 +1,7 @@
 package jp.osd.doma.guice.internal.provider;
 
+import static jp.osd.doma.guice.JndiProperties.JNDI_TRANSACTION;
+
 import javax.inject.Named;
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -7,6 +9,9 @@ import javax.transaction.UserTransaction;
 
 import jp.osd.doma.guice.Doma;
 import jp.osd.doma.guice.DomaGuiceException;
+import jp.osd.doma.guice.internal.logging.Logger;
+import jp.osd.doma.guice.internal.logging.LoggerFactory;
+import jp.osd.doma.guice.internal.logging.MessageCodes;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -17,9 +22,15 @@ import com.google.inject.Provider;
  * @author asuka
  */
 public class UserTransactionProvider implements Provider<UserTransaction> {
+	/** トランザクションの JNDI ルックアップに使用するデフォルトのオブジェクト名です。 */
+	public static final String DEFAULT_JNDI_TRANSACTION_NAME = "java:comp/UserTransaction";
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(UserTransactionProvider.class);
+
 	private final Context context;
 
-	private String transactionName = "java:comp/UserTransaction";
+	private String transactionName = DEFAULT_JNDI_TRANSACTION_NAME;
 
 	/**
 	 * 新たにオブジェクトを構築します。
@@ -29,6 +40,7 @@ public class UserTransactionProvider implements Provider<UserTransaction> {
 	 */
 	@Inject
 	public UserTransactionProvider(@Doma Context context) {
+		LOGGER.logConstructor(Context.class);
 		this.context = context;
 	}
 
@@ -38,8 +50,13 @@ public class UserTransactionProvider implements Provider<UserTransaction> {
 	@Override
 	public UserTransaction get() {
 		try {
-			return (UserTransaction) context.lookup(transactionName);
+			LOGGER.debug(MessageCodes.DG006, transactionName);
+			UserTransaction tx = (UserTransaction) context
+					.lookup(transactionName);
+			LOGGER.debug(MessageCodes.DG008);
+			return tx;
 		} catch (NamingException e) {
+			LOGGER.error(e, MessageCodes.DG007, transactionName);
 			throw new DomaGuiceException("Lookup error : " + transactionName, e);
 		}
 	}
@@ -51,8 +68,9 @@ public class UserTransactionProvider implements Provider<UserTransaction> {
 	 *            オブジェクト名
 	 */
 	@Inject(optional = true)
-	public void setJndiTransactionName(
-			@Named("JNDI.transaction") String transactionName) {
+	public void setDefaultJndiTransactionName(
+			@Named(JNDI_TRANSACTION) String transactionName) {
+		LOGGER.debug(MessageCodes.DG002, JNDI_TRANSACTION, transactionName);
 		this.transactionName = transactionName;
 	}
 }

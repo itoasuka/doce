@@ -16,7 +16,7 @@ public class ClassUtilsTest {
 		assertEquals("hoge.HogeDaoImpl", ClassUtils.getImplClassName(HogeDao.class, "hoge", "", "Impl"));
 		assertEquals("hoge.impl.HogeDaoImpl", ClassUtils.getImplClassName(HogeDao.class, "hoge", "impl", "Impl"));
 	}
-	
+
 	@Test
 	public void testClassUtils() throws Exception {
 		Constructor<ClassUtils> c = ClassUtils.class.getDeclaredConstructor();

@@ -13,26 +13,26 @@ package jp.osd.doma.guice;
  */
 public enum DataSourceBinding {
 	/**
-	 *　バインドする実装クラスオブジェクトを自動で判定するように指定します。どのように判定されるかは {@link jp.osd.doma.guice.internal.AutoDataSourceProvider} を参照してください。
-	 * @see jp.osd.doma.guice.internal.AutoDataSourceProvider
+	 *　バインドする実装クラスオブジェクトを自動で判定するように指定します。どのように判定されるかは {@link jp.osd.doma.guice.internal.provider.AutoDataSourceProvider} を参照してください。
+	 * @see jp.osd.doma.guice.internal.provider.AutoDataSourceProvider
 	 */
 	AUTO,
 	/**
-	 * <a href="http://doma.seasar.org/" target="_blank">Doma</a> 付属の {@link org.seasar.doma.jdbc.SimpleDataSource} オブジェクトを実装クラスオブジェクトとしてバインディングするように指定します。
+	 * <a href="http://doma.seasar.org/" target="_blank">Doma</a> 付属の {@link org.seasar.doma.jdbc.provider.SimpleDataSource} オブジェクトを実装クラスオブジェクトとしてバインディングするように指定します。
 	 *
-	 * @see jp.osd.doma.guice.internal.SimpleDataSourceProvider
+	 * @see jp.osd.doma.guice.internal.provider.SimpleDataSourceProvider
 	 */
 	SIMPLE_DATA_SOURCE,
 	/**
-	 * <a href="http://commons.apache.org/dbcp/" target="_blank">Commons DBCP</a> の {@link org.apache.commons.dbcp.BasicDataSource} オブジェクトを実装クラスオブジェクトとしてバインディングするように指定します。
+	 * <a href="http://commons.apache.org/dbcp/" target="_blank">Commons DBCP</a> の {@link org.apache.commons.dbcp.provider.BasicDataSource} オブジェクトを実装クラスオブジェクトとしてバインディングするように指定します。
 	 *
-	 * @see jp.osd.doma.guice.internal.BasicDataSourceProvider
+	 * @see jp.osd.doma.guice.internal.provider.BasicDataSourceProvider
 	 */
 	BASIC_DATA_SOURCE,
 	/**
 	 * JNDI を用いてデータソースを取得し、バインディングするように指定します。{@code "JNDI.dataSource"} の名前でデータソースのオブジェクト名を定数バインドしておく必要があります。
 	 *
-	 * @see jp.osd.doma.guice.internal.JndiDataSourceProvider
+	 * @see jp.osd.doma.guice.internal.provider.JndiDataSourceProvider
 	 */
 	JNDI,
 	/**

@@ -5,6 +5,7 @@ import static com.google.inject.Scopes.SINGLETON;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 
 import javax.naming.Context;
 import javax.sql.DataSource;
@@ -27,8 +28,11 @@ import org.seasar.doma.jdbc.SqlFileRepository;
 import org.seasar.doma.jdbc.dialect.Dialect;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Binder;
+import com.google.inject.Module;
 import com.google.inject.Scopes;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.name.Names;
 
 /**
  * Doma と Guice を連携させるための Guice モジュールクラスです。
@@ -44,13 +48,22 @@ public class DomaModule extends AbstractModule {
 	private final String daoPackage;
 	private final String daoSubpackage;
 	private final String daoSuffix;
+	private final Properties properties;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	protected void configure() {
-		requestInjection(this);
+		if (properties != null) {
+			// 設定プロパティの反映
+			install(new Module() {
+				@Override
+				public void configure(Binder binder) {
+					Names.bindProperties(binder, properties);
+				}
+			});
+		}
 
 		// ネーミングコンテキストの設定
 		bind(Context.class).annotatedWith(Doma.class)
@@ -77,8 +90,7 @@ public class DomaModule extends AbstractModule {
 				.in(Scopes.SINGLETON);
 		// JDBC ロガーの設定
 		bind(JdbcLogger.class).annotatedWith(Doma.class)
-				.toProvider(AutoJdbcLoggerProvider.class)
-				.in(Scopes.SINGLETON);
+				.toProvider(AutoJdbcLoggerProvider.class).in(Scopes.SINGLETON);
 		// Requires new controller の設定
 		bind(RequiresNewController.class).annotatedWith(Doma.class)
 				.toProvider(DefaultRequiresNewControllerProvider.class)
@@ -96,8 +108,7 @@ public class DomaModule extends AbstractModule {
 		case NONE:
 			break;
 		default:
-			bind(Transaction.class).annotatedWith(Doma.class)
-					.toProvider(AutoTransactionProvider.class)
+			bind(Transaction.class).toProvider(AutoTransactionProvider.class)
 					.in(Scopes.SINGLETON);
 			break;
 		}
@@ -120,13 +131,15 @@ public class DomaModule extends AbstractModule {
 
 	private DomaModule(DataSourceBinding dataSourceBinding,
 			TransactionBinding transactionBinding, List<Class<?>> daoTypes,
-			String daoPackage, String daoSubpackage, String daoSuffix) {
+			String daoPackage, String daoSubpackage, String daoSuffix,
+			Properties properties) {
 		this.dataSourceBinding = dataSourceBinding;
 		this.transactionBinding = transactionBinding;
 		this.daoTypes = daoTypes;
 		this.daoPackage = daoPackage;
 		this.daoSubpackage = daoSubpackage;
 		this.daoSuffix = daoSuffix;
+		this.properties = properties;
 	}
 
 	private <T> void bindDao(Class<T> daoType) {
@@ -155,6 +168,7 @@ public class DomaModule extends AbstractModule {
 		private String daoPackage = "";
 		private String daoSubpackage = "";
 		private String daoSuffix = "Impl";
+		private Properties properties;
 
 		/**
 		 * 新たにオブジェクトを構築します。
@@ -163,9 +177,19 @@ public class DomaModule extends AbstractModule {
 		}
 
 		/**
+		 * 新たにオブジェクトを構築します。
+		 *
+		 * @param properties 設定プロパティ
+		 */
+		public Builder(Properties properties) {
+			this.properties = properties;
+		}
+
+		/**
 		 * データソースのバインディング方法を設定します。
 		 *
-		 * @param dataSourceBinding データソースのバインディング方法
+		 * @param dataSourceBinding
+		 *            データソースのバインディング方法
 		 * @return このメソッドのレシーバオブジェクト
 		 */
 		public Builder setDataSourceBinding(DataSourceBinding dataSourceBinding) {
@@ -176,7 +200,8 @@ public class DomaModule extends AbstractModule {
 		/**
 		 * トランザクションのバインディング方法を設定します。
 		 *
-		 * @param transactionBinding トランザクションのバインディング方法
+		 * @param transactionBinding
+		 *            トランザクションのバインディング方法
 		 * @return このメソッドのレシーバオブジェクト
 		 */
 		public Builder setTransactionBinding(
@@ -267,7 +292,7 @@ public class DomaModule extends AbstractModule {
 		 */
 		public DomaModule create() {
 			return new DomaModule(dataSourceBinding, transactionBinding,
-					daoTypes, daoPackage, daoSubpackage, daoSuffix);
+					daoTypes, daoPackage, daoSubpackage, daoSuffix, properties);
 		}
 	}
 }

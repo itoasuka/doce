@@ -4,6 +4,8 @@
 package jp.osd.doma.guice.internal.provider;
 
 import jp.osd.doma.guice.internal.SettingHelper;
+import jp.osd.doma.guice.internal.logging.Logger;
+import jp.osd.doma.guice.internal.logging.LoggerFactory;
 import jp.osd.doma.guice.internal.logging.Slf4jJdbcLogger;
 
 import org.seasar.doma.jdbc.JdbcLogger;
@@ -26,6 +28,9 @@ import com.google.inject.Provider;
  * @author asuka
  */
 public class AutoJdbcLoggerProvider implements Provider<JdbcLogger> {
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(AutoJdbcLoggerProvider.class);
+
 	private SettingHelper settingHelper;
 
 	private JdbcLogger jdbcLogger;
@@ -38,6 +43,7 @@ public class AutoJdbcLoggerProvider implements Provider<JdbcLogger> {
 	 */
 	@Inject
 	public AutoJdbcLoggerProvider(SettingHelper settingHelper) {
+		LOGGER.logConstructor(SettingHelper.class);
 		this.settingHelper = settingHelper;
 	}
 

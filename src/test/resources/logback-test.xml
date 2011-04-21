@@ -6,7 +6,7 @@
             <property name="LOG_DIR" value="target/log" />
         </then>
     </if>
-    
+
     <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss" />
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
@@ -16,8 +16,8 @@
         </encoder>
     </appender>
 
-    <logger name="jp.microbridge.r3.doma" level="TRACE" />
-    
+    <logger name="jp.osd.doma" level="TRACE" />
+
     <root level="WARN">
         <appender-ref ref="FILE" />
     </root>

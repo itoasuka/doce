@@ -18,15 +18,15 @@ public enum TransactionBinding {
 	 */
 	AUTO,
 	/**
-	 * {@link jp.osd.doma.guice.internal.LocalTransaction} オブジェクトを実装クラスオブジェクトとしてバインディングするように指定します。
+	 * {@link jp.osd.doma.guice.internal.tx.LocalTransaction} オブジェクトを実装クラスオブジェクトとしてバインディングするように指定します。
 	 *
-	 * @see jp.osd.doma.guice.internal.LocalTransaction
+	 * @see jp.osd.doma.guice.internal.tx.LocalTransaction
 	 */
 	LOCAL_TRANSACTION,
 	/**
-	 * {@link jp.osd.doma.guice.internal.JtaUserTransaction} オブジェクトを実装クラスオブジェクトとしてバインディングするように指定します。
+	 * {@link jp.osd.doma.guice.internal.tx.JtaUserTransaction} オブジェクトを実装クラスオブジェクトとしてバインディングするように指定します。
 	 *
-	 * @see jp.osd.doma.guice.internal.JtaUserTransaction
+	 * @see jp.osd.doma.guice.internal.tx.JtaUserTransaction
 	 */
 	JTA_USER_TRANSACTION,
 	/**

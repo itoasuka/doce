@@ -1,6 +1,5 @@
 package jp.osd.doma.guice.internal.tx;
 
-import jp.osd.doma.guice.Doma;
 import jp.osd.doma.guice.Transaction;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -52,7 +51,7 @@ public class TransactionInterceptor implements MethodInterceptor {
 	 * @param transaction トランザクション機能
 	 */
 	@Inject
-	public void setTransaction(@Doma Transaction transaction) {
+	public void setTransaction(Transaction transaction) {
 		this.transaction = transaction;
 	}
 

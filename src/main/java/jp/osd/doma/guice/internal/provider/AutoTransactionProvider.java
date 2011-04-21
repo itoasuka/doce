@@ -9,6 +9,9 @@ import javax.transaction.UserTransaction;
 import jp.osd.doma.guice.Doma;
 import jp.osd.doma.guice.Transaction;
 import jp.osd.doma.guice.TransactionBinding;
+import jp.osd.doma.guice.internal.logging.Logger;
+import jp.osd.doma.guice.internal.logging.LoggerFactory;
+import jp.osd.doma.guice.internal.logging.MessageCodes;
 import jp.osd.doma.guice.internal.tx.JtaUserTransaction;
 import jp.osd.doma.guice.internal.tx.LocalTransaction;
 
@@ -28,7 +31,6 @@ import com.google.inject.Provider;
  * 提供される実装クラスオブジェクトは以下のように決定されます。
  * <P>
  * <OL>
- * <LI>{@link #setTransaction(Transaction)} で設定されたトランザクションがあればそれを提供します。
  * <LI>コンストラクタの引数 {@code dataSource} に設定されたデータソースが
  * {@link LocalTransactionalDataSource} 型ならば {@link LocalTransaction} オブジェクトを
  * Guice インジェクタから取得して提供します。
@@ -42,8 +44,8 @@ import com.google.inject.Provider;
  *
  * <H4>{@link TransactionBinding#JTA_USER_TRANSACTION} の場合</H4>
  *
- * {@link JtaUserTransaction} オブジェクトを生成して提供します。このとき、ひもづく
- * {@link UserTransaction} の取得に {@link UserTransactionProvider} が使用されます。
+ * {@link JtaUserTransaction} オブジェクトを生成して提供します。このとき、ひもづく {@link UserTransaction}
+ * の取得に {@link UserTransactionProvider} が使用されます。
  *
  * <H4>上記以外の場合</H4>
  *
@@ -53,10 +55,11 @@ import com.google.inject.Provider;
  * @see UserTransactionProvider
  */
 public class AutoTransactionProvider implements Provider<Transaction> {
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(AutoTransactionProvider.class);
 	private final TransactionBinding transactionBinding;
 	private final Injector injector;
 	private final DataSource dataSource;
-	private Transaction transaction;
 
 	/**
 	 * 新たにオブジェクトを構築します。
@@ -71,6 +74,8 @@ public class AutoTransactionProvider implements Provider<Transaction> {
 	@Inject
 	public AutoTransactionProvider(@Doma TransactionBinding transactionBinding,
 			Injector injector, @Doma DataSource dataSource) {
+		LOGGER.logConstructor(TransactionBinding.class, Injector.class,
+				DataSource.class);
 		this.transactionBinding = transactionBinding;
 		this.injector = injector;
 		this.dataSource = dataSource;
@@ -81,16 +86,18 @@ public class AutoTransactionProvider implements Provider<Transaction> {
 	 */
 	@Override
 	public Transaction get() {
+		LOGGER.debug(MessageCodes.DG002, "TransactionBinding",
+				transactionBinding);
+		Transaction transaction;
 		switch (transactionBinding) {
 		case AUTO:
-			if (transaction == null) {
-				if (dataSource instanceof LocalTransactionalDataSource) {
-					transaction = injector.getInstance(LocalTransaction.class);
-				} else {
-					UserTransaction tx = injector.getInstance(
-							UserTransactionProvider.class).get();
-					transaction = new JtaUserTransaction(tx);
-				}
+			if (dataSource instanceof LocalTransactionalDataSource) {
+				LOGGER.debug(MessageCodes.DG005);
+				transaction = injector.getInstance(LocalTransaction.class);
+			} else {
+				UserTransaction tx = injector.getInstance(
+						UserTransactionProvider.class).get();
+				transaction = new JtaUserTransaction(tx);
 			}
 			break;
 		case LOCAL_TRANSACTION:
@@ -102,20 +109,9 @@ public class AutoTransactionProvider implements Provider<Transaction> {
 			transaction = new JtaUserTransaction(tx);
 			break;
 		default:
+			transaction = null;
 			break;
 		}
 		return transaction;
-	}
-
-	/**
-	 * {@link #get()} で返すトランザクションを設定します。このメソッドで設定した値は、すべに優先して {@link #get()}
-	 * の戻り値として採用されます。
-	 *
-	 * @param transaction
-	 *            トランザクション
-	 */
-	@Inject(optional = true)
-	public void setTransaction(Transaction transaction) {
-		this.transaction = transaction;
 	}
 }

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>クイックスタート</title>
+    </properties>
+    <body>
+        <section name="目次">
+            <ul>
+                <li><a href="#概要">概要</a></li>
+                <li><a href="#クイックスタート">クイックスタート</a>
+                    <ul>
+                        <li><a href="#設定クラスは不要">設定クラスは不要</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <section name="概要">
+            <p>
+                このページでは、<a href="http://doma.seasar.org/quick_start.html" target="_blank">Doma のクイックスタート</a>と同じことを Doma Guice で行い、最低限必要な手順のみを説明します。
+            </p>
+        </section>
+        <section name="クイックスタート">
+            <p>
+                <a href="http://doma.seasar.org/quick_start.html" target="_blank">Doma のクイックスタート</a>との相違点のみを取り上げますので、随時、相互に参照してください。
+            </p>
+            <subsection name="設定クラスは不要">
+                <p>
+                    Doma Guice では設定クラスの作成を行う必要はありません。インジェクション時に自動的に作成されます。
+                </p>
+            </subsection>
+            <subsection name="DAO インタフェースの作成">
+                <p>
+                    Doma Guice では設定クラスの作成を行わず Guice にまかせてしまうので、DAO インタフェースにその旨を表わすアノテーションを付ける必要があります。
+                    <code>@InjecConfig</code> がそれです。
+                </p>
+<source>package quickstart;
+
+import jp.osd.doma.guice.InjectConfig;
+
+import org.seasar.doma.Dao;
+import org.seasar.doma.Select;
+import org.seasar.doma.Update;
+
+@Dao
+@InjectConfig
+public interface EmployeeDao {
+
+    @Select
+    Employee selectById(Integer employeeId);
+
+    @Update
+    int update(Employee employee);
+}</source>
+            </subsection>
+            <subsection name="起動クラスの作成">
+                <p>
+                    Doma Guice を用いた Guice インジェクタを作成する際に使用するモジュールの生成には専用のビルダを使用します。ビルダには、JDBC の接続情報などをプロパティクラスオブジェクトとして渡します。
+                    トランザクションは、実装の違いを吸収するためより抽象化されています。
+                </p>
+<source>package quickstart;
+
+import java.math.BigDecimal;
+
+import jp.osd.doma.guice.DomaModule;
+import jp.osd.doma.guice.JdbcProperties;
+import jp.osd.doma.guice.Transaction;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+
+public class Main {
+    public static void main(String[] args) {
+        // DB 接続情報の設定
+        JdbcProperties jp = new JdbcProperties(
+                "jdbc:h2:tcp://localhost/~/test", "sa");
+
+        // Guice インジェクタの作成
+        Module m = new DomaModule.Builder(jp).create();
+        Injector injector = Guice.createInjector(m);
+
+        // トランザクションの取得
+        Transaction tx = injector.getInstance(Transaction.class);
+
+        // トランザクションの開始
+        tx.begin();
+        try {
+            // APT で生成された Dao の実装クラスを取得
+            EmployeeDao dao = injector.getInstance(EmployeeDaoImpl.class);
+
+            // 主キーでエンティティを検索
+            Employee employee = dao.selectById(1);
+
+            // エンティティのプロパティを変更
+            employee.employeeName = "KING";
+            employee.salary = employee.salary.add(new BigDecimal(1000));
+
+            // エンティティを更新
+            dao.update(employee);
+
+            // トランザクションのコミット
+            tx.commit();
+        } finally {
+            // トランザクションのロールバック
+            tx.rollback();
+        }
+    }
+}</source>
+            </subsection>
+        </section>
+    </body>
+</document>

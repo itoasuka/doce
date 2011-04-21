@@ -1,5 +1,7 @@
 package jp.osd.doma.guice.internal;
 
+import static jp.osd.doma.guice.DomaProperties.*;
+
 import javax.inject.Named;
 import javax.sql.DataSource;
 
@@ -177,7 +179,7 @@ public class GuiceManagedConfig implements Config {
 	 *            最大行数の制限値
 	 */
 	@Inject(optional = true)
-	public void setMaxRows(@Named("Doma.maxRows") int maxRows) {
+	public void setMaxRows(@Named(DOMA_MAX_ROWS) int maxRows) {
 		this.maxRows = maxRows;
 	}
 
@@ -188,7 +190,7 @@ public class GuiceManagedConfig implements Config {
 	 *            フェッチサイズ
 	 */
 	@Inject(optional = true)
-	public void setFetchSize(@Named("Doma.fetchSize") int fetchSize) {
+	public void setFetchSize(@Named(DOMA_FETCH_SIZE) int fetchSize) {
 		this.fetchSize = fetchSize;
 	}
 
@@ -199,7 +201,7 @@ public class GuiceManagedConfig implements Config {
 	 *            クエリタイムアウト（秒）
 	 */
 	@Inject(optional = true)
-	public void setQueryTimeout(@Named("Doma.queryTimeout") int queryTimeout) {
+	public void setQueryTimeout(@Named(DOMA_QUERY_TIMEOUT) int queryTimeout) {
 		this.queryTimeout = queryTimeout;
 	}
 
@@ -210,7 +212,7 @@ public class GuiceManagedConfig implements Config {
 	 *            バッチサイズ
 	 */
 	@Inject(optional = true)
-	public void setBatchSize(@Named("Doma.batchSize") int batchSize) {
+	public void setBatchSize(@Named(DOMA_BATCH_SIZE) int batchSize) {
 		this.batchSize = batchSize;
 	}
 
