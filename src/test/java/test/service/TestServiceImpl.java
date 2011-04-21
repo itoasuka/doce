@@ -1,6 +1,6 @@
 package test.service;
 
-import jp.osd.doma.guice.Transactional;
+import jp.osd.doce.Transactional;
 import test.dao.HogeDao;
 import test.entity.Hoge;
 

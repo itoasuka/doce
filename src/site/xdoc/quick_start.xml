@@ -36,7 +36,7 @@
                 </p>
 <source>package quickstart;
 
-import jp.osd.doma.guice.InjectConfig;
+import jp.osd.doce.InjectConfig;
 
 import org.seasar.doma.Dao;
 import org.seasar.doma.Select;
@@ -62,9 +62,9 @@ public interface EmployeeDao {
 
 import java.math.BigDecimal;
 
-import jp.osd.doma.guice.DomaModule;
-import jp.osd.doma.guice.JdbcProperties;
-import jp.osd.doma.guice.Transaction;
+import jp.osd.doce.DomaModule;
+import jp.osd.doce.JdbcProperties;
+import jp.osd.doce.Transaction;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

@@ -1,6 +1,6 @@
 package test.dao;
 
-import jp.osd.doma.guice.InjectConfig;
+import jp.osd.doce.InjectConfig;
 
 import org.seasar.doma.Dao;
 import org.seasar.doma.Insert;
@@ -12,15 +12,15 @@ import test.entity.Hoge;
 @Dao
 @InjectConfig
 public interface HogeDao {
-	@Script
-	void createTable();
+    @Script
+    void createTable();
 
-	@Insert
-	int insert(Hoge hoge);
+    @Insert
+    int insert(Hoge hoge);
 
-	@Select
-	Hoge findById(int id);
+    @Select
+    Hoge findById(int id);
 
-	@Script
-	void dropTable();
+    @Script
+    void dropTable();
 }

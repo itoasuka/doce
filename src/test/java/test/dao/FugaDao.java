@@ -1,6 +1,6 @@
 package test.dao;
 
-import jp.osd.doma.guice.InjectConfig;
+import jp.osd.doce.InjectConfig;
 
 import org.seasar.doma.Dao;
 

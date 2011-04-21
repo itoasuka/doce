@@ -4,7 +4,7 @@
         <menu name="About" inherit="top">
             <item name="ホーム" href="index.html" />
             <item name="ダウンロード" href="http://sourceforge.jp/projects/tsukuyomi/releases/44043" />
-            <item name="課題追跡" href="https://github.com/itoasuka/doma-guice/issues" />
+            <item name="課題追跡" href="https://github.com/itoasuka/doce/issues" />
         </menu>
         <menu name="ドキュメント" inherit="top">
             <item name="セットアップ" href="setup.html" />
