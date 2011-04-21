@@ -9,7 +9,7 @@
 
     <name>Doce</name>
     <url>http://maven.apache.org</url>
-    <description>Doce（ドース）は、Doma に関するオブジェクトを Guice でインジェクションするためのライブラリです。</description>
+    <description>Doce（ドース）は、Doma に関するオブジェクトを Guice でインジェクションするためのライブラリです。「doce」とはポルトガル語で「甘い」という意味です。</description>
 
     <!-- プロジェクトの開始年（著作権表示等に使用） -->
     <inceptionYear>2011</inceptionYear>
