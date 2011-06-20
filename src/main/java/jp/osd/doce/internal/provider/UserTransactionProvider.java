@@ -1,20 +1,20 @@
 package jp.osd.doce.internal.provider;
 
-import static jp.osd.doce.JndiProperties.JNDI_TRANSACTION;
+import static jp.osd.doce.JndiProperties.JNDI_USER_TRANSACTION;
 
-import javax.inject.Named;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.transaction.UserTransaction;
 
 import jp.osd.doce.Doma;
-import jp.osd.doce.DomaGuiceException;
+import jp.osd.doce.DoceException;
 import jp.osd.doce.internal.logging.Logger;
 import jp.osd.doce.internal.logging.LoggerFactory;
 import jp.osd.doce.internal.logging.MessageCodes;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.name.Named;
 
 /**
  * JNDI によってユーザトランザクションを取得して提供する Guice プロバイダです。
@@ -57,7 +57,7 @@ public class UserTransactionProvider implements Provider<UserTransaction> {
 			return tx;
 		} catch (NamingException e) {
 			LOGGER.error(e, MessageCodes.DG007, transactionName);
-			throw new DomaGuiceException("Lookup error : " + transactionName, e);
+			throw new DoceException("Lookup error : " + transactionName, e);
 		}
 	}
 
@@ -69,8 +69,8 @@ public class UserTransactionProvider implements Provider<UserTransaction> {
 	 */
 	@Inject(optional = true)
 	public void setDefaultJndiTransactionName(
-			@Named(JNDI_TRANSACTION) String transactionName) {
-		LOGGER.debug(MessageCodes.DG002, JNDI_TRANSACTION, transactionName);
+			@Named(JNDI_USER_TRANSACTION) String transactionName) {
+		LOGGER.debug(MessageCodes.DG002, JNDI_USER_TRANSACTION, transactionName);
 		this.transactionName = transactionName;
 	}
 }

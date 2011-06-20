@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>セットアップ</title>
+    </properties>
+    <body>
+        <section name="目次">
+            <ul>
+                <li><a href="#Doma_のセットアップ">Doma のセットアップ</a></li>
+                <li><a href="#Doce_のセットアップ">Doce のセットアップ</a>
+                    <ul>
+                        <li><a href="#Maven_によるセットアップ">Maven によるセットアップ</a></li>
+                        <li><a href="#手動によるセットアップ">手動によるセットアップ</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <section name="Doma のセットアップ">
+            <p>
+                まずは <a href="http://doma.seasar.org/setup.html" target="_blank">Doma のセットアップ</a>を行ってください。
+            </p>
+        </section>
+        <section name="Doce のセットアップ">
+            <subsection name="Maven によるセットアップ">
+                <p>
+                    Doce はセントラルリポジトリにはありませんので <code>pom.xml</code> に以下のようにリポジトリを追加してください。
+                </p>
+<div class="source"><pre class="prettyprint"><![CDATA[    <repositories>
+        :
+        <repository>
+            <id>itoasuka.github.com</id>
+            <name>itoasuka's github account</name>
+            <url>http://itoasuka.github.com/maven2</url>
+        </repository>
+        :
+    </repositories>]]></pre></div>
+                <p>
+                    次に同じく pom.xml に以下のように依存性を記述してください。
+                </p>
+<div class="source"><pre class="prettyprint"><![CDATA[    <dependencies>
+        :
+        <dependency>
+            <groupId>jp.osd.doce</groupId>
+            <artifactId>doce</artifactId>
+            <version>0.9.0</version>
+        </dependency>
+        :
+    </dependencies>]]></pre></div>
+            </subsection>
+            <subsection name="手動によるセットアップ">
+                <p>
+                     Doce は <a href="http://code.google.com/p/google-guice/" target="_blank">Guice</a>
+                    を使用していますので、Doce の配布物の jar 以外ほかに Guice 2.0 以上が必要です。Guice
+                    の<a href="http://code.google.com/p/google-guice/downloads/list" target="_blank">ダウンロードページ</a>より
+                    guice-2.0.zip をダウンロードし、それを解凍したものの中にある以下のファイルにもクラスパスを通してください。
+                </p>
+                <ul>
+                    <li>aopalliance.jar</li>
+                    <li>guice-2.0.jar</li>
+                </ul>
+                <p>
+                    guice-3.0.zip を使う場合は以下のファイルが必要になります。
+                </p>
+                <ul>
+                    <li>aopalliance.jar</li>
+                    <li>guice-3.0.jar</li>
+                    <li>javax.inject.jar</li>
+                </ul>
+            </subsection>
+        </section>
+    </body>
+</document>

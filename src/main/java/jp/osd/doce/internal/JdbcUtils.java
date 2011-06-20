@@ -3,7 +3,7 @@
  */
 package jp.osd.doce.internal;
 
-import jp.osd.doce.DomaGuiceException;
+import jp.osd.doce.DoceException;
 
 import org.seasar.doma.jdbc.dialect.Db2Dialect;
 import org.seasar.doma.jdbc.dialect.Dialect;
@@ -55,7 +55,7 @@ public class JdbcUtils {
 		} else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
 			driver = "org.postgresql.Driver";
 		} else {
-			throw new DomaGuiceException("Unsupported URL : " + jdbcUrl);
+			throw new DoceException("Unsupported URL : " + jdbcUrl);
 		}
 
 		return driver;

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>Doce プロジェクトへようこそ</title>
+    </properties>
+    <body>
+        <section name="Doce プロジェクト">
+            <p>
+                <strong>Doce（ドース）</strong>プロジェクトは、<a href="http://doma.seasar.org" target="_blank">Doma</a> 関連オブジェクトを
+                <a href="http://code.google.com/p/google-guice/" target="_blank">Guice</a> でインジェクションするためのユーティリティライブラリを提供します。
+            </p>
+            <p>
+                Doce の概要を知りたい場合は、<a href="overview.html">概要</a>のページを参照してください。
+            </p>
+            <p>
+                とりあえず動かしたい場合は、<a href="quick_start.html">クイックスタート</a>のページを参照してください。
+            </p>
+            <p>
+                Doce に関する最新の jar ファイルやソースコードが必要な場合は、<a href="downloads.html">ダウンロード</a>のページを参照してください。
+            </p>
+        </section>
+        <section name="コンセプト">
+            <p>
+                Doce は次のコンセプトの下で開発されています。
+            </p>
+            <ul>
+                <li>Doma の使用感から大きく逸脱しない。</li>
+                <li>Doma および Guice 以外の他のライブラリに依存しない。</li>
+                <li>しかしながら一般的なプロジェクトでふつうに使われるライブラリと親和性を持たせる。</li>
+                <li>「デフォルト設定」をふんだんに準備し、わずかなコーディングでも使えるようにする。</li>
+            </ul>
+        </section>
+        <section name="依存ライブラリ">
+            <p>
+                Doce が想定する Doma および Guice のバージョンは以下のとおりです。
+            </p>
+            <ul>
+                <li>Doma 1.14.0 以上</li>
+                <li>Guice 2.0 以上</li>
+            </ul>
+        </section>
+    </body>
+</document>

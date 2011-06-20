@@ -5,8 +5,6 @@ import static junit.framework.Assert.assertFalse;
 
 import java.lang.reflect.Constructor;
 
-import jp.osd.doce.internal.ClassUtils;
-
 import org.junit.Test;
 
 import test.dao.HogeDao;

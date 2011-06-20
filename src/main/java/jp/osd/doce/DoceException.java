@@ -5,7 +5,7 @@ package jp.osd.doce;
  * 
  * @author asuka
  */
-public class DomaGuiceException extends RuntimeException {
+public class DoceException extends RuntimeException {
 	private static final long serialVersionUID = 8715074614894392039L;
 
 	/**
@@ -15,7 +15,7 @@ public class DomaGuiceException extends RuntimeException {
 	 * @param message
 	 *            詳細メッセージ（あとで {@link Throwable#getMessage()} メソッドで取得するために保存される）
 	 */
-	public DomaGuiceException(String message) {
+	public DoceException(String message) {
 		super(message);
 	}
 
@@ -29,7 +29,7 @@ public class DomaGuiceException extends RuntimeException {
 	 *            原因 (あとで {@link Throwable#getCause()} メソッドで取得するために保存される)。(
 	 *            <code>null</code> 値が許可されており、原因が存在しないか不明であることを示す)
 	 */
-	public DomaGuiceException(String message, Throwable cause) {
+	public DoceException(String message, Throwable cause) {
 		super(message, cause);
 	}
 }

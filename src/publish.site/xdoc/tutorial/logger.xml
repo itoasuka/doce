@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>データソース</title>
+    </properties>
+    <body>
+        <section name="目次">
+            <ul>
+                <li><a href="#概要">概要</a></li>
+                <li><a href="#SLF4J_の利用">SLF4J の利用</a></li>
+                <li><a href="#任意のロガーの使用">任意のロガーの使用</a></li>
+            </ul>
+        </section>
+        <section name="概要">
+            <p>
+                Doma はデフォルトではロギングには java.util.logging
+                関連のモジュールを使用します。しかし、実際のプロジェクトでは java.util.logging
+                はあまり使用されません。このため、Doce
+                は、ロガーを簡単に差し替える機能を提供しています。
+            </p>
+        </section>
+        <section name="SLF4J の利用">
+            <p>
+                Doce はクラスパス上に <code>org.slf4j.Logger</code> がある場合、Doma で使用する <code>JdbcLogger</code>
+                の実装として <a href="http://www.slf4j.org/" target="_blank">SLF4J</a> で実装したものを使用します。また、Doce 自身のログも SLF4J を使用して出力します。
+            </p>
+            <p>
+                Doma の標準のロガー（<code>UtilLoggingJdbcLogger</code>）は、デフォルトではすべてのログを INFO レベルで出力しますが、Doce の SLF4J
+                ロガーは、例外オブジェクトが絡むエラーログは ERROR　レベル、それ以外は DEBUG レベルで出力します。
+            </p>
+        </section>
+        <section name="任意のロガーの使用">
+            <p>
+                Doce が提供する SLF4J ロガーのログレベルやメッセージが気に食わなかったり、すでに独自にロガーを準備していたりする場合は、ロガーを差し替えることも可能です。
+            </p>
+            <p>
+                別途 Guice モジュールで <code>org.seasar.doma.jdbc.JdbcLogger</code>
+                にバインディングを行った場合、Doce はそれを優先して Doma のロガーとして採用します。Doce
+                そのもののロガーの差し替えはできません。
+            </p>
+        </section>
+    </body>
+</document>

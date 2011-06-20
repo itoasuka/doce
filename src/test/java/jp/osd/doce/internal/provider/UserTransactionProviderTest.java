@@ -7,8 +7,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.transaction.UserTransaction;
 
-import jp.osd.doce.internal.provider.UserTransactionProvider;
-
 import org.junit.Test;
 
 import com.google.inject.AbstractModule;

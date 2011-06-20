@@ -6,10 +6,10 @@ package jp.osd.doce;
 /**
  * データソースのバインディングをどのように行うのかを指定するための列挙体です。
  * <P>
- * これは、主に {@link DomaModule} が内部行っているデータソースのバインディング方法について指定するのに用います。
+ * これは、主に {@link DoceModule} が内部行っているデータソースのバインディング方法について指定するのに用います。
  *
  * @author asuka
- * @see DomaModule.Builder#setDataSourceBinding(DataSourceBinding)
+ * @see DoceModule.Builder#setDataSourceBinding(DataSourceBinding)
  */
 public enum DataSourceBinding {
 	/**

@@ -1,8 +1,7 @@
 package jp.osd.doce.internal;
 
-import javax.inject.Singleton;
-
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * 設定に関するヘルパの実装クラスです。

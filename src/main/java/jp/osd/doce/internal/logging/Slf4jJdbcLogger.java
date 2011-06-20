@@ -3,7 +3,6 @@ package jp.osd.doce.internal.logging;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-
 import org.seasar.doma.jdbc.JdbcLogger;
 import org.seasar.doma.jdbc.Sql;
 import org.seasar.doma.jdbc.SqlExecutionSkipCause;

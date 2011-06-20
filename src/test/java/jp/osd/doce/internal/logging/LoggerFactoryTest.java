@@ -4,10 +4,6 @@
 package jp.osd.doce.internal.logging;
 
 import static org.junit.Assert.assertTrue;
-import jp.osd.doce.internal.logging.JulLogger;
-import jp.osd.doce.internal.logging.Logger;
-import jp.osd.doce.internal.logging.LoggerFactory;
-import jp.osd.doce.internal.logging.Slf4jLogger;
 
 import org.junit.Test;
 

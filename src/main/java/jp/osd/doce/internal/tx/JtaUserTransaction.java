@@ -1,12 +1,16 @@
 package jp.osd.doce.internal.tx;
 
-import javax.inject.Inject;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
 import jp.osd.doce.Doma;
-import jp.osd.doce.DomaGuiceException;
+import jp.osd.doce.DoceException;
 import jp.osd.doce.Transaction;
+import jp.osd.doce.internal.logging.Logger;
+import jp.osd.doce.internal.logging.LoggerFactory;
+import jp.osd.doce.internal.logging.MessageCodes;
+
+import com.google.inject.Inject;
 
 /**
  * JTA の {@link UserTransaction} をラップするトランザクションクラスです。
@@ -14,65 +18,79 @@ import jp.osd.doce.Transaction;
  * @author asuka
  */
 public class JtaUserTransaction implements Transaction {
-	private final UserTransaction tx;
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(JtaUserTransaction.class);
 
-	/**
-	 * 新たにオブジェクトを構築します。
-	 *
-	 * @param tx
-	 *            ラップ対象のユーザトランザクション
-	 */
-	@Inject
-	public JtaUserTransaction(@Doma UserTransaction tx) {
-		this.tx = tx;
-	}
+    private final UserTransaction tx;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void begin() {
-		try {
-			tx.begin();
-		} catch (Exception e) {
-			throw new DomaGuiceException("Transaction begin error", e);
-		}
-	}
+    /**
+     * 新たにオブジェクトを構築します。
+     *
+     * @param tx
+     *            ラップ対象のユーザトランザクション
+     */
+    @Inject
+    public JtaUserTransaction(@Doma UserTransaction tx) {
+        LOGGER.logConstructor(UserTransaction.class);
+        this.tx = tx;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void commit() {
-		try {
-			tx.commit();
-		} catch (Exception e) {
-			throw new DomaGuiceException("Transaction commit error", e);
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void begin() {
+        try {
+            tx.begin();
+            LOGGER.debug(MessageCodes.DG016);
+        } catch (Exception e) {
+            LOGGER.error(e, MessageCodes.DG017);
+            throw new DoceException("Transaction begin error", e);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void rollback() {
-		try {
-			tx.rollback();
-		} catch (Exception e) {
-			throw new DomaGuiceException("Transaction rollback error", e);
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commit() {
+        try {
+            if (isActive()) {
+                tx.commit();
+                LOGGER.debug(MessageCodes.DG018);
+            }
+        } catch (Exception e) {
+            LOGGER.error(e, MessageCodes.DG019);
+            throw new DoceException("Transaction commit error", e);
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean isActive() {
-		try {
-			return tx.getStatus() == Status.STATUS_ACTIVE;
-		} catch (Exception e) {
-			throw new DomaGuiceException("Transaction status getting error", e);
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void rollback() {
+        try {
+            if (isActive()) {
+                tx.rollback();
+                LOGGER.debug(MessageCodes.DG020);
+            }
+        } catch (Exception e) {
+            LOGGER.error(e, MessageCodes.DG021);
+            throw new DoceException("Transaction rollback error", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isActive() {
+        try {
+            return tx.getStatus() == Status.STATUS_ACTIVE;
+        } catch (Exception e) {
+            throw new DoceException("Transaction status getting error", e);
+        }
+    }
 
 }

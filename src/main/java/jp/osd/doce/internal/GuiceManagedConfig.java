@@ -1,8 +1,10 @@
 package jp.osd.doce.internal;
 
-import static jp.osd.doce.DomaProperties.*;
+import static jp.osd.doce.DomaProperties.DOMA_BATCH_SIZE;
+import static jp.osd.doce.DomaProperties.DOMA_FETCH_SIZE;
+import static jp.osd.doce.DomaProperties.DOMA_MAX_ROWS;
+import static jp.osd.doce.DomaProperties.DOMA_QUERY_TIMEOUT;
 
-import javax.inject.Named;
 import javax.sql.DataSource;
 
 import jp.osd.doce.Doma;
@@ -14,6 +16,7 @@ import org.seasar.doma.jdbc.SqlFileRepository;
 import org.seasar.doma.jdbc.dialect.Dialect;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * Guice で管理される Doma 設定クラスです。

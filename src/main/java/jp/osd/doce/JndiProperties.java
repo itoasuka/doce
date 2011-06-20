@@ -3,36 +3,41 @@
  */
 package jp.osd.doce;
 
+import org.seasar.doma.jdbc.dialect.Dialect;
+
 /**
  * @author asuka
  */
 public class JndiProperties extends DomaProperties {
-	private static final long serialVersionUID = 3923825987904530206L;
-	public static final String JNDI_DATA_SOURCE = "JNDI.dataSource";
-	public static final String JNDI_TRANSACTION = "JNDI.transaction";
+    private static final long serialVersionUID = 3923825987904530206L;
+    public static final String JNDI_DATA_SOURCE = "JNDI.dataSource";
+    public static final String JNDI_USER_TRANSACTION = "JNDI.userTransaction";
 
-	public JndiProperties(String dataSourceName) {
-		this(dataSourceName, null);
-	}
+    public JndiProperties(String dataSourceName, Class<? extends Dialect> dialectClass) {
+        this(dataSourceName, dialectClass, null);
+    }
 
-	public JndiProperties(String dataSourceName, String transactionName) {
-		setJndiDataSourceName(dataSourceName);
-		setJndiTransactionName(transactionName);
-	}
+    public JndiProperties(String dataSourceName, Class<? extends Dialect> dialectClass, String transactionName) {
+        setJndiDataSourceName(dataSourceName);
+        setDomaDialectClass(dialectClass);
+        if (transactionName != null) {
+            setJndiUserTransactionName(transactionName);
+        }
+    }
 
-	public void setJndiDataSourceName(String jndiDataSourceName) {
-		setString(JNDI_DATA_SOURCE, jndiDataSourceName);
-	}
+    public void setJndiDataSourceName(String jndiDataSourceName) {
+        setString(JNDI_DATA_SOURCE, jndiDataSourceName);
+    }
 
-	public String getJndiDataSourceName() {
-		return getProperty(JNDI_DATA_SOURCE);
-	}
+    public String getJndiDataSourceName() {
+        return getProperty(JNDI_DATA_SOURCE);
+    }
 
-	public void setJndiTransactionName(String jndiTransactionName) {
-		setString(JNDI_TRANSACTION, jndiTransactionName);
-	}
+    public void setJndiUserTransactionName(String jndiUserTransactionName) {
+        setString(JNDI_USER_TRANSACTION, jndiUserTransactionName);
+    }
 
-	public String getJndiTransactionName() {
-		return getProperty(JNDI_TRANSACTION);
-	}
+    public String getJndiUserTransactionName() {
+        return getProperty(JNDI_USER_TRANSACTION);
+    }
 }

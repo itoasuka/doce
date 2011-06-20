@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>設定プロパティー</title>
+    </properties>
+    <body>
+        <section name="目次">
+            <ul>
+                <li><a href="#概要">概要</a></li>
+                <li><a href="#設定プロパティーの項目">設定プロパティーの項目</a>
+                    <ul>
+                        <li><a href="#JDBC_接続に関するプロパティー">JDBC 接続に関するプロパティー</a></li>
+                        <li><a href="#JNDI_に関するプロパティー">JNDI に関するプロパティー</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <section name="概要">
+            <p>
+                Doce では、JDBC の接続情報など実行環境に応じて変更しなければならない値のことを「設定プロパティー」と呼んでいます。設定プロパティーは <code>DoceModule</code> にプロパティーオブジェクト（<code>java.util.Properties</code>）を渡すことで設定可能です。
+            </p>
+        </section>
+        <section name="設定プロパティーの項目">
+            <p>
+                現在 Doce が認識する設定値は以下のとおりです。
+            </p>
+            <subsection name="Doma に関するプロパティー">
+                <p>
+                    このプロパティーの設定のためのユーティリティクラス（<code>java.util.Properties</code>
+                    のサブクラス）として、<a href="../apidocs/jp/osd/doce/DomaProperties.html"><code>jp.osd.doce.DomaProperties</code></a>
+                    クラスがあります。
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>項目名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Doma.batchSize</th>
+                            <td>Doma のバッチサイズ。</td>
+                        </tr>
+                        <tr>
+                            <th>Doma.dialectClassName</th>
+                            <td>Doma のダイアレクトのクラス名。指定しない場合は、<code>JDBC.url</code> から推測された値が使用されます。JNDI からデータソースを取得する場合は <code>JDBC.url</code> を指定することはまずないので、その際はこの値の設定が必須になります。</td>
+                        </tr>
+                        <tr>
+                            <th>Doma.fetchSize</th>
+                            <td>Doma のフェッチサイズ。</td>
+                        </tr>
+                        <tr>
+                            <th>Doma.maxRows</th>
+                            <td>Doma の最大行数の制限値。</td>
+                        </tr>
+                        <tr>
+                            <th>Doma.queryTimeout</th>
+                            <td>Doma のクエリタイムアウト（秒）。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </subsection>
+            <subsection name="JDBC 接続に関するプロパティー">
+                <p>
+                    このプロパティーの設定のためのユーティリティクラス（<code>java.util.Properties</code>
+                    のサブクラス）として、<a href="../apidocs/jp/osd/doce/JdbcProperties.html"><code>jp.osd.doce.JdbcProperties</code></a>
+                    クラスがあります。
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>項目名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>JDBC.url</th>
+                            <td>JDBC 接続する際に使用する URL</td>
+                        </tr>
+                        <tr>
+                            <th>JDBC.username</th>
+                            <td>JDBC 接続する際に使用するユーザ名</td>
+                        </tr>
+                        <tr>
+                            <th>JDBC.password</th>
+                            <td>JDBC 接続する際に使用するパスワード</td>
+                        </tr>
+                        <tr>
+                            <th>JDBC.driverClassName</th>
+                            <td>データソースが <code>BasicDataSource</code> の場合、JDBC 接続する際に使用するドライバのクラス名として使用されます。指定しない場合は、<code>JDBC.url</code> の値から Doce が推測します。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </subsection>
+            <subsection name="JNDI に関するプロパティー">
+                <p>
+                    このプロパティーの設定のためのユーティリティクラス（<code>java.util.Properties</code>
+                    のサブクラス）として、<a href="../apidocs/jp/osd/doce/JndiProperties.html"><code>jp.osd.doce.JndiProperties</code></a>
+                    クラスがあります。
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>項目名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>JNDI.dataSource</th>
+                            <td>JNDI でデータソースをルックアップする際に使用するデータソースのオブジェクト名。</td>
+                        </tr>
+                        <tr>
+                            <th>JNDI.userTransaction</th>
+                            <td>JNDI でユーザトランザクションをルックアップする際に使用するユーザトランザクションのオブジェクト名。指定しない場合は、<code>"java:comp/UserTransaction"</code>
+                            が使用されます。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </subsection>
+            <subsection name="Commons DBCP に関するプロパティー">
+                <p>
+                    データソースに Commons DBCP の BasicDataSource を用いた場合に使用されるプロパティーです。
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>項目名</th>
+                            <th>説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>DBCP.connectionProperties</th>
+                            <td>接続に必要なプロパティ値。</td>
+                        </tr>
+                        <tr>
+                            <th>DBCP.defaultAutoCommit</th>
+                            <td>オートコミットモードの初期値。</td>
+                        </tr>
+                        <tr>
+                            <th>DBCP.defaultAutoCommit</th>
+                            <td>オートコミットモードの初期値。</td>
+                        </tr>
+                        <tr>
+                            <th>DBCP.defaultTransactionIsolation</th>
+                            <td>トランザクション分離レベルの初期値。デフォルト値はドライバに依存します。</td>
+                        </tr>
+                        <tr>
+                            <th>DBCP.defaultCatalog</th>
+                            <td>デフォルトのカタログ名を指定。</td>
+                        </tr>
+                        <tr>
+                            <th>DBCP.maxActive</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>DBCP.maxIdle</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>DBCP.maxOpenPreparedStatements</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>DBCP.maxWait</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>DBCP.minEvictableIdleTimeMillis</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>DBCP.minIdle</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th>DBCP.poolPreparedStatements</th>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </subsection>
+        </section>
+    </body>
+</document>

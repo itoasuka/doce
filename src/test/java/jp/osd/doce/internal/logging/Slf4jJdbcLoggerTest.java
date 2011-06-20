@@ -7,8 +7,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.sql.SQLException;
 
-import jp.osd.doce.internal.logging.Slf4jJdbcLogger;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.seasar.doma.jdbc.Sql;

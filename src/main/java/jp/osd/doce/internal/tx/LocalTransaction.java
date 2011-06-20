@@ -1,6 +1,5 @@
 package jp.osd.doce.internal.tx;
 
-import javax.inject.Inject;
 import javax.sql.DataSource;
 
 import jp.osd.doce.Doma;
@@ -8,6 +7,8 @@ import jp.osd.doce.Transaction;
 
 import org.seasar.doma.jdbc.JdbcLogger;
 import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
+
+import com.google.inject.Inject;
 
 /**
  * Doma の {@link org.seasar.doma.jdbc.tx.LocalTransaction} を用いた

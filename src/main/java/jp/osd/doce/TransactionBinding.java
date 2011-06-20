@@ -6,10 +6,10 @@ package jp.osd.doce;
 /**
  * トランザクション（{@link Transaction}）のバインディングをどのように行うのかを指定するための列挙体です。
  * <P>
- * これは、主に {@link DomaModule} が内部行っているトランザクションのバインディング方法について指定するのに用います。
+ * これは、主に {@link DoceModule} が内部行っているトランザクションのバインディング方法について指定するのに用います。
  *
  * @author asuka
- * @see DomaModule.Builder#setTransactionBinding(TransactionBinding)
+ * @see DoceModule.Builder#setTransactionBinding(TransactionBinding)
  */
 public enum TransactionBinding {
     /**

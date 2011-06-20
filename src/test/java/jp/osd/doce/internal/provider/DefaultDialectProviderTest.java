@@ -1,7 +1,6 @@
 package jp.osd.doce.internal.provider;
 
 import static junit.framework.Assert.assertTrue;
-import jp.osd.doce.internal.provider.DefaultDialectProvider;
 
 import org.junit.Test;
 import org.seasar.doma.jdbc.dialect.Db2Dialect;

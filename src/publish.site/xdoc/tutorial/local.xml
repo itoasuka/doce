@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>ローカル接続</title>
+    </properties>
+    <body>
+        <section name="目次">
+            <ul>
+                <li><a href="#概要">概要</a></li>
+                <li><a href="#基本的な接続法">基本的な接続法</a></li>
+                <li><a href="#データソース実装">データソース実装</a>
+                    <ul>
+                        <li><a href="#Commons_DBCP_のセットアップ">Commons DBCP のセットアップ</a></li>
+                    </ul>
+                </li>
+                <li><a href="#ダイアレクト">ダイアレクト</a></li>
+            </ul>
+        </section>
+        <section name="概要">
+            <p>
+                Doce ではアプリケーションが自前で準備したデータソースを用いてデータベースに接続する方式「ローカル接続」と呼びます。ここではそのローカル接続について説明します。
+            </p>
+        </section>
+        <section name="基本的な接続法">
+            <p>
+                <a href="../quick_start.html">クイックスタート</a>で行った接続法は最も単純なもので、JDBC 接続用の URL とユーザ名のみを指定して行っています。特に組み込みデータベースなどを使用する場合はこの方法でも良いですが、より一般的にはパスワードも指定した以下のような接続方法を用います。
+            </p>
+<div class="source"><pre class="prettyprint"><![CDATA[        // DB 接続情報の設定
+        String url = "jdbc:postgresql:test";    // 接続用 URL
+        String username = "postgres";           // ユーザ名
+        String password = "secret";             // パスワード
+        JdbcProperties jp = new JdbcProperties(url, username, password);
+
+        // Guice インジェクタの作成
+        Module m = new DoceModule(jp);
+        Injector injector = Guice.createInjector(m);]]></pre></div>
+        </section>
+        <section name="データソース実装">
+            <p>
+                Doce は通常、ローカル接続には Doma に標準添付されている
+                <code>SimpleDataSource</code> をデータソースの実装として用います。そのため、<code>META-INF/service/java.sql.Driver</code>
+                ファイルにドライバクラス名を記述しておかなければなりません。
+            </p>
+            <p>
+                Doce はクラスパス上に <a href="http://commons.apache.org/dbcp/" target="_blank">Commons DBCP</a>
+                の <a href="http://commons.apache.org/dbcp/api-1.4/org/apache/commons/dbcp/BasicDataSource.html" target="_blank"><code>org.apache.commons.dbcp.BasicDataSource</code></a>
+                があるとデータソースの実装にこれを用いるようになります。この際、Doce は接続用の URL からドライバクラス名を推測し、データソースに自動的に設定します。この
+                Doce の推測が望ましいものでない場合、以下のように任意のドライバクラス名を指定することができます。
+            </p>
+<div class="source"><pre class="prettyprint"><![CDATA[        // DB 接続情報の設定
+        String url = "jdbc:postgresql:test";    // 接続用 URL
+        String username = "postgres";           // ユーザ名
+        String password = "secret";             // パスワード
+        JdbcProperties jp = new JdbcProperties(url, username, password);
+        // 任意のドライバクラス名を設定
+        jp.setJdbcDriverClassName("org.hoge.Driver");
+
+        // Guice インジェクタの作成
+        Module m = new DoceModule(jp);
+        Injector injector = Guice.createInjector(m);]]></pre></div>
+            <p>
+                Doce はどのデータソース実装を用いたかを INFO レベルのログとして出力します。
+            </p>
+            <subsection name="Commons DBCP のセットアップ">
+                <p>
+                    データソースとして、<a href="http://commons.apache.org/dbcp/" target="_blank">Commons DBCP</a>
+                    の <a href="http://commons.apache.org/dbcp/api-1.4/org/apache/commons/dbcp/BasicDataSource.html" target="_blank"><code>org.apache.commons.dbcp.BasicDataSource</code></a>
+                    を使用する場合のセットアップ方について説明します。
+                </p>
+                <p>
+                    Maven を使用している場合は pom.xml に以下の依存性の記述を追加してください。
+                </p>
+<div class="source"><pre class="prettyprint"><![CDATA[    <dependencies>
+        :
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.4</version>
+        </dependency>
+        :
+    </dependencies>]]></pre></div>
+                <p>
+                    Maven を用いていない場合は <a href="http://commons.apache.org/dbcp/download_dbcp.cgi" target="_blank">Commons DBCP のダウンロードページ</a>より取得してください。また、Commons DBCP
+                    は
+                    <a href="http://commons.apache.org/pool/" target="_blank">Commons Pool</a>
+                    に依存しているため、こちらも<a href="http://commons.apache.org/pool/download_pool.cgi" target="_blank">ダウンロード</a>する必要があります。
+                </p>
+            </subsection>
+        </section>
+        <section name="ダイアレクト">
+            <p>
+                ローカル接続時に Doce はダイアレクトを接続 URL から推測して設定します。Doce はどのダイアレクトを設定したかを INFO レベルのログで出力します。
+            </p>
+            <p>
+                Doce は未知の URL が指定された場合は <code>StandardDialect</code> を使用します。
+            </p>
+            <p>
+                Doce のダイアレクトの推測が望ましくなかったり、別途準備したダイアレクトを使う場合は、以下のようにダイアレクトのクラスを指定することができます。この場合、Doce
+                は、デフォルトコンストラクタでダイアレクトをインスタンス化して使用します。
+            </p>
+<div class="source"><pre class="prettyprint"><![CDATA[        // DB 接続情報の設定
+        String url = "jdbc:postgresql:test";    // 接続用 URL
+        String username = "postgres";           // ユーザ名
+        String password = "secret";             // パスワード
+        JdbcProperties jp = new JdbcProperties(url, username, password);
+        // ダイアレクトのクラスを設定
+        jp.setDialectDriverClass(PostgresDialect.class);
+
+        // Guice インジェクタの作成
+        Module m = new DoceModule(jp);
+        Injector injector = Guice.createInjector(m);
+]]></pre></div>
+            <p>
+                デフォルトコンストラクタを持たないダイアレクト、あるいはデフォルトコンストラクタでインスタンス化したくない場合は、別途 Guice モジュールで
+                <code>org.seasar.doma.jdbc.dialect.Dialect</code> に対するバインドを行ってください。
+            </p>
+        </section>
+    </body>
+</document>

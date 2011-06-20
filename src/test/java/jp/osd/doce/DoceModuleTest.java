@@ -11,10 +11,6 @@ import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
-import jp.osd.doce.DomaGuiceException;
-import jp.osd.doce.DomaModule;
-import jp.osd.doce.TransactionBinding;
-
 import org.junit.Test;
 
 import test.dao.FugaDao;
@@ -28,10 +24,10 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 
-public class DomaModuleTest {
+public class DoceModuleTest {
 	private final Properties domaProperties = new Properties();
 
-	public DomaModuleTest() {
+	public DoceModuleTest() {
 		domaProperties.setProperty("JDBC.url", "jdbc:h2:mem:mydb");
 		domaProperties.setProperty("JDBC.username", "foo");
 		domaProperties.setProperty("JDBC.password", "bar");
@@ -53,7 +49,7 @@ public class DomaModuleTest {
 				binder.bind(Context.class).to(InitialContext.class);
 			}
 		};
-		Module m3 = new DomaModule.Builder().setDaoPackage("")
+		Module m3 = new DoceModule.Builder().setDaoPackage("")
 				.setDaoSubpackage("").setDaoSuffix("Impl")
 				.addDaoTypes(HogeDao.class).addDaoTypes(list)
 				.setTransactionBinding(TransactionBinding.LOCAL_TRANSACTION)
@@ -72,14 +68,14 @@ public class DomaModuleTest {
 				Names.bindProperties(binder, domaProperties);
 			}
 		};
-		Module m2 = new DomaModule.Builder().addDaoTypes(Serializable.class)
+		Module m2 = new DoceModule.Builder().addDaoTypes(Serializable.class)
 				.create();
 
 		try {
 			Guice.createInjector(m1, m2);
 			fail("例外が発生しなかった。");
 		} catch (CreationException e) {
-			assertTrue(e.getCause() instanceof DomaGuiceException);
+			assertTrue(e.getCause() instanceof DoceException);
 		}
 	}
 }

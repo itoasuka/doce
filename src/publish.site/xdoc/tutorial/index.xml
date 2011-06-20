@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>チュートリアル</title>
+    </properties>
+    <body>
+        <section name="目次">
+            <ul>
+                <li><a href="local.html">ローカル接続</a></li>
+                <li><a href="jndi.html">JNDI</a></li>
+                <li><a href="dao.html">DAO のバインディング</a></li>
+                <li><a href="transaction.html">自動トランザクション</a></li>
+                <li><a href="logger.html">ロガー</a></li>
+                <li><a href="property.html">設定プロパティー</a></li>
+            </ul>
+        </section>
+    </body>
+</document>

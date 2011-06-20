@@ -10,7 +10,6 @@ import javax.sql.DataSource;
 
 import jp.osd.doce.DataSourceBinding;
 import jp.osd.doce.Doma;
-import jp.osd.doce.JndiProperties;
 import jp.osd.doce.internal.SettingHelper;
 import jp.osd.doce.internal.logging.Logger;
 import jp.osd.doce.internal.logging.LoggerFactory;

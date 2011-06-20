@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>データソース</title>
+    </properties>
+    <body>
+        <section name="目次">
+            <ul>
+                <li><a href="#概要">概要</a></li>
+                <li><a href="#データソースの自動選択">データソースの自動選択</a>
+                    <ul>
+                        <li><a href="#JNDI_由来のデータソース">JNDI_由来のデータソース</a></li>
+                        <li><a href="#Commons_DBCP_のデータソース">Commons DBCP のデータソース</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <section name="概要">
+            <p>
+                Doce は設定や環境に応じて自動的に作成するデータソースを選択します。
+            </p>
+        </section>
+        <section name="データソースの自動選択">
+            <p>
+                Doce が行うデータソースの自動選択について優先度が高い順に説明します。
+            </p>
+            <subsection name="JNDI 由来のデータソース">
+                <p>
+                    Doce は設定プロパティーで <code>JNDI.dataSource</code> の値が設定されると、データソースを JNDI
+                    を用いて取得します。
+                </p>
+                <p>
+                    取得には <a href="http://java.sun.com/javase/ja/6/docs/ja/api/javax/naming/InitialContext.html" target="_blank"><code>javax.naming.InitialContext</code></a>
+                    を環境プロパティーなしでインスタンス化したもので行います。
+                </p>
+                <p>
+                    任意のネーミングコンテキストを使用することもできます。その際は Guice モジュールで <code>javax.naming.Context</code> に任意のバインドを行ってください。
+                </p>
+            </subsection>
+            <subsection name="Commons DBCP のデータソース">
+                <p>
+                    Doce は設定プロパティーで <code>JNDI.dataSource</code> の値が設定されていない場合で、クラスパス上に
+                    <a href="http://commons.apache.org/dbcp/" target="_blank">Commons DBCP</a>
+                    の <a href="http://commons.apache.org/dbcp/api-1.4/org/apache/commons/dbcp/BasicDataSource.html" target="_blank"><code>org.apache.commons.dbcp.BasicDataSource</code></a>
+                    がある場合、これを用いてデータソースとします。
+                </p>
+                <p>
+                    Maven を用いている場合は以下のように記述することで Commons DBCP 関連ライブラリをクラスパスに含めることが出来ます。
+                </p>
+<div class="source"><pre class="prettyprint"><![CDATA[    <dependencies>
+        :
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.4</version>
+        </dependency>
+        :
+    </dependencies>]]></pre></div>
+                <p>
+                    Maven を用いていない場合は <a href="http://commons.apache.org/dbcp/download_dbcp.cgi" target="_blank">Commons DBCP のダウンロードページ</a>より取得してください。また、Commons DBCP
+                    は
+                    <a href="http://commons.apache.org/pool/" target="_blank">Commons Pool</a>
+                    に依存しているため、こちらも<a href="http://commons.apache.org/pool/download_pool.cgi" target="_blank">ダウンロード</a>する必要があります。
+                </p>
+            </subsection>
+            <subsection name="Doma 添付のデータソース">
+                <p>
+                    JNDI を利用せず、かつ Commons DBCP が利用できない場合は Doce は Doma に標準で添付されている
+                    <a href="http://doma.seasar.org/apidocs/org/seasar/doma/jdbc/SimpleDataSource.html" target="_blank"><code>org.seasar.doma.jdbc.SimpleDataSource</code></a>
+                    を用いてデータソースとします。
+                </p>
+            </subsection>
+        </section>
+    </body>
+</document>

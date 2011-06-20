@@ -1,13 +1,18 @@
 package jp.osd.doce.internal.provider;
 
-import javax.inject.Provider;
-
+import static jp.osd.doce.DomaProperties.DOMA_DIALECT_CLASS_NAME;
+import static jp.osd.doce.JdbcProperties.JDBC_URL;
+import jp.osd.doce.DoceException;
 import jp.osd.doce.internal.JdbcUtils;
+import jp.osd.doce.internal.logging.Logger;
+import jp.osd.doce.internal.logging.LoggerFactory;
+import jp.osd.doce.internal.logging.MessageCodes;
 
 import org.seasar.doma.jdbc.dialect.Dialect;
 import org.seasar.doma.jdbc.dialect.StandardDialect;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
 /**
@@ -22,48 +27,83 @@ import com.google.inject.name.Named;
  * @author asuka
  */
 public class DefaultDialectProvider implements Provider<Dialect> {
-	private String jdbcUrl = null;
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(DefaultDialectProvider.class);
 
-	private Dialect dialect = null;
+    private String jdbcUrl = null;
 
-	/**
-	 * 新たにオブジェクトを構築します。
-	 */
-	public DefaultDialectProvider() {
-	}
+    private Dialect dialect = null;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Dialect get() {
-		if (dialect != null) {
-			return dialect;
-		}
-		if (jdbcUrl == null) {
-			return new StandardDialect();
-		}
-		return JdbcUtils.getDialect(jdbcUrl);
-	}
+    private String dialectClassName = null;
 
-	/**
-	 * Dialect を判定するための JDBC 接続 URL を設定します。
-	 * @param jdbcUrl
-	 *            JDBC 接続 URL
-	 */
-	@Inject(optional = true)
-	public void setJdbcUrl(@Named("JDBC.url") String jdbcUrl) {
-		this.jdbcUrl = jdbcUrl;
-	}
+    /**
+     * 新たにオブジェクトを構築します。
+     */
+    public DefaultDialectProvider() {
+        LOGGER.logConstructor();
+    }
 
-	/**
-	 * プロバイダとして提供するダイアレクトを設定します。
-	 * @param dialect
-	 *            ダイアレクト
-	 */
-	@Inject(optional = true)
-	public void setDialect(Dialect dialect) {
-		this.dialect = dialect;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Dialect get() {
+        if (dialect != null) {
+            LOGGER.info(MessageCodes.DG011);
+            return dialect;
+        }
+        if (dialectClassName != null) {
+            try {
+                LOGGER.info(MessageCodes.DG012, dialectClassName);
+                return Class.forName(dialectClassName)
+                        .asSubclass(Dialect.class).newInstance();
+            } catch (Exception e) {
+                LOGGER.error(e, MessageCodes.DG013, e);
+                throw new DoceException(dialectClassName + " newInstance error", e);
+            }
+        }
+        if (jdbcUrl == null) {
+            LOGGER.info(MessageCodes.DG014);
+            return new StandardDialect();
+        }
+        Dialect d = JdbcUtils.getDialect(jdbcUrl);
+        LOGGER.info(MessageCodes.DG015, jdbcUrl, d.getClass());
+        return d;
+    }
 
+    /**
+     * Dialect を判定するための JDBC 接続 URL を設定します。
+     *
+     * @param jdbcUrl
+     *            JDBC 接続 URL
+     */
+    @Inject(optional = true)
+    public void setJdbcUrl(@Named(JDBC_URL) String jdbcUrl) {
+        this.jdbcUrl = jdbcUrl;
+    }
+
+    /**
+     * プロバイダとして提供するダイアレクトを設定します。
+     *
+     * @param dialect
+     *            ダイアレクト
+     */
+    @Inject(optional = true)
+    public void setDialect(Dialect dialect) {
+        this.dialect = dialect;
+    }
+
+    /**
+     * プロバイダとして提供するダイアレクトのクラス名を設定します。
+     * <P>
+     * {@link #setDialect(Dialect)} でダイアレクトが設定されなかった場合、この値からダイアレクトを生成して提供します。
+     *
+     * @param dialectClassName
+     *            ダイアレクトのクラス名
+     */
+    @Inject(optional = true)
+    public void setDomaDialectClassName(
+            @Named(DOMA_DIALECT_CLASS_NAME) String dialectClassName) {
+        this.dialectClassName = dialectClassName;
+    }
 }

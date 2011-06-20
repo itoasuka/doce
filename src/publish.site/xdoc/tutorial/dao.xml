@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>DAO のバインディング</title>
+    </properties>
+    <body>
+        <section name="目次">
+            <ul>
+                <li><a href="#概要">概要</a></li>
+                <li><a href="#起動クラスの修正">起動クラスの修正</a></li>
+                <li><a href="#実装クラス名のカスタマイズ">実装クラス名のカスタマイズ</a></li>
+            </ul>
+        </section>
+        <section name="概要">
+            <p>
+                Doma ユーザならば一度は javac のバグ（Bug ID <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403465" target="_blank">6403465</a>）に悩まされたことがあるかと思います（<a href="http://doma.seasar.org/reference/app_build.html" target="_blank">Doma
+                の公式サイトにもこの話は載っています</a>よね）。このせいで、悪いのは
+                Doma じゃないのに Doma が悪者っぽくみられてプロジェクトへの採用が見送られたなんてこともあるかもしれません。また、対応策が「無視すること」というのもとくに几帳面な人には気持ち悪い話です。
+            </p>
+            <p>
+                Doce は、この問題に対応するためソースコード上から完全に APT で生成される実装クラスを隠蔽し、そのようなエラーがでない仕組みを提供しています。
+            </p>
+        </section>
+        <section name="起動クラスの修正">
+            <p>
+                <a href="../quick_start.html">クイックスタート</a>で作成した起動クラスを修正し、実装クラス名を隠蔽してみます。
+            </p>
+<div class="source"><pre class="prettyprint lang-java">package quickstart;
+
+import java.math.BigDecimal;
+
+import jp.osd.doce.DoceModule;
+import jp.osd.doce.JdbcProperties;
+import jp.osd.doce.Transaction;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+
+public class Main {
+    public static void main(String[] args) {
+        // DB 接続情報の設定
+        JdbcProperties jp = new JdbcProperties(
+                "jdbc:h2:tcp://localhost/~/test", "sa");
+
+        // Guice インジェクタの作成
+        // 第二引数以降に DAO インタフェースのクラスを指定する
+        Module m = new DoceModule(jp, EmployeeDao.class);
+        Injector injector = Guice.createInjector(m);
+
+        // トランザクションの取得
+        Transaction tx = injector.getInstance(Transaction.class);
+
+        // トランザクションの開始
+        tx.begin();
+        try {
+            // APT で生成された Dao の実装クラスを取得
+            // インスタンスを取得するときはインタフェースを指定して取得
+            EmployeeDao dao = injector.getInstance(EmployeeDao.class);
+
+            // 主キーでエンティティを検索
+            Employee employee = dao.selectById(1);
+
+            // エンティティのプロパティを変更
+            employee.employeeName = "KING";
+            employee.salary = employee.salary.add(new BigDecimal(1000));
+
+            // エンティティを更新
+            dao.update(employee);
+
+            // トランザクションのコミット
+            tx.commit();
+        } finally {
+            tx.rollback();
+        }
+    }
+}</pre>
+</div>
+            <p>
+                <code>DoceModule</code> のコンストラクタは第二引数以降が可変長引数になっており、ここに指定した Dao
+                のインタフェースにバインドする実装クラスは実行時に決定されます。可変長引数にだらだら書き連ねるのが嫌だなという場合は、任意のコレクションクラスを渡すこともできます。
+            </p>
+        </section>
+        <section name="実装クラス名のカスタマイズ">
+            <p>
+                APT にオプションを指定して実装クラスのパッケージやサフィックスをカスタマイズしている場合、Doce 側にもそれに対応する設定が必要です。詳しくは「<a href="builder.html">モジュールビルダ</a>」を参照してください。
+            </p>
+        </section>
+    </body>
+</document>

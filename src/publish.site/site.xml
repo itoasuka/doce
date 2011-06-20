@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Doce">
+    <skin>
+        <groupId>jp.osd.project</groupId>
+        <artifactId>osd-skin</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </skin>
+    <body>
+        <menu name="About" inherit="top">
+            <item name="ホーム" href="index.html" />
+            <item name="ダウンロード" href="downloads.html" />
+            <item name="課題追跡" href="https://github.com/itoasuka/doce/issues" />
+        </menu>
+        <menu name="ドキュメント" inherit="top">
+            <item name="セットアップ" href="setup.html" />
+            <item name="クイックスタート" href="quick_start.html" />
+            <item name="チュートリアル" href="tutorial/index.html" collapse="true" >
+                <item name="ローカル接続" href="tutorial/local.html" />
+                <item name="JNDI" href="tutorial/jndi.html" />
+                <item name="DAO のバインディング" href="tutorial/dao.html" />
+                <item name="自動トランザクション" href="tutorial/transaction.html" />
+                <item name="データソース" href="tutorial/datasource.html" />
+                <item name="ロガー" href="tutorial/logger.html" />
+                <item name="設定プロパティー" href="tutorial/property.html" />
+            </item>
+            <item name="Javadoc" href="apidocs/index.html" />
+        </menu>
+        <menu ref="reports" />
+    </body>
+    <poweredBy>
+        <logo name="Maven" href="http://maven.apache.org/"
+            img="./images/logos/maven-feather.png" />
+    </poweredBy>
+</project>

@@ -92,7 +92,7 @@ public class AutoTransactionProvider implements Provider<Transaction> {
         switch (transactionBinding) {
         case AUTO:
             if (dataSource instanceof LocalTransactionalDataSource) {
-                LOGGER.debug(MessageCodes.DG005);
+                LOGGER.info(MessageCodes.DG005);
                 transaction = injector.getInstance(LocalTransaction.class);
             } else {
                 UserTransaction tx = injector.getInstance(

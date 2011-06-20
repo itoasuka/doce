@@ -13,7 +13,7 @@ import com.google.inject.BindingAnnotation;
 /**
  * {@link jp.osd.doce.internal.GuiceManagedConfig} にインジェクションすることを示す注釈です。
  * <P>
- * {@link DomaModule} で設定したインジェクタで DAO にインジェクションされる列挙体を除く定数以外のオブジェクトはこのアノテーションを付加してバインド定義されています。
+ * {@link DoceModule} で設定したインジェクタで DAO にインジェクションされる列挙体を除く定数以外のオブジェクトはこのアノテーションを付加してバインド定義されています。
  * @author asuka
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>自動トランザクション</title>
+    </properties>
+    <body>
+        <section name="目次">
+            <ul>
+                <li><a href="#概要">概要</a></li>
+                <li><a href="#サービスクラスの作成">サービスクラスの作成</a></li>
+                <li><a href="#トランザクションの実装">トランザクションの実装</a>
+                    <ul>
+                        <li><a href="#ローカルトランザクション">ローカルトランザクション</a></li>
+                        <li><a href="#JNDI_由来のユーザトランザクション">JNDI 由来のユーザトランザクション</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <section name="概要">
+            <p>
+                Doce は AOP とアノテーションを用いて自動的にトランザクションを提供する仕組みを持っています。
+            </p>
+        </section>
+        <section name="サービスクラスの作成">
+            <p>
+                Doce では、<code>jp.osd.doce.Transactional</code> アノテーションがついたクラスのすべてのメソッド、またはこのアノテーションがついたメソッドに入るときにトランザクションが開始されます。すでにトランザクションが開始されている場合は何もしません。
+            </p>
+            <p>
+                入るときにトランザクションを開始したメソッドは、終了時にトランザクションをコミットします。ただし、例外が発生した場合はロールバックします。
+            </p>
+            <p>
+                例として<a href="../quick_start.html">クイックスタート</a>のトランザクション部分をこの仕組を用いた「サービスクラス」を作って置き換えてみます。
+            </p>
+<div class="source"><pre class="prettyprint lang-java"><![CDATA[package quickstart;
+
+import java.math.BigDecimal;
+
+import com.google.inject.Inject;
+
+import jp.osd.doce.Transactional;
+
+/**
+ * ビジネスロジックを受け持つサービスクラスです。
+ * Transactional アノテーションにより、すべてのメソッドがトランザクション管理下におかれます。
+ */
+@Transactional
+public class EmployeeService {
+    @Inject
+    private EmployeeDao employeeDao;
+
+    public void update(int employeeId, String employeeName, BigDecimal salary) {
+        // 主キーでエンティティを検索
+        Employee employee = employeeDao.selectById(employeeId);
+
+        // エンティティのプロパティを変更
+        employee.employeeName = employeeName;
+        employee.salary = employee.salary.add(salary);
+
+        // エンティティを更新
+        employeeDao.update(employee);
+    }
+}]]></pre></div>
+            <p>
+                起動クラスは以下のようになります。
+            </p>
+<div class="source"><pre class="prettyprint lang-java"><![CDATA[package quickstart;
+
+import java.math.BigDecimal;
+
+import jp.osd.doce.DoceModule;
+import jp.osd.doce.JdbcProperties;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+
+public class Main {
+    public static void main(String[] args) {
+        // DB 接続情報の設定
+        JdbcProperties jp = new JdbcProperties(
+                "jdbc:h2:tcp://localhost/~/test", "sa");
+
+        // Guice インジェクタの作成
+        // 第二引数以降に DAO インタフェースのクラスを指定する
+        Module m = new DoceModule(jp, EmployeeDao.class);
+        Injector injector = Guice.createInjector(m);
+
+        // サービスクラスを取得
+        EmployeeService service = injector.getInstance(EmployeeService.class);
+
+        // サービスの呼び出し
+        service.update(1, "KING", new BigDecimal(1000));
+    }
+}]]></pre></div>
+        </section>
+        <section name="トランザクションの実装">
+            <p>
+                トランザクション機能の実装は、環境に応じて Doce が自動的に選択します。
+            </p>
+            <subsection name="ローカルトランザクション">
+                <p>
+                    以下のいずれかの条件に合致するとき、Doce はトランザクションに Doma が標準で持っているローカルトランザクションの仕組みを用いた実装を使用します。
+                </p>
+                <ul>
+                    <li>データソースが JNDI 由来ではない。</li>
+                    <li>データソースが JNDI 由来だが、設定プロパティーの <code>JNDI.userTransaction</code> の値が設定されておらず、かつ <code>"java:comp/UserTransaction"</code>
+                    で JNDI からユーザトランザクションがルックアップできない。</li>
+                </ul>
+                <p>
+                    Doce においてデータソースがどのように準備されるのかについては「<a href="datasource.html">データソース</a>」を参照してください。
+                </p>
+            </subsection>
+            <subsection name="JNDI 由来のユーザトランザクション">
+                <p>
+                    Doce はローカルトランザクションを利用する条件に合致しない場合は、JNDI
+                    由来のユーザトランザクションを用いようとして、JNDI からのルックアップを行います。
+                </p>
+                <p>
+                    ルックアップを行う際のオブジェクト名には、設定プロパティーの <code>JNDI.userTransaction</code>
+                    の値が設定されていれば、その値を使用します。設定されていなければ
+                    <code>"java:comp/UserTransaction"</code> を使用します。
+                </p>
+            </subsection>
+        </section>
+    </body>
+</document>
