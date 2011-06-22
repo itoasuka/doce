@@ -13,6 +13,7 @@ public class TestServiceImpl implements TestService {
 	@Override
 	@Transactional
 	public void test() {
+		hogeDao.dropTable();
 		hogeDao.createTable();
 		Hoge hoge = new Hoge();
 		hoge.id = 1;
