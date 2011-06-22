@@ -43,7 +43,7 @@ public class DomaProperties extends Properties {
         setInteger(DOMA_MAX_ROWS, domaMaxRows);
     }
 
-    public Integer setDomaMaxRows() {
+    public Integer getDomaMaxRows() {
         return getInteger(DOMA_MAX_ROWS);
     }
 
@@ -51,7 +51,7 @@ public class DomaProperties extends Properties {
         setInteger(DOMA_FETCH_SIZE, domaFetchSize);
     }
 
-    public Integer setDomaFetchSize() {
+    public Integer getDomaFetchSize() {
         return getInteger(DOMA_FETCH_SIZE);
     }
 

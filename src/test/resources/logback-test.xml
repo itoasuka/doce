@@ -16,7 +16,8 @@
         </encoder>
     </appender>
 
-    <logger name="jp.osd.doma" level="TRACE" />
+    <logger name="jp.osd.doce" level="TRACE" />
+    <logger name="test" level="TRACE" />
 
     <root level="WARN">
         <appender-ref ref="FILE" />
