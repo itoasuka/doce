@@ -65,7 +65,7 @@
         <dependency>
             <groupId>org.seasar.doma</groupId>
             <artifactId>doma</artifactId>
-            <version>1.16.0</version>
+            <version>1.17.0</version>
         </dependency>
 
         <!-- Guice 関連 -->
