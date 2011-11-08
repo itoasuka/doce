@@ -13,18 +13,18 @@ package jp.osd.doce;
  */
 public enum DataSourceBinding {
 	/**
-	 *　バインドする実装クラスオブジェクトを自動で判定するように指定します。どのように判定されるかは {@link jp.osd.doce.internal.provider.AutoDataSourceProvider} を参照してください。
+	 * バインドする実装クラスオブジェクトを自動で判定するように指定します。どのように判定されるかは {@link jp.osd.doce.internal.provider.AutoDataSourceProvider} を参照してください。
 	 * @see jp.osd.doce.internal.provider.AutoDataSourceProvider
 	 */
 	AUTO,
 	/**
-	 * <a href="http://doma.seasar.org/" target="_blank">Doma</a> 付属の {@link org.seasar.doma.jdbc.provider.SimpleDataSource} オブジェクトを実装クラスオブジェクトとしてバインディングするように指定します。
+	 * <a href="http://doma.seasar.org/" target="_blank">Doma</a> 付属の {@link org.seasar.doma.jdbc.SimpleDataSource} オブジェクトを実装クラスオブジェクトとしてバインディングするように指定します。
 	 *
 	 * @see jp.osd.doce.internal.provider.SimpleDataSourceProvider
 	 */
 	SIMPLE_DATA_SOURCE,
 	/**
-	 * <a href="http://commons.apache.org/dbcp/" target="_blank">Commons DBCP</a> の {@link org.apache.commons.dbcp.provider.BasicDataSource} オブジェクトを実装クラスオブジェクトとしてバインディングするように指定します。
+	 * <a href="http://commons.apache.org/dbcp/" target="_blank">Commons DBCP</a> の {@link org.apache.commons.dbcp.BasicDataSource} オブジェクトを実装クラスオブジェクトとしてバインディングするように指定します。
 	 *
 	 * @see jp.osd.doce.internal.provider.BasicDataSourceProvider
 	 */
