@@ -57,7 +57,7 @@
 		<!-- mvn deploy コマンドでデプロイする -->
 		<repository>
 			<id>osd.jp</id>
-			<url>scp://osd.jp/var/www/maven2</url>
+			<url>scp://osd.jp:10022/var/www/maven2</url>
 		</repository>
 	</distributionManagement>
 
@@ -81,7 +81,7 @@
 		<dependency>
 			<groupId>org.seasar.doma</groupId>
 			<artifactId>doma</artifactId>
-			<version>1.19.0</version>
+			<version>1.20.0</version>
 		</dependency>
 
 		<!-- Guice 関連 -->
