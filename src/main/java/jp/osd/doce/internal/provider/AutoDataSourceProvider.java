@@ -33,13 +33,13 @@ import com.google.inject.name.Named;
  * <LI>{@link #setJndiDataSourceName(String)} で設定された値があれば
  * {@link JndiDataSourceProvider} を用いてデータソースを取得して提供します。
  * <LI>{@code org.apache.commons.dbcp.BasicDataSource} クラスがクラスパス上に存在するとき、
- * {@link BasicDataSourceProvider} を用いてデータソースを取得して提供します。
+ * {@link BoneCPDataSourceProvider} を用いてデータソースを取得して提供します。
  * <LI>上記のいずれにも当てはまらない場合、{@link SimpleDataSourceProvider} を用いてデータソースを取得して提供します。
  * </OL>
  *
  * <H4>{@link DataSourceBinding#BASIC_DATA_SOURCE} の場合</H4>
  *
- * {@link BasicDataSourceProvider} を用いてデータソースを取得して提供します。
+ * {@link BoneCPDataSourceProvider} を用いてデータソースを取得して提供します。
  * {@code org.apache.commons.dbcp.BasicDataSource} クラスがクラスパス上に存在しない場合は
  * {@link ClassNotFoundException} がスローされます。
  *
@@ -56,7 +56,7 @@ import com.google.inject.name.Named;
  * {@link #setDataSource(DataSource)} で設定された値を提供します。
  *
  * @author asuka
- * @see BasicDataSourceProvider
+ * @see BoneCPDataSourceProvider
  * @see SimpleDataSourceProvider
  * @see JndiDataSourceProvider
  */
@@ -114,11 +114,11 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 			}
 			break;
 		case JNDI:
-			dataSource = injector.getInstance(BasicDataSourceProvider.class)
+			dataSource = injector.getInstance(BoneCPDataSourceProvider.class)
 					.get();
 			break;
 		case BASIC_DATA_SOURCE:
-			dataSource = injector.getInstance(BasicDataSourceProvider.class)
+			dataSource = injector.getInstance(BoneCPDataSourceProvider.class)
 					.get();
 			break;
 		case SIMPLE_DATA_SOURCE:
@@ -143,8 +143,8 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 
 	private boolean createBasicDataSource() {
 		if (settingHelper
-				.isClassLoadable("org.apache.commons.dbcp.BasicDataSource")) {
-			dataSource = injector.getInstance(BasicDataSourceProvider.class)
+				.isClassLoadable("com.jolbox.bonecp.BoneCPDataSource")) {
+			dataSource = injector.getInstance(BoneCPDataSourceProvider.class)
 					.get();
 			return true;
 		}

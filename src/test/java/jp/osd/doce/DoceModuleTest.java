@@ -14,7 +14,6 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.junit.Test;
 import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
 
@@ -31,6 +30,7 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
+import com.jolbox.bonecp.BoneCPDataSource;
 
 public class DoceModuleTest {
 	private final JdbcProperties domaProperties = new JdbcProperties(
@@ -139,7 +139,7 @@ public class DoceModuleTest {
 
 		DataSource ds = injector.getInstance(Key.get(DataSource.class,
 				Doma.class));
-		((BasicDataSource) ds).setDefaultAutoCommit(true);
+		((BoneCPDataSource) ds).setDefaultAutoCommit(true);
 		TestService ts = injector.getInstance(TestService.class);
 		ts.test();
 		Hoge hoge = ts.get(1);

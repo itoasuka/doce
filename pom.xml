@@ -93,12 +93,11 @@
 
 		<!-- Commons DBCP（オプション） -->
 		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>1.4</version>
-			<optional>true</optional>
+			<groupId>com.jolbox</groupId>
+			<artifactId>bonecp</artifactId>
+			<version>0.7.1.RELEASE</version>
 		</dependency>
-
+		
 		<!-- JTA 関連（オプション） -->
 		<dependency>
 			<groupId>javax.transaction</groupId>
@@ -152,7 +151,7 @@
 
 	<build>
 		<defaultGoal>validate</defaultGoal>
-		
+
 		<extensions>
 			<!-- Enabling the use of SSH -->
 			<extension>
@@ -161,7 +160,7 @@
 				<version>2.0</version>
 			</extension>
 		</extensions>
-		
+
 		<plugins>
 			<!-- compiler: http://maven.apache.org/plugins/maven-compiler-plugin/ -->
 			<plugin>
