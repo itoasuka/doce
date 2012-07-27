@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>モジュールビルダ</title>
+    </properties>
+    <body>
+        <section name="目次">
+            <ul>
+                <li><a href="#description">概要</a></li>
+                <li><a href="#basic">基本的な使い方</a></li>
+                <li><a href="#property">設定プロパティーの設定</a></li>
+                <li><a href="#dao">DAO の設定</a>
+                    <ul>
+                        <li><a href="#dao_interface">DAO インタフェースの登録</a></li>
+                        <li><a href="#dao_suffix">実装クラスのサフィックスの設定</a></li>
+                        <li><a href="#dao_package">実装クラスのパッケージの設定</a></li>
+                    </ul>
+                </li>
+                <li><a href="#datasource">データソースの設定</a></li>
+                <li><a href="#transaction">トランザクションの設定</a></li>
+            </ul>
+        </section>
+        <section name="概要" id="description">
+            <p>
+                Guice に渡す Doce 用のモジュールは、モジュールビルダを使うことによってカスタマイズすることができます。
+            </p>
+        </section>
+        <section name="基本的な使い方" id="basic">
+            <p>
+                <a href="../apidocs/index.html?jp/osd/doce/DoceModule.Builder.html"><code>jp.osd.doce.DoceModule.Builder</code></a>
+                を用いて Doce を使用するための Guice モジュールを作成します。
+            </p>
+            <div class="source"><pre class="prettyprint lang-java">DoceModule.Builder builder = new DoceModule.Builder();
+
+// 各種設定を行う。下の例は HogeDao を Dao インタフェースとして登録している。
+builder.addDaoType(HogeDao.class);
+
+DoceModule m = builder.create();
+Injector injector = Guice.createInjector(m);</pre>
+            </div>
+            <p>
+                モジュールビルダの各メソッドは自分自身を返すので以下のように書くこともできます。
+            </p>
+            <div class="source"><pre class="prettyprint lang-java">DoceModule.Builder builder = new DoceModule.Builder();
+
+DoceModule m = builder.addDaoType(HogeDao.class).create();
+Injector injector = Guice.createInjector(m);</pre>
+            </div>
+        </section>
+        <section name="設定プロパティーの設定" id="property">
+            <p>
+                <a href="property.html">設定プロパティー</a>は以下のように <code>setProperties</code> メソッドで設定します。
+            </p>
+            <div class="source"><pre class="prettyprint lang-java">DoceModule.Builder builder = new DoceModule.Builder();
+JdbcProperties jp = new JdbcProperties("jdbc:h2:tcp://localhost/~/test", "sa");
+
+DoceModule m = builder.setProperties(jp).create();
+Injector injector = Guice.createInjector(m);</pre>
+            </div>
+        </section>
+        <section name="DAO の設定" id="dao">
+            <subsection name="DAO インタフェースの登録" id="dao_interface">
+                <p>
+                    Guice 管理下におく DAO インタフェースは以下のように <code>addDaoType</code> メソッドで登録します。
+                </p>
+                <div class="source"><pre class="prettyprint lang-java">DoceModule.Builder builder = new DoceModule.Builder();
+List&gt;Class&gt;?&lt;&lt; list = new ArrayList&gt;Class&gt;?&lt;&lt;();
+
+// コレクションで登録することが出来ます
+list.add(HogeDao.class);
+builder.addDaoType(list);
+
+// 可変引数に指定して登録することも出来ます
+builder.addDaoType(FooDao.class, BarDao.class);
+
+DoceModule m = builder.create();
+Injector injector = Guice.createInjector(m);</pre>
+                </div>
+            </subsection>
+            <subsection name="DAO 実装クラスのサフィックスの設定" id="dao_suffix">
+                <p>
+                    Doma の APT を独自に設定して DAO の実装クラスのサフィックスを任意のものに変更している場合、<code>setDaoSuffix</code> メソッドでそれを設定しなければなりません。
+                </p>
+                <div class="source"><pre class="prettyprint lang-java">DoceModule.Builder builder = new DoceModule.Builder();
+
+// サフィックスを "Im" に変更する場合
+DoceModule m = builder.setDaoSuffix("Im").create();
+Injector injector = Guice.createInjector(m);</pre>
+                </div>
+            </subsection>
+            <subsection name="DAO 実装クラスのパッケージの設定" id="dao_package">
+                <p>
+                    Doma の APT を独自に設定して DAO の実装クラスのパッケージ変更している場合、<code>setDaoPackage</code>
+                    メソッドおよび <code>setDaoSubPackage</code> でそれを設定しなければなりません。
+                </p>
+                <div class="source"><pre class="prettyprint lang-java">DoceModule.Builder builder = new DoceModule.Builder();
+
+// DAO 実装クラスのパッケージは com.example.dao.impl となる
+DoceModule m = builder.setDaoPackage("com.example.dao").setDaoSubPackage("impl").create();
+Injector injector = Guice.createInjector(m);</pre>
+                </div>
+            </subsection>
+        </section>
+        <section name="データソースの設定" id="datasource">
+            <p>
+                DAO にバインドするデータソースを明示的に指定することが出来ます。<code>setDataSourceBinding</code> に 列挙型 <a href="../apidocs/index.html?jp/osd/doce/DataSourceBinding.html"><code>jp.osd.doce.DataSourceBinding</code></a> 
+                の値を指定してください。各値の意味は API ドキュメントを参照してください。
+            </p>
+            <div class="source"><pre class="prettyprint lang-java">DoceModule.Builder builder = new DoceModule.Builder();
+
+// 下の例はデータソースを JNDI から持ってくるように指定している。
+DoceModule m = builder.setDataSourceBingding(DataSourceBinding.JNDI).create();
+Injector injector = Guice.createInjector(m);</pre>
+            </div>
+        </section>
+        <section name="トランザクションの設定" id="transaction">
+            <p>
+                自動トランザクションで使用するトランザクション実装を明示的に指定することが出来ます。<code>setTransactionBinding</code> に 列挙型 <a href="../apidocs/index.html?jp/osd/doce/TransactionBinding.html"><code>jp.osd.doce.TransactionBinding</code></a> 
+                の値を指定してください。各値の意味は API ドキュメントを参照してください。
+            </p>
+            <div class="source"><pre class="prettyprint lang-java">DoceModule.Builder builder = new DoceModule.Builder();
+
+// 下の例は JTA トランザクション実装を JNDI から持ってくるように指定している。
+DoceModule m = builder.setTransactionBingding(TransactionBinding.JTA_USER_TRANSACTION).create();
+Injector injector = Guice.createInjector(m);</pre>
+            </div>
+        </section>
+    </body>
+</document>

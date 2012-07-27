@@ -44,7 +44,7 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 	 *            データベースへログインするためのユーザ名
 	 * @param transactionBinding
 	 *            どのようにトランザクションをバインディングするか
-	 * @see BoneCPDataSource#setUrl(String)
+	 * @see BoneCPDataSource#setJdbcUrl(String)
 	 * @see BoneCPDataSource#setUsername(String)
 	 */
 	@Inject
@@ -107,7 +107,7 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 	 * 
 	 * @param defaultAutoCommit
 	 *            defaultAutoCommit プロパティの値
-	 * @see BoneCPDataSource#setDefaultAutoCommit(boolean)
+	 * @see BoneCPDataSource#setDefaultAutoCommit(Boolean)
 	 */
 	@Inject(optional = true)
 	public void setDefaultAutoCommit(
@@ -122,7 +122,7 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 	 * 
 	 * @param defaultReadOnly
 	 *            defaultAutoCommit プロパティの値
-	 * @see BoneCPDataSource#setDefaultReadOnly(boolean)
+	 * @see BoneCPDataSource#setDefaultReadOnly(Boolean)
 	 */
 	@Inject(optional = true)
 	public void setDefaultReadOnly(
@@ -137,7 +137,7 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 	 * 
 	 * @param defaultTransactionIsolation
 	 *            defaultTransactionIsolation プロパティの値
-	 * @see BoneCPDataSource#setDefaultTransactionIsolation(int)
+	 * @see BoneCPDataSource#setDefaultTransactionIsolation(String)
 	 */
 	@Inject(optional = true)
 	public void setDefaultTransactionIsolation(
@@ -169,8 +169,8 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 	 * @see BoneCPDataSource#setPartitionCount(int)
 	 */
 	@Inject(optional = true)
-	public void setPartitionCount(@Named("BoneCP.initialSize") int partitionCount) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.initialSize", partitionCount);
+	public void setPartitionCount(@Named("BoneCP.partitionCount") int partitionCount) {
+		LOGGER.debug(MessageCodes.DG002, "BoneCP.partitionCount", partitionCount);
 		dataSource.setPartitionCount(partitionCount);
 	}
 
@@ -179,7 +179,7 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 	 * 
 	 * @param maxConnectionsPerPartition
 	 *            maxConnectionsPerPartition プロパティの値
-	 * @see BoneCPDataSource#setMaxIdle(int)
+	 * @see BoneCPDataSource#setMaxConnectionsPerPartition(int)
 	 */
 	@Inject(optional = true)
 	public void setMaxConnectionsPerPartition(
@@ -220,7 +220,7 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 	}
 
 	/**
-	 * {@link BoneCPDataSource} の minEvictableIdleTimeMillis プロパティを設定します。
+	 * {@link BoneCPDataSource} の acquireRetryAttempts プロパティを設定します。
 	 * 
 	 * @param acquireRetryAttempts
 	 *            acquireRetryAttempts プロパティの値
@@ -273,7 +273,7 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 	 */
 	@Inject(optional = true)
 	public void setIdleMaxAgeInMinutes(
-			@Named("BoneCP.connectionTimeoutInMs") long idleMaxAgeInMinutes) {
+			@Named("BoneCP.idleMaxAgeInMinutes") long idleMaxAgeInMinutes) {
 		LOGGER.debug(MessageCodes.DG002, "BoneCP.idleMaxAgeInMinutes",
 				idleMaxAgeInMinutes);
 		dataSource.setIdleMaxAgeInMinutes(idleMaxAgeInMinutes);

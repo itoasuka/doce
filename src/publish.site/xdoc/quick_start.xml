@@ -7,32 +7,32 @@
     <body>
         <section name="目次">
             <ul>
-                <li><a href="#概要">概要</a></li>
-                <li><a href="#クイックスタート">クイックスタート</a>
+                <li><a href="#description">概要</a></li>
+                <li><a href="#quickstart">クイックスタート</a>
                     <ul>
-                        <li><a href="#設定クラスは不要">設定クラスは不要</a></li>
-                        <li><a href="#DAO インタフェースの作成">DAO インタフェースの作成</a></li>
-                        <li><a href="#起動クラスの作成">起動クラスの作成</a></li>
+                        <li><a href="#config_class_is_not_required">設定クラスは不要</a></li>
+                        <li><a href="#create_dao_interface">DAO インタフェースの作成</a></li>
+                        <li><a href="#create_boot_class">起動クラスの作成</a></li>
                     </ul>
                 </li>
-                <li><a href="#次のステップ">次のステップ</a></li>
+                <li><a href="#next_step">次のステップ</a></li>
             </ul>
         </section>
-        <section name="概要">
+        <section name="概要" id="description">
             <p>
                 このページでは、<a href="http://doma.seasar.org/quick_start.html" target="_blank">Doma のクイックスタート</a>と同じことを Doce で行い、最低限必要な手順のみを説明します。
             </p>
         </section>
-        <section name="クイックスタート">
+        <section name="クイックスタート" id="quickstart">
             <p>
                 <a href="http://doma.seasar.org/quick_start.html" target="_blank">Doma のクイックスタート</a>との相違点のみを取り上げますので、随時、相互に参照してください。
             </p>
-            <subsection name="設定クラスは不要">
+            <subsection name="設定クラスは不要" id="config_class_is_not_required">
                 <p>
                     Doce では設定クラスの作成を行う必要はありません。インジェクション時に自動的に作成されます。
                 </p>
             </subsection>
-            <subsection name="DAO インタフェースの作成">
+            <subsection name="DAO インタフェースの作成" id="create_dao_interface">
                 <p>
                     Doce では設定クラスの作成を行わず Guice にまかせてしまうので、DAO インタフェースにその旨を表わすアノテーションを付ける必要があります。
                     <code>@InjecConfig</code> がそれです。
@@ -56,7 +56,7 @@ public interface EmployeeDao {
     int update(Employee employee);
 }]]></pre></div>
             </subsection>
-            <subsection name="起動クラスの作成">
+            <subsection name="起動クラスの作成" id="create_boot_class">
                 <p>
                     Doce を用いた Guice インジェクタを作成する際に使用するモジュールに JDBC の接続情報などをプロパティクラスオブジェクトとして渡します。
                     トランザクションは、実装の違いを吸収するためより抽象化されています。
@@ -112,9 +112,9 @@ public class Main {
 }</pre></div>
             </subsection>
         </section>
-        <section name="次のステップ">
+        <section name="次のステップ" id="next_step">
             <p>
-                Doce が提供するより詳細な機能については<a href="tutorial/index.html">チュートリアル</a>や<a href="reference/index.html">リファレンス</a>を参照してください。
+                Doce が提供するより詳細な機能については<a href="tutorial/index.html">チュートリアル</a>を参照してください。
             </p>
         </section>
     </body>

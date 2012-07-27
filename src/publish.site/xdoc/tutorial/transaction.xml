@@ -7,22 +7,22 @@
     <body>
         <section name="目次">
             <ul>
-                <li><a href="#概要">概要</a></li>
-                <li><a href="#サービスクラスの作成">サービスクラスの作成</a></li>
-                <li><a href="#トランザクションの実装">トランザクションの実装</a>
+                <li><a href="#description">概要</a></li>
+                <li><a href="#create_service_class">サービスクラスの作成</a></li>
+                <li><a href="#implment_transaction">トランザクションの実装</a>
                     <ul>
-                        <li><a href="#ローカルトランザクション">ローカルトランザクション</a></li>
-                        <li><a href="#JNDI_由来のユーザトランザクション">JNDI 由来のユーザトランザクション</a></li>
+                        <li><a href="#local_transaction">ローカルトランザクション</a></li>
+                        <li><a href="#from_jndi">JNDI 由来のユーザトランザクション</a></li>
                     </ul>
                 </li>
             </ul>
         </section>
-        <section name="概要">
+        <section name="概要" id="description">
             <p>
                 Doce は AOP とアノテーションを用いて自動的にトランザクションを提供する仕組みを持っています。
             </p>
         </section>
-        <section name="サービスクラスの作成">
+        <section name="サービスクラスの作成" id="create_service_class">
             <p>
                 Doce では、<code>jp.osd.doce.Transactional</code> アノテーションがついたクラスのすべてのメソッド、またはこのアノテーションがついたメソッドに入るときにトランザクションが開始されます。すでにトランザクションが開始されている場合は何もしません。
             </p>
@@ -94,11 +94,11 @@ public class Main {
     }
 }]]></pre></div>
         </section>
-        <section name="トランザクションの実装">
+        <section name="トランザクションの実装" id="implement_transaction">
             <p>
                 トランザクション機能の実装は、環境に応じて Doce が自動的に選択します。
             </p>
-            <subsection name="ローカルトランザクション">
+            <subsection name="ローカルトランザクション" id="local_transaction">
                 <p>
                     以下のいずれかの条件に合致するとき、Doce はトランザクションに Doma が標準で持っているローカルトランザクションの仕組みを用いた実装を使用します。
                 </p>
@@ -111,7 +111,7 @@ public class Main {
                     Doce においてデータソースがどのように準備されるのかについては「<a href="datasource.html">データソース</a>」を参照してください。
                 </p>
             </subsection>
-            <subsection name="JNDI 由来のユーザトランザクション">
+            <subsection name="JNDI 由来のユーザトランザクション" id="from_jndi">
                 <p>
                     Doce はローカルトランザクションを利用する条件に合致しない場合は、JNDI
                     由来のユーザトランザクションを用いようとして、JNDI からのルックアップを行います。

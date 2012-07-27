@@ -24,11 +24,11 @@ public enum DataSourceBinding {
 	 */
 	SIMPLE_DATA_SOURCE,
 	/**
-	 * <a href="http://commons.apache.org/dbcp/" target="_blank">Commons DBCP</a> の {@link org.apache.commons.dbcp.BasicDataSource} オブジェクトを実装クラスオブジェクトとしてバインディングするように指定します。
+	 * <a href="http://jolbox.com/" target="_blank">BoneCP</a> の {@link com.jolbox.bonecp.BoneCPDataSource} オブジェクトを実装クラスオブジェクトとしてバインディングするように指定します。
 	 *
-	 * @see jp.osd.doce.internal.provider.BasicDataSourceProvider
+	 * @see jp.osd.doce.internal.provider.BoneCPDataSourceProvider
 	 */
-	BASIC_DATA_SOURCE,
+	BONE_CP_DATA_SOURCE,
 	/**
 	 * JNDI を用いてデータソースを取得し、バインディングするように指定します。{@code "JNDI.dataSource"} の名前でデータソースのオブジェクト名を定数バインドしておく必要があります。
 	 *

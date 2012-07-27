@@ -7,32 +7,32 @@
     <body>
         <section name="目次">
             <ul>
-                <li><a href="#概要">概要</a></li>
+                <li><a href="#description">概要</a></li>
                 <li>
-                    <a href="#JNDI_によるデータソースの取得">JNDI によるデータソースの取得</a>
+                    <a href="#by_jndi">JNDI によるデータソースの取得</a>
                     <ul>
-                        <li><a href="#context.xml_の作成">context.xml の作成</a></li>
-                        <li><a href="#web.xml_の修正">web.xml の修正</a></li>
-                        <li><a href="#JSP_の作成">JSP の作成</a></li>
-                        <li><a href="#ネーミングコンテキスト">ネーミングコンテキスト</a></li>
+                        <li><a href="#create_context.xml">context.xml の作成</a></li>
+                        <li><a href="#modify_web.xml">web.xml の修正</a></li>
+                        <li><a href="#create_jsp">JSP の作成</a></li>
                     </ul>
                 </li>
-                <li><a href="#トランザクション">トランザクション</a></li>
+                <li><a href="#transaction">トランザクション</a></li>
+                <li><a href="#namingcontext">ネーミングコンテキスト</a></li>
             </ul>
         </section>
-        <section name="概要">
+        <section name="概要" id="description">
             <p>
                 Doce には JNDI によってデータソースを取得する機能があります。Tomcat などの JNDI でデータソースを提供する機能のある Servlet
                 コンテナやアプリケーションサーバ上で使用することを想定しています。
             </p>
         </section>
-        <section name="JNDI によるデータソースの取得">
+        <section name="JNDI によるデータソースの取得" id="by_jndi">
             <p>
                 <a href="../quick_start.html">クイックスタート</a> でも使用したデータベースに Tomcat
                 のデータソースを JNDI で取得してそれを通してアクセスしてみます。Tomcat
                 そのもののセットアップ法や Eclipse 等での Web アプリケーションの作り方そのものについての説明はここでは割愛します。
             </p>
-            <subsection name="context.xml の作成">
+            <subsection name="context.xml の作成" id="create_context.xml">
                 <p>
                     まず、データソースを定義するため、Web アプリケーションの <code>META-INF</code> に
                     <code>context.xml</code> ファイルを以下のように作成します。
@@ -51,7 +51,7 @@
         url="jdbc:h2:tcp://localhost/~/test" />
 </Context>]]></pre></div>
             </subsection>
-            <subsection name="web.xml の修正">
+            <subsection name="web.xml の修正" id="modify_web.xml">
                 <p>
                     次に <code>WEB-INF/web.xml</code> の最後部に以下のように追記します。
                 </p>
@@ -61,7 +61,7 @@
         <res-auth>Container</res-auth>
     </resource-ref>]]></pre></div>
             </subsection>
-            <subsection name="JSP の作成">
+            <subsection name="JSP の作成" id="create_jsp">
                 <p>
                     <a href="../quick_start.html">クイックスタート</a>の起動クラスのかわりに <code>employee</code>
                     テーブルを読み込んで表示するサーブレットを作成します。
@@ -167,7 +167,7 @@ public class MainServlet extends HttpServlet {
 </html>]]></pre></div>
             </subsection>
         </section>
-        <section name="トランザクション">
+        <section name="トランザクション" id="transaction">
             <p>
                 Doce はトランザクションに JNDI から取得した
                 <code>javax.transaction.UserTransaction</code>
@@ -196,7 +196,7 @@ Injector injector = Guice.createInjector(m);
                 が用いられます。オブジェクト名を指定してユーザトランザクションの取得ができない場合は実行時例外がスローされます。
             </p>
         </section>
-        <section name="ネーミングコンテキスト">
+        <section name="ネーミングコンテキスト" id="namingcontext">
             <p>
                 Doce は JNDI によるオブジェクトの取得に使用するネーミングコンテキスト（<code>javax.naming.Context</code>）の実装に環境プロパティーなしでインスタンス化した
                 <code>javax.naming.InitialContext</code> を使用します。

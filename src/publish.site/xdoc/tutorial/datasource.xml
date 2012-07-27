@@ -7,25 +7,26 @@
     <body>
         <section name="目次">
             <ul>
-                <li><a href="#概要">概要</a></li>
-                <li><a href="#データソースの自動選択">データソースの自動選択</a>
+                <li><a href="#description">概要</a></li>
+                <li><a href="#datasource">データソースの自動選択</a>
                     <ul>
-                        <li><a href="#JNDI_由来のデータソース">JNDI_由来のデータソース</a></li>
-                        <li><a href="#Commons_DBCP_のデータソース">Commons DBCP のデータソース</a></li>
+                        <li><a href="#from_jndi">JNDI_由来のデータソース</a></li>
+                        <li><a href="#BoneCP">BoneCP のデータソース</a></li>
+                        <li><a href="#doma">Doma 添付のデータソース</a></li>
                     </ul>
                 </li>
             </ul>
         </section>
-        <section name="概要">
+        <section name="概要" id="description">
             <p>
                 Doce は設定や環境に応じて自動的に作成するデータソースを選択します。
             </p>
         </section>
-        <section name="データソースの自動選択">
+        <section name="データソースの自動選択" id="datasource">
             <p>
                 Doce が行うデータソースの自動選択について優先度が高い順に説明します。
             </p>
-            <subsection name="JNDI 由来のデータソース">
+            <subsection name="JNDI 由来のデータソース" id="from_jndi">
                 <p>
                     Doce は設定プロパティーで <code>JNDI.dataSource</code> の値が設定されると、データソースを JNDI
                     を用いて取得します。
@@ -38,35 +39,32 @@
                     任意のネーミングコンテキストを使用することもできます。その際は Guice モジュールで <code>javax.naming.Context</code> に任意のバインドを行ってください。
                 </p>
             </subsection>
-            <subsection name="Commons DBCP のデータソース">
+            <subsection name="BoneCP のデータソース" id="BoneCP">
                 <p>
                     Doce は設定プロパティーで <code>JNDI.dataSource</code> の値が設定されていない場合で、クラスパス上に
-                    <a href="http://commons.apache.org/dbcp/" target="_blank">Commons DBCP</a>
-                    の <a href="http://commons.apache.org/dbcp/api-1.4/org/apache/commons/dbcp/BasicDataSource.html" target="_blank"><code>org.apache.commons.dbcp.BasicDataSource</code></a>
+                    <a href="http://jolbox.com/" target="_blank">BoneCP</a>
+                    の <a href="http://jolbox.com/bonecp/downloads/site/apidocs/index.html?com/jolbox/bonecp/BoneCPDataSource.html" target="_blank"><code>com.jolbox.bonecp.BoneCPDataSource</code></a>
                     がある場合、これを用いてデータソースとします。
                 </p>
                 <p>
-                    Maven を用いている場合は以下のように記述することで Commons DBCP 関連ライブラリをクラスパスに含めることが出来ます。
+                    Maven を使用している場合は pom.xml に以下の依存性の記述を追加してください。
                 </p>
 <div class="source"><pre class="prettyprint"><![CDATA[    <dependencies>
         :
         <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
-            <version>1.4</version>
+            <groupId>com.jolbox</groupId>
+            <artifactId>bonecp</artifactId>
+            <version>0.7.1.RELEASE</version>
         </dependency>
         :
     </dependencies>]]></pre></div>
                 <p>
-                    Maven を用いていない場合は <a href="http://commons.apache.org/dbcp/download_dbcp.cgi" target="_blank">Commons DBCP のダウンロードページ</a>より取得してください。また、Commons DBCP
-                    は
-                    <a href="http://commons.apache.org/pool/" target="_blank">Commons Pool</a>
-                    に依存しているため、こちらも<a href="http://commons.apache.org/pool/download_pool.cgi" target="_blank">ダウンロード</a>する必要があります。
+                    Maven を用いていない場合は <a href="http://jolbox.com/index.html?page=http://jolbox.com/download.html" target="_blank">BoneCP のダウンロードページ</a>より取得してください。
                 </p>
             </subsection>
-            <subsection name="Doma 添付のデータソース">
+            <subsection name="Doma 添付のデータソース" id="doma">
                 <p>
-                    JNDI を利用せず、かつ Commons DBCP が利用できない場合は Doce は Doma に標準で添付されている
+                    JNDI を利用せず、かつ BoneCP が利用できない場合は Doce は Doma に標準で添付されている
                     <a href="http://doma.seasar.org/apidocs/org/seasar/doma/jdbc/SimpleDataSource.html" target="_blank"><code>org.seasar.doma.jdbc.SimpleDataSource</code></a>
                     を用いてデータソースとします。
                 </p>

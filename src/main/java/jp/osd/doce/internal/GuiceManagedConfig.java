@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 import jp.osd.doce.Doma;
 
 import org.seasar.doma.jdbc.Config;
+import org.seasar.doma.jdbc.ExceptionSqlLogType;
 import org.seasar.doma.jdbc.JdbcLogger;
 import org.seasar.doma.jdbc.RequiresNewController;
 import org.seasar.doma.jdbc.SqlFileRepository;
@@ -217,6 +218,16 @@ public class GuiceManagedConfig implements Config {
 	@Inject(optional = true)
 	public void setBatchSize(@Named(DOMA_BATCH_SIZE) int batchSize) {
 		this.batchSize = batchSize;
+	}
+
+	/**
+	 * 例外に含めるSQLログのタイプを返します。
+	 * 
+	 * @return 常に {@link ExceptionSqlLogType#FORMATTED_SQL}
+	 */
+	@Override
+	public ExceptionSqlLogType getExceptionSqlLogType() {
+		return ExceptionSqlLogType.FORMATTED_SQL;
 	}
 
 }

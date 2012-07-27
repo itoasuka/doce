@@ -11,6 +11,8 @@
                 <li><a href="jndi.html">JNDI</a></li>
                 <li><a href="dao.html">DAO のバインディング</a></li>
                 <li><a href="transaction.html">自動トランザクション</a></li>
+                <li><a href="datasource.html">データソース</a></li>
+                <li><a href="builder.html">モジュールビルダ</a></li>
                 <li><a href="logger.html">ロガー</a></li>
                 <li><a href="property.html">設定プロパティー</a></li>
             </ul>

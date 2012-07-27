@@ -21,6 +21,7 @@
                 <item name="DAO のバインディング" href="tutorial/dao.html" />
                 <item name="自動トランザクション" href="tutorial/transaction.html" />
                 <item name="データソース" href="tutorial/datasource.html" />
+                <item name="モジュールビルダ" href="tutorial/builder.html" />
                 <item name="ロガー" href="tutorial/logger.html" />
                 <item name="設定プロパティー" href="tutorial/property.html" />
             </item>

@@ -7,12 +7,12 @@
     <body>
         <section name="目次">
             <ul>
-                <li><a href="#概要">概要</a></li>
-                <li><a href="#SLF4J_の利用">SLF4J の利用</a></li>
-                <li><a href="#任意のロガーの使用">任意のロガーの使用</a></li>
+                <li><a href="#description">概要</a></li>
+                <li><a href="#slf4j">SLF4J の利用</a></li>
+                <li><a href="#optional">任意のロガーの使用</a></li>
             </ul>
         </section>
-        <section name="概要">
+        <section name="概要" id="description">
             <p>
                 Doma はデフォルトではロギングには java.util.logging
                 関連のモジュールを使用します。しかし、実際のプロジェクトでは java.util.logging
@@ -20,7 +20,7 @@
                 は、ロガーを簡単に差し替える機能を提供しています。
             </p>
         </section>
-        <section name="SLF4J の利用">
+        <section name="SLF4J の利用" id="slf4j">
             <p>
                 Doce はクラスパス上に <code>org.slf4j.Logger</code> がある場合、Doma で使用する <code>JdbcLogger</code>
                 の実装として <a href="http://www.slf4j.org/" target="_blank">SLF4J</a> で実装したものを使用します。また、Doce 自身のログも SLF4J を使用して出力します。
@@ -30,7 +30,7 @@
                 ロガーは、例外オブジェクトが絡むエラーログは ERROR　レベル、それ以外は DEBUG レベルで出力します。
             </p>
         </section>
-        <section name="任意のロガーの使用">
+        <section name="任意のロガーの使用" id="optional">
             <p>
                 Doce が提供する SLF4J ロガーのログレベルやメッセージが気に食わなかったり、すでに独自にロガーを準備していたりする場合は、ロガーを差し替えることも可能です。
             </p>

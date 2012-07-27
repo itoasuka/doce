@@ -7,22 +7,22 @@
     <body>
         <section name="目次">
             <ul>
-                <li><a href="#Doma_のセットアップ">Doma のセットアップ</a></li>
-                <li><a href="#Doce_のセットアップ">Doce のセットアップ</a>
+                <li><a href="#setup_doma">Doma のセットアップ</a></li>
+                <li><a href="#setup_doce">Doce のセットアップ</a>
                     <ul>
-                        <li><a href="#Maven_によるセットアップ">Maven によるセットアップ</a></li>
-                        <li><a href="#手動によるセットアップ">手動によるセットアップ</a></li>
+                        <li><a href="#by_maven">Maven によるセットアップ</a></li>
+                        <li><a href="#by_manual">手動によるセットアップ</a></li>
                     </ul>
                 </li>
             </ul>
         </section>
-        <section name="Doma のセットアップ">
+        <section name="Doma のセットアップ" id="setup_doma">
             <p>
                 まずは <a href="http://doma.seasar.org/setup.html" target="_blank">Doma のセットアップ</a>を行ってください。
             </p>
         </section>
-        <section name="Doce のセットアップ">
-            <subsection name="Maven によるセットアップ">
+        <section name="Doce のセットアップ" id="setup_doce">
+            <subsection name="Maven によるセットアップ" id="by_maven">
                 <p>
                     Doce はセントラルリポジトリにはありませんので <code>pom.xml</code> に以下のようにリポジトリを追加してください。
                 </p>
@@ -48,7 +48,7 @@
         :
     </dependencies>]]></pre></div>
             </subsection>
-            <subsection name="手動によるセットアップ">
+            <subsection name="手動によるセットアップ" id="by_manual">
                 <p>
                      Doce は <a href="http://code.google.com/p/google-guice/" target="_blank">Guice</a>
                     を使用していますので、Doce の配布物の jar 以外ほかに Guice 2.0 以上が必要です。Guice

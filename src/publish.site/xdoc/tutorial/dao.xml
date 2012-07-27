@@ -7,12 +7,12 @@
     <body>
         <section name="目次">
             <ul>
-                <li><a href="#概要">概要</a></li>
-                <li><a href="#起動クラスの修正">起動クラスの修正</a></li>
-                <li><a href="#実装クラス名のカスタマイズ">実装クラス名のカスタマイズ</a></li>
+                <li><a href="#description">概要</a></li>
+                <li><a href="#modify_boot_class">起動クラスの修正</a></li>
+                <li><a href="#customize_impl_class_name">実装クラス名のカスタマイズ</a></li>
             </ul>
         </section>
-        <section name="概要">
+        <section name="概要" id="description">
             <p>
                 Doma ユーザならば一度は javac のバグ（Bug ID <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6403465" target="_blank">6403465</a>）に悩まされたことがあるかと思います（<a href="http://doma.seasar.org/reference/app_build.html" target="_blank">Doma
                 の公式サイトにもこの話は載っています</a>よね）。このせいで、悪いのは
@@ -22,7 +22,7 @@
                 Doce は、この問題に対応するためソースコード上から完全に APT で生成される実装クラスを隠蔽し、そのようなエラーがでない仕組みを提供しています。
             </p>
         </section>
-        <section name="起動クラスの修正">
+        <section name="起動クラスの修正" id="modify_boot_class">
             <p>
                 <a href="../quick_start.html">クイックスタート</a>で作成した起動クラスを修正し、実装クラス名を隠蔽してみます。
             </p>
@@ -82,7 +82,7 @@ public class Main {
                 のインタフェースにバインドする実装クラスは実行時に決定されます。可変長引数にだらだら書き連ねるのが嫌だなという場合は、任意のコレクションクラスを渡すこともできます。
             </p>
         </section>
-        <section name="実装クラス名のカスタマイズ">
+        <section name="実装クラス名のカスタマイズ" id="customize_impl_class_name">
             <p>
                 APT にオプションを指定して実装クラスのパッケージやサフィックスをカスタマイズしている場合、Doce 側にもそれに対応する設定が必要です。詳しくは「<a href="builder.html">モジュールビルダ</a>」を参照してください。
             </p>

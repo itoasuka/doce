@@ -7,22 +7,22 @@
     <body>
         <section name="目次">
             <ul>
-                <li><a href="#概要">概要</a></li>
-                <li><a href="#基本的な接続法">基本的な接続法</a></li>
-                <li><a href="#データソース実装">データソース実装</a>
+                <li><a href="#description">概要</a></li>
+                <li><a href="#basic">基本的な接続法</a></li>
+                <li><a href="#datasource">データソース実装</a>
                     <ul>
-                        <li><a href="#Commons_DBCP_のセットアップ">Commons DBCP のセットアップ</a></li>
+                        <li><a href="#BoneCP">BoneCP のセットアップ</a></li>
                     </ul>
                 </li>
-                <li><a href="#ダイアレクト">ダイアレクト</a></li>
+                <li><a href="#dialect">ダイアレクト</a></li>
             </ul>
         </section>
-        <section name="概要">
+        <section name="概要" id="description">
             <p>
                 Doce ではアプリケーションが自前で準備したデータソースを用いてデータベースに接続する方式「ローカル接続」と呼びます。ここではそのローカル接続について説明します。
             </p>
         </section>
-        <section name="基本的な接続法">
+        <section name="基本的な接続法" id="basic">
             <p>
                 <a href="../quick_start.html">クイックスタート</a>で行った接続法は最も単純なもので、JDBC 接続用の URL とユーザ名のみを指定して行っています。特に組み込みデータベースなどを使用する場合はこの方法でも良いですが、より一般的にはパスワードも指定した以下のような接続方法を用います。
             </p>
@@ -36,15 +36,15 @@
         Module m = new DoceModule(jp);
         Injector injector = Guice.createInjector(m);]]></pre></div>
         </section>
-        <section name="データソース実装">
+        <section name="データソース実装" id="datasource">
             <p>
                 Doce は通常、ローカル接続には Doma に標準添付されている
                 <code>SimpleDataSource</code> をデータソースの実装として用います。そのため、<code>META-INF/service/java.sql.Driver</code>
                 ファイルにドライバクラス名を記述しておかなければなりません。
             </p>
             <p>
-                Doce はクラスパス上に <a href="http://commons.apache.org/dbcp/" target="_blank">Commons DBCP</a>
-                の <a href="http://commons.apache.org/dbcp/api-1.4/org/apache/commons/dbcp/BasicDataSource.html" target="_blank"><code>org.apache.commons.dbcp.BasicDataSource</code></a>
+                Doce はクラスパス上に <a href="http://jolbox.com/" target="_blank">BoneCP</a>
+                    の <a href="http://jolbox.com/bonecp/downloads/site/apidocs/index.html?com/jolbox/bonecp/BoneCPDataSource.html" target="_blank"><code>com.jolbox.bonecp.BoneCPDataSource</code></a>
                 があるとデータソースの実装にこれを用いるようになります。この際、Doce は接続用の URL からドライバクラス名を推測し、データソースに自動的に設定します。この
                 Doce の推測が望ましいものでない場合、以下のように任意のドライバクラス名を指定することができます。
             </p>
@@ -62,10 +62,10 @@
             <p>
                 Doce はどのデータソース実装を用いたかを INFO レベルのログとして出力します。
             </p>
-            <subsection name="Commons DBCP のセットアップ">
+            <subsection name="BoneCP のセットアップ" id="BoneCP">
                 <p>
-                    データソースとして、<a href="http://commons.apache.org/dbcp/" target="_blank">Commons DBCP</a>
-                    の <a href="http://commons.apache.org/dbcp/api-1.4/org/apache/commons/dbcp/BasicDataSource.html" target="_blank"><code>org.apache.commons.dbcp.BasicDataSource</code></a>
+                    データソースとして、<a href="http://jolbox.com/" target="_blank">BoneCP</a>
+                    の <a href="http://jolbox.com/bonecp/downloads/site/apidocs/index.html?com/jolbox/bonecp/BoneCPDataSource.html" target="_blank"><code>com.jolbox.bonecp.BoneCPDataSource</code></a>
                     を使用する場合のセットアップ方について説明します。
                 </p>
                 <p>
@@ -74,21 +74,18 @@
 <div class="source"><pre class="prettyprint"><![CDATA[    <dependencies>
         :
         <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
-            <version>1.4</version>
+            <groupId>com.jolbox</groupId>
+            <artifactId>bonecp</artifactId>
+            <version>0.7.1.RELEASE</version>
         </dependency>
         :
     </dependencies>]]></pre></div>
                 <p>
-                    Maven を用いていない場合は <a href="http://commons.apache.org/dbcp/download_dbcp.cgi" target="_blank">Commons DBCP のダウンロードページ</a>より取得してください。また、Commons DBCP
-                    は
-                    <a href="http://commons.apache.org/pool/" target="_blank">Commons Pool</a>
-                    に依存しているため、こちらも<a href="http://commons.apache.org/pool/download_pool.cgi" target="_blank">ダウンロード</a>する必要があります。
+                    Maven を用いていない場合は <a href="http://jolbox.com/index.html?page=http://jolbox.com/download.html" target="_blank">BoneCP のダウンロードページ</a>より取得してください。
                 </p>
             </subsection>
         </section>
-        <section name="ダイアレクト">
+        <section name="ダイアレクト" id="dialect">
             <p>
                 ローカル接続時に Doce はダイアレクトを接続 URL から推測して設定します。Doce はどのダイアレクトを設定したかを INFO レベルのログで出力します。
             </p>

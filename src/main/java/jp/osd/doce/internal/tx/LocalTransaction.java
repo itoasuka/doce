@@ -13,7 +13,7 @@ import com.google.inject.Inject;
 /**
  * Doma の {@link org.seasar.doma.jdbc.tx.LocalTransaction} を用いた
  * {@link Transaction} の実装クラスです。
- *
+ * 
  * @author asuka
  */
 public class LocalTransaction implements Transaction {
@@ -23,7 +23,7 @@ public class LocalTransaction implements Transaction {
 
 	/**
 	 * 新たにオブジェクトを構築します。
-	 *
+	 * 
 	 * @param dataSource
 	 *            データソース
 	 * @param jdbcLogger
@@ -49,7 +49,12 @@ public class LocalTransaction implements Transaction {
 	 */
 	@Override
 	public void commit() {
-		dataSource.getLocalTransaction(jdbcLogger).commit();
+		org.seasar.doma.jdbc.tx.LocalTransaction tx = dataSource
+				.getLocalTransaction(jdbcLogger);
+
+		if (tx.isActive()) {
+			tx.commit();
+		}
 	}
 
 	/**
@@ -57,7 +62,12 @@ public class LocalTransaction implements Transaction {
 	 */
 	@Override
 	public void rollback() {
-		dataSource.getLocalTransaction(jdbcLogger).rollback();
+		org.seasar.doma.jdbc.tx.LocalTransaction tx = dataSource
+				.getLocalTransaction(jdbcLogger);
+
+		if (tx.isActive()) {
+			tx.rollback();
+		}
 	}
 
 	/**
