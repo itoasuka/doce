@@ -62,6 +62,16 @@ public class Slf4jLogger extends Logger {
      * {@inheritDoc}
      */
     @Override
+    public void warn(MessageCodes codes, Object... arguments) {
+        if (logger.isWarnEnabled()) {
+            logger.warn(getString(codes, arguments));
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void error(Throwable throwable, MessageCodes codes,
             Object... arguments) {
         if (logger.isErrorEnabled()) {

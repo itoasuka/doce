@@ -6,7 +6,6 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.transaction.UserTransaction;
 
-import jp.osd.doce.Doma;
 import jp.osd.doce.DoceException;
 import jp.osd.doce.internal.logging.Logger;
 import jp.osd.doce.internal.logging.LoggerFactory;
@@ -38,8 +37,7 @@ public class UserTransactionProvider implements Provider<UserTransaction> {
 	 * @param context
 	 *            トランザクションを JNDI でルックアップする際に使用するネーミングコンテキスト
 	 */
-	@Inject
-	public UserTransactionProvider(@Doma Context context) {
+	public UserTransactionProvider(Context context) {
 		LOGGER.logConstructor(Context.class);
 		this.context = context;
 	}

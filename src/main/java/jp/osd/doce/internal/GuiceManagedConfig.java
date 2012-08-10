@@ -17,7 +17,9 @@ import org.seasar.doma.jdbc.SqlFileRepository;
 import org.seasar.doma.jdbc.dialect.Dialect;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 /**
  * Guice で管理される Doma 設定クラスです。
@@ -60,11 +62,13 @@ import com.google.inject.name.Named;
  * @author asuka
  */
 public class GuiceManagedConfig implements Config {
-	private final DataSource dataSource;
-	private final Dialect dialect;
-	private final SqlFileRepository sqlFileRepository;
-	private final JdbcLogger jdbcLogger;
-	private final RequiresNewController requiresNewController;
+	private final DbNamedPropeties properties;
+	private Injector injector;
+	private DataSource dataSource;
+	private Dialect dialect;
+	private SqlFileRepository sqlFileRepository;
+	private JdbcLogger jdbcLogger;
+	private RequiresNewController requiresNewController;
 	private int maxRows = 0;
 	private int fetchSize = 0;
 	private int queryTimeout = 0;
@@ -73,27 +77,25 @@ public class GuiceManagedConfig implements Config {
 	/**
 	 * 新たにオブジェクトを構築します。
 	 *
-	 * @param dataSource
-	 *            データソース
-	 * @param dialect
-	 *            Dialect
-	 * @param sqlFileRepository
-	 *            SQL ファイルリポジトリ
-	 * @param jdbcLogger
-	 *            JDBC ロガー
-	 * @param requiresNewController
-	 *            REQUIRES_NEW の属性をもつトランザクションを制御するコントローラ
+	 * @param properties
+	 *            データベース名付き設定プロパティ
+	 */
+	public GuiceManagedConfig(DbNamedPropeties propeties) {
+		this.properties = propeties;
+		maxRows = properties.getInt(DOMA_MAX_ROWS, maxRows);
+		fetchSize = properties.getInt(DOMA_FETCH_SIZE, fetchSize);
+		queryTimeout = properties.getInt(DOMA_QUERY_TIMEOUT, queryTimeout);
+		batchSize = properties.getInt(DOMA_BATCH_SIZE, batchSize);
+	}
+	
+	/**
+	 * Guice インジェクタを設定します。
+	 * 
+	 * @param injector Guice インジェクタ
 	 */
 	@Inject
-	public GuiceManagedConfig(@Doma DataSource dataSource,
-			@Doma Dialect dialect, @Doma SqlFileRepository sqlFileRepository,
-			@Doma JdbcLogger jdbcLogger,
-			@Doma RequiresNewController requiresNewController) {
-		this.dataSource = dataSource;
-		this.dialect = dialect;
-		this.sqlFileRepository = sqlFileRepository;
-		this.jdbcLogger = jdbcLogger;
-		this.requiresNewController = requiresNewController;
+	public void setInjector(Injector injector) {
+		this.injector = injector;
 	}
 
 	/**
@@ -101,6 +103,10 @@ public class GuiceManagedConfig implements Config {
 	 */
 	@Override
 	public DataSource getDataSource() {
+		if (dataSource == null) {
+			dataSource = getInstance(DataSource.class);
+		}
+		
 		return dataSource;
 	}
 
@@ -109,7 +115,7 @@ public class GuiceManagedConfig implements Config {
 	 */
 	@Override
 	public String getDataSourceName() {
-		return dataSource.getClass().getSimpleName();
+		return getDataSource().getClass().getSimpleName();
 	}
 
 	/**
@@ -117,6 +123,10 @@ public class GuiceManagedConfig implements Config {
 	 */
 	@Override
 	public Dialect getDialect() {
+		if (dialect == null) {
+			dialect = getInstance(Dialect.class);
+		}
+		
 		return dialect;
 	}
 
@@ -125,6 +135,10 @@ public class GuiceManagedConfig implements Config {
 	 */
 	@Override
 	public SqlFileRepository getSqlFileRepository() {
+		if (sqlFileRepository == null) {
+			sqlFileRepository = getInstance(SqlFileRepository.class);
+		}
+		
 		return sqlFileRepository;
 	}
 
@@ -133,6 +147,10 @@ public class GuiceManagedConfig implements Config {
 	 */
 	@Override
 	public JdbcLogger getJdbcLogger() {
+		if (jdbcLogger == null) {
+			jdbcLogger = getInstance(JdbcLogger.class);
+		}
+		
 		return jdbcLogger;
 	}
 
@@ -177,50 +195,6 @@ public class GuiceManagedConfig implements Config {
 	}
 
 	/**
-	 * 最大行数の制限値を設定します。
-	 *
-	 * @param maxRows
-	 *            最大行数の制限値
-	 */
-	@Inject(optional = true)
-	public void setMaxRows(@Named(DOMA_MAX_ROWS) int maxRows) {
-		this.maxRows = maxRows;
-	}
-
-	/**
-	 * フェッチサイズを設定します。
-	 *
-	 * @param fetchSize
-	 *            フェッチサイズ
-	 */
-	@Inject(optional = true)
-	public void setFetchSize(@Named(DOMA_FETCH_SIZE) int fetchSize) {
-		this.fetchSize = fetchSize;
-	}
-
-	/**
-	 * クエリタイムアウト（秒）を設定します。
-	 *
-	 * @param queryTimeout
-	 *            クエリタイムアウト（秒）
-	 */
-	@Inject(optional = true)
-	public void setQueryTimeout(@Named(DOMA_QUERY_TIMEOUT) int queryTimeout) {
-		this.queryTimeout = queryTimeout;
-	}
-
-	/**
-	 * バッチサイズを設定します。
-	 *
-	 * @param batchSize
-	 *            バッチサイズ
-	 */
-	@Inject(optional = true)
-	public void setBatchSize(@Named(DOMA_BATCH_SIZE) int batchSize) {
-		this.batchSize = batchSize;
-	}
-
-	/**
 	 * 例外に含めるSQLログのタイプを返します。
 	 * 
 	 * @return 常に {@link ExceptionSqlLogType#FORMATTED_SQL}
@@ -230,4 +204,14 @@ public class GuiceManagedConfig implements Config {
 		return ExceptionSqlLogType.FORMATTED_SQL;
 	}
 
+	private <T> T getInstance(Class<T> type) {
+		if (injector == null) {
+			return null;
+		}
+		String dbName = properties.getDbName();
+		if (dbName == null) {
+			return injector.getInstance(Key.get(type, Doma.class));
+		}
+		return injector.getInstance(Key.get(type, Names.named(dbName)));
+	}
 }

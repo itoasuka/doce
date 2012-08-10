@@ -10,8 +10,8 @@ import static jp.osd.doce.JdbcProperties.JDBC_USERNAME;
 
 import javax.sql.DataSource;
 
-import jp.osd.doce.Doma;
 import jp.osd.doce.TransactionBinding;
+import jp.osd.doce.internal.DbNamedPropeties;
 import jp.osd.doce.internal.logging.Logger;
 import jp.osd.doce.internal.logging.LoggerFactory;
 import jp.osd.doce.internal.logging.MessageCodes;
@@ -19,9 +19,7 @@ import jp.osd.doce.internal.logging.MessageCodes;
 import org.seasar.doma.jdbc.SimpleDataSource;
 import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
 
-import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.name.Named;
 
 /**
  * @author asuka
@@ -35,24 +33,34 @@ public class SimpleDataSourceProvider implements Provider<DataSource> {
 
 	/**
 	 * 新たにオブジェクトを構築します。
-	 *
-	 * @param url
-	 *            接続先のデータベースの URL
-	 * @param username
-	 *            データベースへログインするためのユーザ名
-	 * @see SimpleDataSource#setUrl(String)
-	 * @see SimpleDataSource#setUser(String)
+	 * 
+	 * @param properties
+	 *            データベース名付き設定プロパティ
 	 */
-	@Inject
-	public SimpleDataSourceProvider(@Named(JDBC_URL) final String url,
-			@Named(JDBC_USERNAME) final String username,
-			@Doma TransactionBinding transactionBinding) {
+	public SimpleDataSourceProvider(DbNamedPropeties properties) {
 		LOGGER.logConstructor(String.class, String.class, String.class);
+		String url = properties.getString(JDBC_URL);
+		String username = properties.getString(JDBC_USERNAME);
 		LOGGER.debug(MessageCodes.DG002, JDBC_URL, url);
 		LOGGER.debug(MessageCodes.DG002, JDBC_USERNAME, username);
 		dataSource.setUrl(url);
 		dataSource.setUser(username);
-		this.transactionBinding = transactionBinding;
+		this.transactionBinding = properties.getTransactionBinding();
+		
+		// パスワード
+		if (properties.containsKey(JDBC_PASSWORD)) {
+			String password = properties.getString(JDBC_PASSWORD);
+			LOGGER.debug(MessageCodes.DG002, JDBC_PASSWORD, password);
+			dataSource.setPassword(password);
+		}
+		
+		// ログインタイムアウト値
+		if (properties.containsKey(JDBC_LOGIN_TIMEOUT)) {
+			int loginTimeout = properties.getInt(JDBC_LOGIN_TIMEOUT, 0);
+			LOGGER.debug(MessageCodes.DG002, JDBC_LOGIN_TIMEOUT,
+					loginTimeout);
+			dataSource.setLoginTimeout(loginTimeout);
+		}
 	}
 
 	/**
@@ -67,33 +75,6 @@ public class SimpleDataSourceProvider implements Provider<DataSource> {
 			return dataSource;
 		}
 		return new LocalTransactionalDataSource(dataSource);
-	}
-
-	/**
-	 * データベースへログインするためのパスワードを設定します。
-	 *
-	 * @param password
-	 *            データベースへログインするためのパスワード
-	 * @see SimpleDataSource#setPassword(String)
-	 */
-	@Inject(optional = true)
-	public void setPassword(@Named(JDBC_PASSWORD) String password) {
-		LOGGER.debug(MessageCodes.DG002, JDBC_PASSWORD, password);
-		dataSource.setPassword(password);
-	}
-
-	/**
-	 * データベースへのログインのタイムアウト時間を設定します。
-	 *
-	 * @param loginTimeout
-	 *            データベースへのログインのタイムアウト時間
-	 * @see SimpleDataSource#setLoginTimeout(int)
-	 */
-	@Inject(optional = true)
-	public void setLoginTimeout(
-			@Named(JDBC_LOGIN_TIMEOUT) final int loginTimeout) {
-		LOGGER.debug(MessageCodes.DG002, JDBC_LOGIN_TIMEOUT, loginTimeout);
-		dataSource.setLoginTimeout(loginTimeout);
 	}
 
 }

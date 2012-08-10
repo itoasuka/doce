@@ -1,0 +1,1 @@
+SELECT * FROM foo WHERE id = /* id */1

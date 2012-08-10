@@ -3,6 +3,7 @@ package jp.osd.doce.internal.provider;
 import static jp.osd.doce.DomaProperties.DOMA_DIALECT_CLASS_NAME;
 import static jp.osd.doce.JdbcProperties.JDBC_URL;
 import jp.osd.doce.DoceException;
+import jp.osd.doce.internal.DbNamedPropeties;
 import jp.osd.doce.internal.JdbcUtils;
 import jp.osd.doce.internal.logging.Logger;
 import jp.osd.doce.internal.logging.LoggerFactory;
@@ -13,7 +14,6 @@ import org.seasar.doma.jdbc.dialect.StandardDialect;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.name.Named;
 
 /**
  * Dialect オブジェクトを提供するプロバイダクラスです。
@@ -29,18 +29,24 @@ import com.google.inject.name.Named;
 public class DefaultDialectProvider implements Provider<Dialect> {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(DefaultDialectProvider.class);
-
+    
     private String jdbcUrl = null;
 
     private Dialect dialect = null;
 
     private String dialectClassName = null;
 
-    /**
-     * 新たにオブジェクトを構築します。
-     */
-    public DefaultDialectProvider() {
+	/**
+	 * 新たにオブジェクトを構築します。
+	 *
+	 * @param properties
+	 *            データベース名付き設定プロパティ
+	 */
+    public DefaultDialectProvider(DbNamedPropeties properties) {
         LOGGER.logConstructor();
+        
+        jdbcUrl = properties.getString(JDBC_URL);
+        dialectClassName = properties.getString(DOMA_DIALECT_CLASS_NAME);
     }
 
     /**
@@ -72,17 +78,6 @@ public class DefaultDialectProvider implements Provider<Dialect> {
     }
 
     /**
-     * Dialect を判定するための JDBC 接続 URL を設定します。
-     *
-     * @param jdbcUrl
-     *            JDBC 接続 URL
-     */
-    @Inject(optional = true)
-    public void setJdbcUrl(@Named(JDBC_URL) String jdbcUrl) {
-        this.jdbcUrl = jdbcUrl;
-    }
-
-    /**
      * プロバイダとして提供するダイアレクトを設定します。
      *
      * @param dialect
@@ -91,19 +86,5 @@ public class DefaultDialectProvider implements Provider<Dialect> {
     @Inject(optional = true)
     public void setDialect(Dialect dialect) {
         this.dialect = dialect;
-    }
-
-    /**
-     * プロバイダとして提供するダイアレクトのクラス名を設定します。
-     * <P>
-     * {@link #setDialect(Dialect)} でダイアレクトが設定されなかった場合、この値からダイアレクトを生成して提供します。
-     *
-     * @param dialectClassName
-     *            ダイアレクトのクラス名
-     */
-    @Inject(optional = true)
-    public void setDomaDialectClassName(
-            @Named(DOMA_DIALECT_CLASS_NAME) String dialectClassName) {
-        this.dialectClassName = dialectClassName;
     }
 }

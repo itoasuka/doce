@@ -10,8 +10,8 @@ import static jp.osd.doce.JdbcProperties.JDBC_USERNAME;
 
 import javax.sql.DataSource;
 
-import jp.osd.doce.Doma;
 import jp.osd.doce.TransactionBinding;
+import jp.osd.doce.internal.DbNamedPropeties;
 import jp.osd.doce.internal.JdbcUtils;
 import jp.osd.doce.internal.logging.Logger;
 import jp.osd.doce.internal.logging.LoggerFactory;
@@ -19,9 +19,7 @@ import jp.osd.doce.internal.logging.MessageCodes;
 
 import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
 
-import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.name.Named;
 import com.jolbox.bonecp.BoneCPDataSource;
 
 /**
@@ -38,29 +36,140 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 	/**
 	 * 新たにオブジェクトを構築します。
 	 * 
-	 * @param url
-	 *            接続先のデータベースの URL
-	 * @param username
-	 *            データベースへログインするためのユーザ名
-	 * @param transactionBinding
-	 *            どのようにトランザクションをバインディングするか
-	 * @see BoneCPDataSource#setJdbcUrl(String)
-	 * @see BoneCPDataSource#setUsername(String)
+	 * @param properties
+	 *            データベース名付き設定プロパティ
 	 */
-	@Inject
-	public BoneCPDataSourceProvider(@Named(JDBC_URL) final String url,
-			@Named(JDBC_USERNAME) final String username,
-			@Doma TransactionBinding transactionBinding) {
+	public BoneCPDataSourceProvider(DbNamedPropeties properties) {
 		LOGGER.logConstructor(String.class, String.class, String.class);
+		url = properties.getString(JDBC_URL);
 		LOGGER.debug(MessageCodes.DG002, JDBC_URL, url);
+		String username = properties.getString(JDBC_USERNAME);
 		LOGGER.debug(MessageCodes.DG002, JDBC_USERNAME, username);
-		this.url = url;
-		this.transactionBinding = transactionBinding;
+		transactionBinding = properties.getTransactionBinding();
 		dataSource.setJdbcUrl(url);
 		dataSource.setUsername(username);
 
 		// 自動コミットはさせない
 		dataSource.setDefaultAutoCommit(false);
+
+		// パスワード
+		if (properties.containsKey(JDBC_PASSWORD)) {
+			String password = properties.getString(JDBC_PASSWORD);
+			LOGGER.debug(MessageCodes.DG002, JDBC_PASSWORD, password);
+			dataSource.setPassword(password);
+		}
+
+		// JDBC ドライバのクラス名
+		if (properties.containsKey(JDBC_DRIVER_CLASS_NAME)) {
+			driverClassName = properties.getString(JDBC_DRIVER_CLASS_NAME);
+			LOGGER.debug(MessageCodes.DG002, JDBC_DRIVER_CLASS_NAME,
+					driverClassName);
+			dataSource.setInitSQL(driverClassName);
+		}
+
+
+		// データソースのパラメータ
+		if (properties.containsKey("BoneCP.defaultAutoCommit")) {
+			boolean defaultAutoCommit = properties
+					.getBoolean("BoneCP.defaultAutoCommit");
+			LOGGER.debug(MessageCodes.DG002, "BoneCP.defaultAutoCommit",
+					defaultAutoCommit);
+			dataSource.setDefaultAutoCommit(defaultAutoCommit);
+		}
+		if (properties.containsKey("BoneCP.defaultReadOnly")) {
+			boolean defaultReadOnly = properties
+					.getBoolean("BoneCP.defaultReadOnly");
+			LOGGER.debug(MessageCodes.DG002, "BoneCP.defaultReadOnly",
+					defaultReadOnly);
+			dataSource.setDefaultReadOnly(defaultReadOnly);
+		}
+		if (properties.containsKey("BoneCP.defaultTransactionIsolation")) {
+			String defaultTransactionIsolation = properties
+					.getString("BoneCP.defaultReadOnly");
+			LOGGER.debug(MessageCodes.DG002,
+					"BoneCP.defaultTransactionIsolation",
+					defaultTransactionIsolation);
+			dataSource
+					.setDefaultTransactionIsolation(defaultTransactionIsolation);
+		}
+		if (properties.containsKey("BoneCP.defaultCatalog")) {
+			String defaultCatalog = properties
+					.getString("BoneCP.defaultCatalog");
+			LOGGER.debug(MessageCodes.DG002, "BoneCP.defaultCatalog",
+					defaultCatalog);
+			dataSource.setDefaultCatalog(defaultCatalog);
+		}
+		if (properties.containsKey("BoneCP.partitionCount")) {
+			int partitionCount = properties.getInt("BoneCP.partitionCount", 0);
+			LOGGER.debug(MessageCodes.DG002, "BoneCP.partitionCount",
+					partitionCount);
+			dataSource.setPartitionCount(partitionCount);
+		}
+		if (properties.containsKey("BoneCP.maxConnectionsPerPartition")) {
+			int maxConnectionsPerPartition = properties.getInt(
+					"BoneCP.maxConnectionsPerPartition", 0);
+			LOGGER.debug(MessageCodes.DG002,
+					"BoneCP.maxConnectionsPerPartition",
+					maxConnectionsPerPartition);
+			dataSource
+					.setMaxConnectionsPerPartition(maxConnectionsPerPartition);
+		}
+		if (properties.containsKey("BoneCP.minConnectionsPerPartition")) {
+			int minConnectionsPerPartition = properties.getInt(
+					"BoneCP.minConnectionsPerPartition", 0);
+			LOGGER.debug(MessageCodes.DG002,
+					"BoneCP.minConnectionsPerPartition",
+					minConnectionsPerPartition);
+			dataSource
+					.setMinConnectionsPerPartition(minConnectionsPerPartition);
+		}
+		if (properties.containsKey("BoneCP.acquireIncrement")) {
+			int acquireIncrement = properties.getInt("BoneCP.acquireIncrement",
+					0);
+			LOGGER.debug(MessageCodes.DG002, "BoneCP.acquireIncrement",
+					acquireIncrement);
+			dataSource.setAcquireIncrement(acquireIncrement);
+		}
+		if (properties.containsKey("BoneCP.acquireRetryAttempts")) {
+			int acquireRetryAttempts = properties.getInt(
+					"BoneCP.acquireRetryAttempts", 0);
+			LOGGER.debug(MessageCodes.DG002, "BoneCP.acquireRetryAttempts",
+					acquireRetryAttempts);
+			dataSource.setAcquireRetryAttempts(acquireRetryAttempts);
+		}
+		if (properties.containsKey("BoneCP.acquireRetryDelayInMs")) {
+			int acquireRetryDelayInMs = properties.getInt(
+					"BoneCP.acquireRetryDelayInMs", 0);
+			LOGGER.debug(MessageCodes.DG002, "BoneCP.acquireRetryDelayInMs",
+					acquireRetryDelayInMs);
+			dataSource.setAcquireRetryDelayInMs(acquireRetryDelayInMs);
+		}
+		if (properties.containsKey("BoneCP.connectionTimeoutInMs")) {
+			int connectionTimeoutInMs = properties.getInt(
+					"BoneCP.connectionTimeoutInMs", 0);
+			LOGGER.debug(MessageCodes.DG002, "BoneCP.connectionTimeoutInMs",
+					connectionTimeoutInMs);
+			dataSource.setConnectionTimeoutInMs(connectionTimeoutInMs);
+		}
+		if (properties.containsKey("BoneCP.idleMaxAgeInMinutes")) {
+			int idleMaxAgeInMinutes = properties.getInt(
+					"BoneCP.idleMaxAgeInMinutes", 0);
+			LOGGER.debug(MessageCodes.DG002, "BoneCP.idleMaxAgeInMinutes",
+					idleMaxAgeInMinutes);
+			dataSource.setIdleMaxAgeInMinutes(idleMaxAgeInMinutes);
+		}
+		if (properties.containsKey("BoneCP.initSQL")) {
+			String initSQL = properties.getString("BoneCP.initSQL");
+			LOGGER.debug(MessageCodes.DG002, "BoneCP.initSQL", initSQL);
+			dataSource.setInitSQL(initSQL);
+		}
+		if (properties.containsKey("BoneCP.logStatementsEnabled")) {
+			boolean logStatementsEnabled = properties
+					.getBoolean("BoneCP.logStatementsEnabled");
+			LOGGER.debug(MessageCodes.DG002, "BoneCP.logStatementsEnabled",
+					logStatementsEnabled);
+			dataSource.setLogStatementsEnabled(logStatementsEnabled);
+		}
 	}
 
 	/**
@@ -88,238 +197,4 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 
 		return new LocalTransactionalDataSource(dataSource);
 	}
-
-	/**
-	 * {@link BoneCPDataSource} の password プロパティを設定します。
-	 * 
-	 * @param password
-	 *            password プロパティの値
-	 * @see BoneCPDataSource#setPassword(String)
-	 */
-	@Inject(optional = true)
-	public void setPassword(@Named(JDBC_PASSWORD) String password) {
-		LOGGER.debug(MessageCodes.DG002, JDBC_PASSWORD, password);
-		dataSource.setPassword(password);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の defaultAutoCommit プロパティを設定します。
-	 * 
-	 * @param defaultAutoCommit
-	 *            defaultAutoCommit プロパティの値
-	 * @see BoneCPDataSource#setDefaultAutoCommit(Boolean)
-	 */
-	@Inject(optional = true)
-	public void setDefaultAutoCommit(
-			@Named("BoneCP.defaultAutoCommit") Boolean defaultAutoCommit) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.defaultAutoCommit",
-				defaultAutoCommit);
-		dataSource.setDefaultAutoCommit(defaultAutoCommit);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の defaultReadOnly プロパティを設定します。
-	 * 
-	 * @param defaultReadOnly
-	 *            defaultAutoCommit プロパティの値
-	 * @see BoneCPDataSource#setDefaultReadOnly(Boolean)
-	 */
-	@Inject(optional = true)
-	public void setDefaultReadOnly(
-			@Named("BoneCP.defaultReadOnly") Boolean defaultReadOnly) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.defaultReadOnly",
-				defaultReadOnly);
-		dataSource.setDefaultReadOnly(defaultReadOnly);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の defaultTransactionIsolation プロパティを設定します。
-	 * 
-	 * @param defaultTransactionIsolation
-	 *            defaultTransactionIsolation プロパティの値
-	 * @see BoneCPDataSource#setDefaultTransactionIsolation(String)
-	 */
-	@Inject(optional = true)
-	public void setDefaultTransactionIsolation(
-			@Named("BoneCP.defaultTransactionIsolation") String defaultTransactionIsolation) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.defaultTransactionIsolation",
-				defaultTransactionIsolation);
-		dataSource.setDefaultTransactionIsolation(defaultTransactionIsolation);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の defaultCatalog プロパティを設定します。
-	 * 
-	 * @param defaultCatalog
-	 *            defaultCatalog プロパティの値
-	 * @see BoneCPDataSource#setDefaultCatalog(String)
-	 */
-	@Inject(optional = true)
-	public void setDefaultCatalog(
-			@Named("BoneCP.defaultCatalog") String defaultCatalog) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.defaultCatalog", defaultCatalog);
-		dataSource.setDefaultCatalog(defaultCatalog);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の partitionCount プロパティを設定します。
-	 * 
-	 * @param partitionCount
-	 *            partitionCount プロパティの値
-	 * @see BoneCPDataSource#setPartitionCount(int)
-	 */
-	@Inject(optional = true)
-	public void setPartitionCount(@Named("BoneCP.partitionCount") int partitionCount) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.partitionCount", partitionCount);
-		dataSource.setPartitionCount(partitionCount);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の maxConnectionsPerPartition プロパティを設定します。
-	 * 
-	 * @param maxConnectionsPerPartition
-	 *            maxConnectionsPerPartition プロパティの値
-	 * @see BoneCPDataSource#setMaxConnectionsPerPartition(int)
-	 */
-	@Inject(optional = true)
-	public void setMaxConnectionsPerPartition(
-			@Named("BoneCP.maxConnectionsPerPartition") int maxConnectionsPerPartition) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.maxConnectionsPerPartition",
-				maxConnectionsPerPartition);
-		dataSource.setMaxConnectionsPerPartition(maxConnectionsPerPartition);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の minConnectionsPerPartition プロパティを設定します。
-	 * 
-	 * @param minConnectionsPerPartition
-	 *            minConnectionsPerPartition プロパティの値
-	 * @see BoneCPDataSource#setMinConnectionsPerPartition(int)
-	 */
-	@Inject(optional = true)
-	public void setMinConnectionsPerPartition(
-			@Named("BoneCP.minConnectionsPerPartition") int minConnectionsPerPartition) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.minConnectionsPerPartition",
-				minConnectionsPerPartition);
-		dataSource.setMinConnectionsPerPartition(minConnectionsPerPartition);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の acquireIncrement プロパティを設定します。
-	 * 
-	 * @param acquireIncrement
-	 *            acquireIncrement プロパティの値
-	 * @see BoneCPDataSource#setAcquireIncrement(int)
-	 */
-	@Inject(optional = true)
-	public void setAcquireIncrement(
-			@Named("BoneCP.acquireIncrement") int acquireIncrement) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.acquireIncrement",
-				acquireIncrement);
-		dataSource.setAcquireIncrement(acquireIncrement);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の acquireRetryAttempts プロパティを設定します。
-	 * 
-	 * @param acquireRetryAttempts
-	 *            acquireRetryAttempts プロパティの値
-	 * @see BoneCPDataSource#setAcquireRetryAttempts(int)
-	 */
-	@Inject(optional = true)
-	public void setAcquireRetryAttempts(
-			@Named("BoneCP.acquireRetryAttempts") int acquireRetryAttempts) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.acquireRetryAttempts",
-				acquireRetryAttempts);
-		dataSource.setAcquireRetryAttempts(acquireRetryAttempts);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の acquireRetryDelayInMs プロパティを設定します。
-	 * 
-	 * @param acquireRetryDelayInMs
-	 *            acquireRetryDelayInMs プロパティの値
-	 * @see BoneCPDataSource#setAcquireRetryDelayInMs(long)
-	 */
-	@Inject(optional = true)
-	public void setAcquireRetryDelayInMs(
-			@Named("BoneCP.acquireRetryDelayInMs") long acquireRetryDelayInMs) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.acquireRetryDelayInMs",
-				acquireRetryDelayInMs);
-		dataSource.setAcquireRetryDelayInMs(acquireRetryDelayInMs);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の connectionTimeoutInMs プロパティを設定します。
-	 * 
-	 * @param connectionTimeoutInMs
-	 *            connectionTimeoutInMs プロパティの値
-	 * @see BoneCPDataSource#setConnectionTimeoutInMs(long)
-	 */
-	@Inject(optional = true)
-	public void setConnectionTimeoutInMs(
-			@Named("BoneCP.connectionTimeoutInMs") long connectionTimeoutInMs) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.connectionTimeoutInMs",
-				connectionTimeoutInMs);
-		dataSource.setConnectionTimeoutInMs(connectionTimeoutInMs);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の idleMaxAgeInMinutes プロパティを設定します。
-	 * 
-	 * @param idleMaxAgeInMinutes
-	 *            idleMaxAgeInMinutes プロパティの値
-	 * @see BoneCPDataSource#setIdleMaxAgeInMinutes(long)
-	 */
-	@Inject(optional = true)
-	public void setIdleMaxAgeInMinutes(
-			@Named("BoneCP.idleMaxAgeInMinutes") long idleMaxAgeInMinutes) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.idleMaxAgeInMinutes",
-				idleMaxAgeInMinutes);
-		dataSource.setIdleMaxAgeInMinutes(idleMaxAgeInMinutes);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の initSQL プロパティを設定します。
-	 * 
-	 * @param initSQL
-	 *            initSQL プロパティの値
-	 * @see BoneCPDataSource#setInitSQL(String)
-	 */
-	@Inject(optional = true)
-	public void setInitSQL(@Named("BoneCP.initSQL") String initSQL) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.initSQL", initSQL);
-		dataSource.setInitSQL(initSQL);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の logStatementsEnabled プロパティを設定します。
-	 * 
-	 * @param logStatementsEnabled
-	 *            logStatementsEnabled プロパティの値
-	 * @see BoneCPDataSource#setLogStatementsEnabled(boolean)
-	 */
-	@Inject(optional = true)
-	public void setInitSQL(
-			@Named("BoneCP.logStatementsEnabled") boolean logStatementsEnabled) {
-		LOGGER.debug(MessageCodes.DG002, "BoneCP.logStatementsEnabled",
-				logStatementsEnabled);
-		dataSource.setLogStatementsEnabled(logStatementsEnabled);
-	}
-
-	/**
-	 * {@link BoneCPDataSource} の driverClassName
-	 * プロパティを設定します。設定しない場合は、コンストラクタの引数 {@code url} から推測して適用されます。
-	 * 
-	 * @param driverClassName
-	 *            driverClassName プロパティの値
-	 */
-	@Inject(optional = true)
-	public void setDriverClassName(
-			@Named(JDBC_DRIVER_CLASS_NAME) String driverClassName) {
-		LOGGER.debug(MessageCodes.DG002, JDBC_DRIVER_CLASS_NAME,
-				driverClassName);
-		this.driverClassName = driverClassName;
-	}
-
 }

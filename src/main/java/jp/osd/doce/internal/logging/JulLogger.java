@@ -65,6 +65,16 @@ public class JulLogger extends Logger {
      * {@inheritDoc}
      */
     @Override
+    public void warn(MessageCodes codes, Object... arguments) {
+        if (logger.isLoggable(Level.WARNING)) {
+            logger.warning(getString(codes, arguments));
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void error(Throwable throwable, MessageCodes codes,
             Object... arguments) {
         if (logger.isLoggable(Level.SEVERE)) {

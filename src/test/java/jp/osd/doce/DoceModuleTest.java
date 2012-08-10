@@ -14,12 +14,16 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
 
+import test.dao.FooDao;
 import test.dao.FugaDao;
 import test.dao.HogeDao;
+import test.entity.Foo;
 import test.entity.Hoge;
+import test.service.Test2Service;
 import test.service.TestService;
 
 import com.google.inject.AbstractModule;
@@ -33,10 +37,15 @@ import com.google.inject.name.Names;
 import com.jolbox.bonecp.BoneCPDataSource;
 
 public class DoceModuleTest {
-	private final JdbcProperties domaProperties = new JdbcProperties(
-			"jdbc:h2:mem:mydb;DB_CLOSE_DELAY=-1", "foo", "bar");
+	private JdbcProperties domaProperties;
 
 	public DoceModuleTest() {
+	}
+
+	@Before
+	public void setUp() {
+		domaProperties = new JdbcProperties(
+				"jdbc:h2:mem:mydb;DB_CLOSE_DELAY=-1", "foo", "bar");
 		domaProperties.setDomaMaxRows(0);
 		domaProperties.setDomaFetchSize(0);
 		domaProperties.setDomaQueryTimeout(0);
@@ -50,15 +59,14 @@ public class DoceModuleTest {
 		Module m1 = new Module() {
 			@Override
 			public void configure(Binder binder) {
-				Names.bindProperties(binder, domaProperties);
 				binder.bind(Context.class).to(InitialContext.class);
 			}
 		};
-		Module m3 = new DoceModule.Builder().setDaoPackage("")
-				.setDaoSubpackage("").setDaoSuffix("Impl")
-				.addDaoTypes(HogeDao.class).addDaoTypes(list)
-				.setTransactionBinding(TransactionBinding.LOCAL_TRANSACTION)
-				.create();
+		domaProperties
+				.setTransactionBinding(TransactionBinding.LOCAL_TRANSACTION);
+		Module m3 = new DoceModule.Builder().setProperties(domaProperties)
+				.setDaoPackage("").setDaoSubpackage("").setDaoSuffix("Impl")
+				.addDaoTypes(HogeDao.class).addDaoTypes(list).create();
 
 		Injector injector = Guice.createInjector(m1, m3);
 
@@ -115,9 +123,9 @@ public class DoceModuleTest {
 						.toInstance(lds);
 			}
 		};
+		domaProperties.setDataSourceBinding(DataSourceBinding.NONE);
 		Module m2 = new DoceModule.Builder().setProperties(domaProperties)
-				.addDaoTypes(HogeDao.class)
-				.setDataSourceBinding(DataSourceBinding.NONE).create();
+				.addDaoTypes(HogeDao.class).create();
 
 		Injector injector = Guice.createInjector(m1, m2);
 
@@ -131,9 +139,9 @@ public class DoceModuleTest {
 	 */
 	@Test
 	public void testConfigure_5() {
+		domaProperties.setTransactionBinding(TransactionBinding.NONE);
 		Module m = new DoceModule.Builder().setProperties(domaProperties)
-				.addDaoTypes(HogeDao.class)
-				.setTransactionBinding(TransactionBinding.NONE).create();
+				.addDaoTypes(HogeDao.class).create();
 
 		Injector injector = Guice.createInjector(m);
 
@@ -144,5 +152,30 @@ public class DoceModuleTest {
 		ts.test();
 		Hoge hoge = ts.get(1);
 		assertEquals("Mike", hoge.name);
+	}
+	
+	/**
+	 * データベース名を指定したモジュールの組立ができるか確認する。
+	 */
+	@Test
+	public void testConfigure_6() {
+		Module m1 = new Module() {
+			@Override
+			public void configure(Binder binder) {
+				binder.bind(Context.class).to(InitialContext.class);
+			}
+		};
+		domaProperties
+				.setTransactionBinding(TransactionBinding.LOCAL_TRANSACTION);
+		Module m3 = new DoceModule.Builder("test").setProperties(domaProperties)
+				.setDaoPackage("").setDaoSubpackage("").setDaoSuffix("Impl")
+				.addDaoTypes(FooDao.class).create();
+
+		Injector injector = Guice.createInjector(m1, m3);
+
+		Test2Service ts = injector.getInstance(Test2Service.class);
+		ts.test();
+		Foo foo = ts.get(1);
+		assertEquals("Mike", foo.name);
 	}
 }

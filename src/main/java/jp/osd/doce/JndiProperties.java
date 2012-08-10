@@ -23,6 +23,7 @@ public class JndiProperties extends DomaProperties {
         if (transactionName != null) {
             setJndiUserTransactionName(transactionName);
         }
+        setDataSourceBinding(DataSourceBinding.JNDI);
     }
 
     public void setJndiDataSourceName(String jndiDataSourceName) {

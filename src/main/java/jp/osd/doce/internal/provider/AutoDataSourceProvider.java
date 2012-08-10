@@ -5,11 +5,12 @@ package jp.osd.doce.internal.provider;
 
 import static jp.osd.doce.JndiProperties.JNDI_DATA_SOURCE;
 
-import javax.naming.Context;
+import java.util.Properties;
+
 import javax.sql.DataSource;
 
 import jp.osd.doce.DataSourceBinding;
-import jp.osd.doce.Doma;
+import jp.osd.doce.internal.DbNamedPropeties;
 import jp.osd.doce.internal.SettingHelper;
 import jp.osd.doce.internal.logging.Logger;
 import jp.osd.doce.internal.logging.LoggerFactory;
@@ -18,15 +19,14 @@ import jp.osd.doce.internal.logging.MessageCodes;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
-import com.google.inject.name.Named;
 
 /**
  * {@link DataSource} の実装クラスオブジェクトを提供する Guice プロバイダです。
  * <P>
  * このプロバイダは、コンストラクタ引数 {@code dataSourceBinding} の値によって提供するオブジェクトが変わります。
- *
+ * 
  * <h4>{@link DataSourceBinding#AUTO} の場合</h4>
- *
+ * 
  * 提供される実装クラスオブジェクトは以下のように決定されます。
  * <OL>
  * <LI>{@link #setDataSource(DataSource)} で設定されたデータソースがあればそれを提供します。
@@ -36,25 +36,25 @@ import com.google.inject.name.Named;
  * {@link BoneCPDataSourceProvider} を用いてデータソースを取得して提供します。
  * <LI>上記のいずれにも当てはまらない場合、{@link SimpleDataSourceProvider} を用いてデータソースを取得して提供します。
  * </OL>
- *
+ * 
  * <H4>{@link DataSourceBinding#BONE_CP_DATA_SOURCE} の場合</H4>
- *
+ * 
  * {@link BoneCPDataSourceProvider} を用いてデータソースを取得して提供します。
  * {@code com.jolbox.bonecp.BoneCPDataSource} クラスがクラスパス上に存在しない場合は
  * {@link ClassNotFoundException} がスローされます。
- *
+ * 
  * <H4>{@link DataSourceBinding#SIMPLE_DATA_SOURCE} の場合</H4>
- *
+ * 
  * {@link SimpleDataSourceProvider} を用いてデータソースを取得して提供します。
- *
+ * 
  * <H4>{@link DataSourceBinding#JNDI} の場合</H4>
- *
+ * 
  * {@link JndiDataSourceProvider} を用いてデータソースを取得して提供します。
- *
+ * 
  * <H4>上記以外の場合</H4>
- *
+ * 
  * {@link #setDataSource(DataSource)} で設定された値を提供します。
- *
+ * 
  * @author asuka
  * @see BoneCPDataSourceProvider
  * @see SimpleDataSourceProvider
@@ -64,34 +64,25 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AutoDataSourceProvider.class);
 
+	private final DbNamedPropeties properties;
+
 	private DataSource dataSource = null;
 
-	private String jndiDataSourceName = null;
+	@Inject
+	private Injector injector;
 
-	private final DataSourceBinding dataSourceBinding;
-
-	private final Injector injector;
-
-	private final SettingHelper settingHelper;
+	@Inject
+	private SettingHelper settingHelper;
 
 	/**
 	 * 新たにオブジェクトを構築します。
-	 *
-	 * @param dataSourceBinding
-	 *            データソースのバインド方法
-	 * @param injector
-	 *            インジェクタ
-	 * @param settingHelper
-	 *            設定ヘルパ
+	 * 
+	 * @param properties
+	 *            データベース名付き設定プロパティ
 	 */
-	@Inject
-	public AutoDataSourceProvider(@Doma DataSourceBinding dataSourceBinding,
-			Injector injector, SettingHelper settingHelper) {
-		LOGGER.logConstructor(DataSourceBinding.class, Injector.class,
-				SettingHelper.class);
-		this.dataSourceBinding = dataSourceBinding;
-		this.injector = injector;
-		this.settingHelper = settingHelper;
+	public AutoDataSourceProvider(DbNamedPropeties properties) {
+		LOGGER.logConstructor(String.class, Properties.class);
+		this.properties = properties;
 	}
 
 	/**
@@ -99,6 +90,7 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 	 */
 	@Override
 	public DataSource get() {
+		DataSourceBinding dataSourceBinding = properties.getDataSourceBinding();
 		LOGGER.debug(MessageCodes.DG002, "DataSourceBinding", dataSourceBinding);
 		switch (dataSourceBinding) {
 		case AUTO:
@@ -114,24 +106,28 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 			}
 			break;
 		case JNDI:
-			dataSource = injector.getInstance(BoneCPDataSourceProvider.class)
+			dataSource = injector.getInstance(JndiDataSourceProvider.class)
 					.get();
 			break;
 		case BONE_CP_DATA_SOURCE:
-			dataSource = injector.getInstance(BoneCPDataSourceProvider.class)
-					.get();
+			BoneCPDataSourceProvider boneCPDataSourceProvider = new BoneCPDataSourceProvider(
+					properties);
+			dataSource = boneCPDataSourceProvider.get();
 			break;
 		case SIMPLE_DATA_SOURCE:
-			dataSource = injector.getInstance(SimpleDataSourceProvider.class)
-					.get();
+			SimpleDataSourceProvider simpleDataSourceProvider = new SimpleDataSourceProvider(
+					properties);
+			dataSource = simpleDataSourceProvider.get();
 			break;
 		default:
 			break;
 		}
+		assert (dataSource != null);
 		return dataSource;
 	}
 
 	private boolean createJndiDataSource() {
+		String jndiDataSourceName = properties.getString(JNDI_DATA_SOURCE);
 		if (jndiDataSourceName != null) {
 			dataSource = injector.getInstance(JndiDataSourceProvider.class)
 					.get();
@@ -142,10 +138,10 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 	}
 
 	private boolean createBoneCPDataSource() {
-		if (settingHelper
-				.isClassLoadable("com.jolbox.bonecp.BoneCPDataSource")) {
-			dataSource = injector.getInstance(BoneCPDataSourceProvider.class)
-					.get();
+		if (settingHelper.isClassLoadable("com.jolbox.bonecp.BoneCPDataSource")) {
+			BoneCPDataSourceProvider boneCPDataSourceProvider = new BoneCPDataSourceProvider(
+					properties);
+			dataSource = boneCPDataSourceProvider.get();
 			return true;
 		}
 		LOGGER.debug(MessageCodes.DG004);
@@ -155,26 +151,12 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 	/**
 	 * {@link #get()} で返すデータソースを設定します。このメソッドで設定した値は、すべに優先して {@link #get()}
 	 * の戻り値として採用されます。
-	 *
+	 * 
 	 * @param dataSource
 	 *            データソース
 	 */
 	@Inject(optional = true)
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
-	}
-
-	/**
-	 * {@link #setDataSource(DataSource)} で値を設定しない場合、JNDI
-	 * を用いてデータソースをルックアップする際に使用するオブジェクトの名前を設定します。
-	 *
-	 * @param jndiDataSourceName
-	 *            検索すデータソースの名前
-	 * @see Context#lookup(String)
-	 */
-	@Inject(optional = true)
-	public void setJndiDataSourceName(
-			@Named(JNDI_DATA_SOURCE) String jndiDataSourceName) {
-		this.jndiDataSourceName = jndiDataSourceName;
 	}
 }

@@ -1,6 +1,8 @@
 package jp.osd.doce.internal.provider;
 
 import static junit.framework.Assert.assertTrue;
+import jp.osd.doce.JdbcProperties;
+import jp.osd.doce.internal.DbNamedPropeties;
 
 import org.junit.Test;
 import org.seasar.doma.jdbc.dialect.Db2Dialect;
@@ -16,7 +18,6 @@ import org.seasar.doma.jdbc.dialect.StandardDialect;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.name.Names;
 
 public class DefaultDialectProviderTest {
 	public static class URLModule extends AbstractModule {
@@ -28,8 +29,9 @@ public class DefaultDialectProviderTest {
 
 		@Override
 		protected void configure() {
-			bind(Dialect.class).toProvider(DefaultDialectProvider.class);
-			bindConstant().annotatedWith(Names.named("JDBC.url")).to(url);
+			DbNamedPropeties props = new DbNamedPropeties(null, new JdbcProperties(url, "sa"));
+			DefaultDialectProvider provider = new DefaultDialectProvider(props);
+			bind(Dialect.class).toProvider(provider);
 		}
 	}
 

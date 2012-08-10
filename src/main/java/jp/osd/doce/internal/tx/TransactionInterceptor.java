@@ -6,6 +6,9 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 /**
  * メソッドをトランザクション下で実行させるためのインターセプタです。
@@ -13,13 +16,18 @@ import com.google.inject.Inject;
  * @author asuka
  */
 public class TransactionInterceptor implements MethodInterceptor {
-	private Transaction transaction;
+	private final String dbName;
+	
+	@Inject
+	private Injector injector;
 
 	/**
 	 * 新たにオブジェクトを構築します。
+	 * 
+	 * @param dbName データベース名
 	 */
-	public TransactionInterceptor() {
-		// 何もしない
+	public TransactionInterceptor(String dbName) {
+		this.dbName = dbName;
 	}
 
 	/**
@@ -27,6 +35,12 @@ public class TransactionInterceptor implements MethodInterceptor {
 	 */
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
+		Transaction transaction;
+		if (dbName == null) {
+			transaction = injector.getInstance(Transaction.class);
+		} else {
+			transaction = injector.getInstance(Key.get(Transaction.class, Names.named(dbName)));
+		}
 		Object result;
 
 		if (transaction.isActive()) {
@@ -44,15 +58,4 @@ public class TransactionInterceptor implements MethodInterceptor {
 
 		return result;
 	}
-
-	/**
-	 * トランザクション機能を設定します。
-	 *
-	 * @param transaction トランザクション機能
-	 */
-	@Inject
-	public void setTransaction(Transaction transaction) {
-		this.transaction = transaction;
-	}
-
 }

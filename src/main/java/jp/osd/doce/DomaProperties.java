@@ -12,12 +12,36 @@ import org.seasar.doma.jdbc.dialect.Dialect;
  */
 public class DomaProperties extends Properties {
     private static final long serialVersionUID = 8253719579596477785L;
+    public static final String DS_TYPE = "ds.type";
+    public static final String TX_TYPE = "tx.type";
     public static final String DOMA_DIALECT_CLASS_NAME = "Doma.dialectClassName";
     public static final String DOMA_MAX_ROWS = "Doma.maxRows";
     public static final String DOMA_FETCH_SIZE = "Doma.fetchSize";
     public static final String DOMA_QUERY_TIMEOUT = "Doma.queryTimeout";
     public static final String DOMA_BATCH_SIZE = "Doma.batchSize";
 
+    public void setDataSourceBinding(DataSourceBinding dataSourceBinding) {
+    	setProperty(DS_TYPE, dataSourceBinding.toString());
+    }
+    
+    public DataSourceBinding getDataSourceBinding() {
+    	if (!containsKey(DS_TYPE)) {
+    		return DataSourceBinding.AUTO;
+    	}
+    	return DataSourceBinding.valueOf(getProperty(DS_TYPE));
+    }
+    
+    public void setTransactionBinding(TransactionBinding transactionBinding) {
+    	setProperty(TX_TYPE, transactionBinding.toString());
+    }
+    
+    public TransactionBinding getTransactionBinding() {
+    	if (!containsKey(TX_TYPE)) {
+    		return TransactionBinding.AUTO;
+    	}
+    	return TransactionBinding.valueOf(getProperty(TX_TYPE));
+    }
+    
     public void setDomaDialectClassName(String domaDialectClassName) {
         setString(DOMA_DIALECT_CLASS_NAME, domaDialectClassName);
     }

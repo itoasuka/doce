@@ -2,13 +2,10 @@ package jp.osd.doce.internal.tx;
 
 import javax.sql.DataSource;
 
-import jp.osd.doce.Doma;
 import jp.osd.doce.Transaction;
 
 import org.seasar.doma.jdbc.JdbcLogger;
 import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
-
-import com.google.inject.Inject;
 
 /**
  * Doma の {@link org.seasar.doma.jdbc.tx.LocalTransaction} を用いた
@@ -29,9 +26,7 @@ public class LocalTransaction implements Transaction {
 	 * @param jdbcLogger
 	 *            JDBC ロガー
 	 */
-	@Inject
-	public LocalTransaction(@Doma DataSource dataSource,
-			@Doma JdbcLogger jdbcLogger) {
+	public LocalTransaction(DataSource dataSource, JdbcLogger jdbcLogger) {
 		this.dataSource = (LocalTransactionalDataSource) dataSource;
 		this.jdbcLogger = jdbcLogger;
 	}
