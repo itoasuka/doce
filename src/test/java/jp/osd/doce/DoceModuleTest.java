@@ -153,7 +153,7 @@ public class DoceModuleTest {
 		Hoge hoge = ts.get(1);
 		assertEquals("Mike", hoge.name);
 	}
-	
+
 	/**
 	 * データベース名を指定したモジュールの組立ができるか確認する。
 	 */
@@ -167,7 +167,8 @@ public class DoceModuleTest {
 		};
 		domaProperties
 				.setTransactionBinding(TransactionBinding.LOCAL_TRANSACTION);
-		Module m3 = new DoceModule.Builder("test").setProperties(domaProperties)
+		Module m3 = new DoceModule.Builder()
+				.setDataSourceProperties("test", domaProperties)
 				.setDaoPackage("").setDaoSubpackage("").setDaoSuffix("Impl")
 				.addDaoTypes(FooDao.class).create();
 

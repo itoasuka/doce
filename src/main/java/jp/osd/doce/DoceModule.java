@@ -1,39 +1,17 @@
 package jp.osd.doce;
 
-import static com.google.inject.Scopes.SINGLETON;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-
-import javax.naming.Context;
-import javax.sql.DataSource;
 
 import jp.osd.doce.internal.ClassUtils;
 import jp.osd.doce.internal.DbNamedPropeties;
-import jp.osd.doce.internal.GuiceManagedConfig;
-import jp.osd.doce.internal.provider.AutoDataSourceProvider;
-import jp.osd.doce.internal.provider.AutoJdbcLoggerProvider;
-import jp.osd.doce.internal.provider.AutoTransactionProvider;
-import jp.osd.doce.internal.provider.DefaultContextProvider;
-import jp.osd.doce.internal.provider.DefaultDialectProvider;
-import jp.osd.doce.internal.provider.DefaultRequiresNewControllerProvider;
-import jp.osd.doce.internal.provider.DefaultSqlFileRepositoryProvider;
-import jp.osd.doce.internal.tx.TransactionInterceptor;
-
-import org.seasar.doma.jdbc.Config;
-import org.seasar.doma.jdbc.JdbcLogger;
-import org.seasar.doma.jdbc.RequiresNewController;
-import org.seasar.doma.jdbc.SqlFileRepository;
-import org.seasar.doma.jdbc.dialect.Dialect;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Scopes;
-import com.google.inject.binder.LinkedBindingBuilder;
-import com.google.inject.matcher.Matchers;
-import com.google.inject.name.Names;
 
 /**
  * Doma と Guice を連携させるための Guice モジュールクラスです。
@@ -47,12 +25,11 @@ public class DoceModule extends AbstractModule {
 	private static final String DEFAUL_DAO_SUBPACKAGE = "";
 	private static final String DEFAUL_DAO_SUFFIX = "Impl";
 
-	private final String dbName;
+	private final Map<String, DbNamedPropeties> dbNamedPropetiesMap;
 	private final Collection<Class<?>> daoTypes;
 	private final String daoPackage;
 	private final String daoSubpackage;
 	private final String daoSuffix;
-	private final Properties properties;
 
 	public DoceModule(Properties properties, Class<?>... daoTypes) {
 		this(properties, Arrays.asList(daoTypes));
@@ -64,8 +41,9 @@ public class DoceModule extends AbstractModule {
 
 	public DoceModule(String dbName, Properties properties,
 			Collection<Class<?>> daoTypes) {
-		this.dbName = dbName;
-		this.properties = properties;
+		this.dbNamedPropetiesMap = new HashMap<String, DbNamedPropeties>();
+		dbNamedPropetiesMap.put(dbName,
+				new DbNamedPropeties(dbName, properties));
 		this.daoTypes = daoTypes;
 		daoPackage = DEFAUL_DAO_PACKAGE;
 		daoSubpackage = DEFAUL_DAO_SUBPACKAGE;
@@ -77,69 +55,10 @@ public class DoceModule extends AbstractModule {
 	 */
 	@Override
 	protected void configure() {
-		DbNamedPropeties props = new DbNamedPropeties(dbName, properties);
-		DataSourceBinding dataSourceBinding = props.getDataSourceBinding();
-		TransactionBinding transactionBinding = props.getTransactionBinding();
-
-		// ネーミングコンテキストの設定
-		bindNamed(Context.class).toProvider(DefaultContextProvider.class).in(
-				SINGLETON);
-
-		// データソースプロバイダの設定
-		switch (dataSourceBinding) {
-		case NONE:
-			break;
-		default:
-			AutoDataSourceProvider provider = new AutoDataSourceProvider(props);
-			requestInjection(provider);
-			bindNamed(DataSource.class).toProvider(provider).in(SINGLETON);
-			break;
-		}
-
-		// SQL ファイルリポジトリの設定
-		bindNamed(SqlFileRepository.class).toProvider(
-				DefaultSqlFileRepositoryProvider.class).in(Scopes.SINGLETON);
-		// JDBC ロガーの設定
-		bindNamed(JdbcLogger.class).toProvider(AutoJdbcLoggerProvider.class)
-				.in(Scopes.SINGLETON);
-		// Requires new controller の設定
-		bindNamed(RequiresNewController.class).toProvider(
-				DefaultRequiresNewControllerProvider.class)
-				.in(Scopes.SINGLETON);
-
-		// Dialect の設定
-		DefaultDialectProvider defaultDialectProvider = new DefaultDialectProvider(
-				props);
-		requestInjection(defaultDialectProvider);
-		bindNamed(Dialect.class).toProvider(defaultDialectProvider).in(
-				Scopes.SINGLETON);
-
-		// Doma 用 Config クラスの設定
-		GuiceManagedConfig config = new GuiceManagedConfig(props);
-		requestInjection(config);
-		bindNamed2(Config.class).toInstance(config);
-
-		// トランザクションの設定
-		switch (transactionBinding) {
-		case NONE:
-			break;
-		default:
-			AutoTransactionProvider provider = new AutoTransactionProvider(
-					props);
-			requestInjection(provider);
-			bindNamed2(Transaction.class).toProvider(provider).in(
-					Scopes.SINGLETON);
-			break;
-		}
-
-		// トランザクションインタセプタの設定
-		if (transactionBinding != TransactionBinding.NONE) {
-			TransactionInterceptor lti = new TransactionInterceptor(dbName);
-			requestInjection(lti);
-			bindInterceptor(Matchers.any(),
-					Matchers.annotatedWith(Transactional.class), lti);
-			bindInterceptor(Matchers.annotatedWith(Transactional.class),
-					Matchers.any(), lti);
+		for (Map.Entry<String, DbNamedPropeties> e : dbNamedPropetiesMap
+				.entrySet()) {
+			install(new DoceDataSourceModule(e.getKey(), e.getValue()
+					.getProperties()));
 		}
 
 		// Dao の設定
@@ -148,15 +67,14 @@ public class DoceModule extends AbstractModule {
 		}
 	}
 
-	private DoceModule(String dbName, List<Class<?>> daoTypes,
-			String daoPackage, String daoSubpackage, String daoSuffix,
-			Properties properties) {
-		this.dbName = dbName;
+	private DoceModule(Map<String, DbNamedPropeties> dbNamedPropetiesMap,
+			List<Class<?>> daoTypes, String daoPackage, String daoSubpackage,
+			String daoSuffix) {
+		this.dbNamedPropetiesMap = dbNamedPropetiesMap;
 		this.daoTypes = daoTypes;
 		this.daoPackage = daoPackage;
 		this.daoSubpackage = daoSubpackage;
 		this.daoSuffix = daoSuffix;
-		this.properties = properties;
 	}
 
 	private <T> void bindDao(Class<T> daoType) {
@@ -172,50 +90,51 @@ public class DoceModule extends AbstractModule {
 		bind(daoType).to(implClass);
 	}
 
-	private <T> LinkedBindingBuilder<T> bindNamed(Class<T> type) {
-		if (dbName == null) {
-			return bind(type).annotatedWith(Doma.class);
-		}
-		return bind(type).annotatedWith(Names.named(dbName));
-	}
-
-	private <T> LinkedBindingBuilder<T> bindNamed2(Class<T> type) {
-		if (dbName == null) {
-			return bind(type);
-		}
-		return bind(type).annotatedWith(Names.named(dbName));
-	}
-
 	/**
 	 * {@link DoceModule} オブジェクトを作成するためのビルダクラスです。
 	 * 
 	 * @author asuka
 	 */
 	public static final class Builder {
-		private final String dbName;
+		private final Map<String, DbNamedPropeties> dbNamedPropetiesMap = new HashMap<String, DbNamedPropeties>();
 		private DataSourceBinding dataSourceBinding = null;
 		private TransactionBinding transactionBinding = null;
 		private final List<Class<?>> daoTypes = new ArrayList<Class<?>>();
 		private String daoPackage = DEFAUL_DAO_PACKAGE;
 		private String daoSubpackage = DEFAUL_DAO_SUBPACKAGE;
 		private String daoSuffix = DEFAUL_DAO_SUFFIX;
-		private Properties properties;
 
 		/**
 		 * 新たにオブジェクトを構築します。
 		 */
 		public Builder() {
-			this(null);
 		}
 
 		/**
-		 * 新たにオブジェクトを構築します。
+		 * データソースの設定を追加します。
+		 * 
+		 * @param properties
+		 *            設定プロパティー
+		 * @return このメソッドのレシーバオブジェクト
+		 */
+		public Builder setDataSourceProperties(Properties properties) {
+			return setDataSourceProperties(null, properties);
+		}
+
+		/**
+		 * データソースの設定を追加します。
 		 * 
 		 * @param dbName
 		 *            データベース名
+		 * @param properties
+		 *            設定プロパティー
+		 * @return このメソッドのレシーバオブジェクト
 		 */
-		public Builder(String dbName) {
-			this.dbName = dbName;
+		public Builder setDataSourceProperties(String dbName,
+				Properties properties) {
+			dbNamedPropetiesMap.put(dbName, new DbNamedPropeties(dbName,
+					properties));
+			return this;
 		}
 
 		/**
@@ -224,10 +143,12 @@ public class DoceModule extends AbstractModule {
 		 * @param properties
 		 *            設定プロパティ
 		 * @return このメソッドのレシーバオブジェクト
+		 * @deprecated このメソッドは推奨されません。かわりに
+		 *             {@link #setDataSourceProperties(Properties)} を使用してください。
 		 */
+		@Deprecated
 		public Builder setProperties(Properties properties) {
-			this.properties = properties;
-			return this;
+			return setDataSourceProperties(properties);
 		}
 
 		/**
@@ -339,22 +260,26 @@ public class DoceModule extends AbstractModule {
 		 */
 		public DoceModule create() {
 			if (dataSourceBinding != null) {
-				if (properties == null) {
-					properties = new Properties();
+				if (!dbNamedPropetiesMap.containsKey(null)) {
+					DbNamedPropeties props = new DbNamedPropeties(null,
+							new Properties());
+					dbNamedPropetiesMap.put(null, props);
 				}
-				properties.put(DomaProperties.DS_TYPE,
-						dataSourceBinding.toString());
+				DbNamedPropeties props = dbNamedPropetiesMap.get(null);
+				props.setDataSourceBinding(dataSourceBinding);
 			}
 			if (transactionBinding != null) {
-				if (properties == null) {
-					properties = new Properties();
+				if (!dbNamedPropetiesMap.containsKey(null)) {
+					DbNamedPropeties props = new DbNamedPropeties(null,
+							new Properties());
+					dbNamedPropetiesMap.put(null, props);
 				}
-				properties.put(DomaProperties.TX_TYPE,
-						transactionBinding.toString());
+				DbNamedPropeties props = dbNamedPropetiesMap.get(null);
+				props.setTransactionBinding(transactionBinding);
 			}
 
-			return new DoceModule(dbName, daoTypes, daoPackage, daoSubpackage,
-					daoSuffix, properties);
+			return new DoceModule(dbNamedPropetiesMap, daoTypes, daoPackage,
+					daoSubpackage, daoSuffix);
 		}
 	}
 }

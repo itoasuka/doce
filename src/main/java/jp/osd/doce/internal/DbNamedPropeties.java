@@ -16,7 +16,8 @@ import jp.osd.doce.internal.logging.MessageCodes;
  * @since 1.0.0
  */
 public class DbNamedPropeties {
-	private static final Logger LOGGER = LoggerFactory.getLogger(DbNamedPropeties.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(DbNamedPropeties.class);
 	private final String dbName;
 	private final Properties properties;
 
@@ -40,6 +41,14 @@ public class DbNamedPropeties {
 	 */
 	public String getDbName() {
 		return dbName;
+	}
+	
+	/**
+	 * 設定プロパティーを取得します。
+	 * @return 設定プロパティー
+	 */
+	public Properties getProperties() {
+		return properties;
 	}
 
 	/**
@@ -79,7 +88,7 @@ public class DbNamedPropeties {
 		String value;
 		if (properties.containsKey(dbNamedKey)) {
 			value = properties.getProperty(dbNamedKey);
-		} else if(properties.containsKey(key))  {
+		} else if (properties.containsKey(key)) {
 			value = properties.getProperty(key);
 		} else {
 			return defaultValue;
@@ -87,7 +96,7 @@ public class DbNamedPropeties {
 
 		return Integer.parseInt(value);
 	}
-	
+
 	/**
 	 * 設定値を真偽値として取得します。
 	 * 
@@ -106,7 +115,7 @@ public class DbNamedPropeties {
 		String value;
 		if (properties.containsKey(dbNamedKey)) {
 			value = properties.getProperty(dbNamedKey);
-		} else if(properties.containsKey(key))  {
+		} else if (properties.containsKey(key)) {
 			value = properties.getProperty(key);
 		} else {
 			return false;
@@ -132,6 +141,21 @@ public class DbNamedPropeties {
 			return DataSourceBinding.AUTO;
 		}
 	}
+	
+	/**
+	 * データソースのバインド方法を設定します。
+	 * @param dataSourceBinding データソースのバインド方法
+	 */
+	public void setDataSourceBinding(DataSourceBinding dataSourceBinding) {
+		String dbNamedKey = getDbNamedKey(DomaProperties.DS_TYPE);
+		if (properties.containsKey(dbNamedKey)) {
+			properties.setProperty(dbNamedKey,
+					dataSourceBinding.toString());
+		} else {
+			properties.setProperty(DomaProperties.DS_TYPE,
+					dataSourceBinding.toString());
+		}
+	}
 
 	/**
 	 * トランザクションのバインド方法を取得します。
@@ -152,9 +176,25 @@ public class DbNamedPropeties {
 	}
 	
 	/**
+	 * トランザクションのバインド方法を設定します。
+	 * @param transactionBinding トランザクションのバインド方法
+	 */
+	public void setTransactionBinding(TransactionBinding transactionBinding) {
+		String dbNamedKey = getDbNamedKey(DomaProperties.TX_TYPE);
+		if (properties.containsKey(dbNamedKey)) {
+			properties.setProperty(dbNamedKey,
+					transactionBinding.toString());
+		} else {
+			properties.setProperty(DomaProperties.TX_TYPE,
+					transactionBinding.toString());
+		}
+	}
+
+	/**
 	 * 指定したキーが存在するかを取得します。
 	 * 
-	 * @param key キー
+	 * @param key
+	 *            キー
 	 * @return 存在した場合 <code>true</code>
 	 */
 	public boolean containsKey(String key) {
@@ -166,7 +206,7 @@ public class DbNamedPropeties {
 		}
 		return properties.containsKey(key);
 	}
-	
+
 	private String getDbNamedKey(String key) {
 		if (dbName == null) {
 			return key;
