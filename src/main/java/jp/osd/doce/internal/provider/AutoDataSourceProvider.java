@@ -99,25 +99,19 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 				if (!createJndiDataSource()) {
 					// BasicDataSource の作成を試みる
 					if (!createBoneCPDataSource()) {
-						dataSource = injector.getInstance(
-								SimpleDataSourceProvider.class).get();
+						createSimpleDataSource();
 					}
 				}
 			}
 			break;
 		case JNDI:
-			dataSource = injector.getInstance(JndiDataSourceProvider.class)
-					.get();
+			createJndiDataSource();
 			break;
 		case BONE_CP_DATA_SOURCE:
-			BoneCPDataSourceProvider boneCPDataSourceProvider = new BoneCPDataSourceProvider(
-					properties);
-			dataSource = boneCPDataSourceProvider.get();
+			createBoneCPDataSource();
 			break;
 		case SIMPLE_DATA_SOURCE:
-			SimpleDataSourceProvider simpleDataSourceProvider = new SimpleDataSourceProvider(
-					properties);
-			dataSource = simpleDataSourceProvider.get();
+			createSimpleDataSource();
 			break;
 		default:
 			break;
@@ -146,6 +140,13 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 		}
 		LOGGER.debug(MessageCodes.DG004);
 		return false;
+	}
+	
+	private boolean createSimpleDataSource() {
+		SimpleDataSourceProvider simpleDataSourceProvider = new SimpleDataSourceProvider(
+				properties);
+		dataSource = simpleDataSourceProvider.get();
+		return true;
 	}
 
 	/**
