@@ -64,7 +64,7 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 			driverClassName = properties.getString(JDBC_DRIVER_CLASS_NAME);
 			LOGGER.debug(MessageCodes.DG002, JDBC_DRIVER_CLASS_NAME,
 					driverClassName);
-			dataSource.setInitSQL(driverClassName);
+			dataSource.setDriverClass(driverClassName);
 		}
 
 
