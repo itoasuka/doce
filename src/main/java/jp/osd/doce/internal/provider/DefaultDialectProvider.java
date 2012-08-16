@@ -43,7 +43,7 @@ public class DefaultDialectProvider implements Provider<Dialect> {
 	 *            データベース名付き設定プロパティ
 	 */
     public DefaultDialectProvider(DbNamedPropeties properties) {
-        LOGGER.logConstructor();
+        LOGGER.logConstructor(DbNamedPropeties.class);
         
         jdbcUrl = properties.getString(JDBC_URL);
         dialectClassName = properties.getString(DOMA_DIALECT_CLASS_NAME);

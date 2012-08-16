@@ -64,12 +64,8 @@ public class JndiDataSourceProvider implements Provider<DataSource> {
 	/**
 	 * 新たにオブジェクトを構築します。
 	 * 
-	 * @param context
-	 *            JNDI ネーミングコンテキスト
-	 * @param jndiDataSourceName
-	 *            JNDI でルックアップする際に使用するデータソースのオブジェクト名
-	 * @param transactionBinding
-	 *            トランザクションのバインド方法
+	 * @param properties
+	 *            データベース名付き設定プロパティ
 	 */
 	public JndiDataSourceProvider(DbNamedPropeties properties) {
 		LOGGER.logConstructor(DbNamedPropeties.class);

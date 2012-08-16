@@ -40,7 +40,7 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 	 *            データベース名付き設定プロパティ
 	 */
 	public BoneCPDataSourceProvider(DbNamedPropeties properties) {
-		LOGGER.logConstructor(String.class, String.class, String.class);
+		LOGGER.logConstructor(DbNamedPropeties.class);
 		url = properties.getString(JDBC_URL);
 		LOGGER.debug(MessageCodes.DG002, JDBC_URL, url);
 		String username = properties.getString(JDBC_USERNAME);
@@ -113,6 +113,9 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 					maxConnectionsPerPartition);
 			dataSource
 					.setMaxConnectionsPerPartition(maxConnectionsPerPartition);
+		} else {
+			 // 何も設定しないと警告がでるのでデフォルト値を設定
+			dataSource.setMaxConnectionsPerPartition(20);
 		}
 		if (properties.containsKey("BoneCP.minConnectionsPerPartition")) {
 			int minConnectionsPerPartition = properties.getInt(
