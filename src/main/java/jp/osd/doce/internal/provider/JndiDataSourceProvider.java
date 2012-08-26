@@ -86,18 +86,18 @@ public class JndiDataSourceProvider implements Provider<DataSource> {
 		// まずは JNDI でデータソースを取得
 		DataSource ds;
 		try {
-			LOGGER.debug(MessageCodes.DG006, jndiDataSourceName);
+			LOGGER.debug(MessageCodes.DG006, dbName, jndiDataSourceName);
 			ds = (DataSource) getContext().lookup(jndiDataSourceName);
-			LOGGER.debug(MessageCodes.DG008);
+			LOGGER.debug(MessageCodes.DG008, dbName);
 		} catch (NamingException e) {
-			LOGGER.error(e, MessageCodes.DG007, jndiDataSourceName);
+			LOGGER.error(e, MessageCodes.DG007, dbName, jndiDataSourceName);
 			throw new DoceException("Lookup error : " + jndiDataSourceName, e);
 		}
 
 		// ローカルトランザクションを使用するならば LocalTransactionalDataSource
 		// でラップ
 		if (useLocalTransaction()) {
-			LOGGER.debug(MessageCodes.DG009);
+			LOGGER.debug(MessageCodes.DG009, dbName);
 			return new LocalTransactionalDataSource(ds);
 		}
 		return ds;

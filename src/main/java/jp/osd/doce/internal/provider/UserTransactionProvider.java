@@ -27,6 +27,8 @@ public class UserTransactionProvider implements Provider<UserTransaction> {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(UserTransactionProvider.class);
 
+	private final String dbName;
+	
 	private final Context context;
 
 	private String transactionName = DEFAULT_JNDI_TRANSACTION_NAME;
@@ -37,8 +39,9 @@ public class UserTransactionProvider implements Provider<UserTransaction> {
 	 * @param context
 	 *            トランザクションを JNDI でルックアップする際に使用するネーミングコンテキスト
 	 */
-	public UserTransactionProvider(Context context) {
-		LOGGER.logConstructor(Context.class);
+	public UserTransactionProvider(String dbName, Context context) {
+		LOGGER.logConstructor(String.class, Context.class);
+		this.dbName = dbName;
 		this.context = context;
 	}
 
@@ -48,13 +51,13 @@ public class UserTransactionProvider implements Provider<UserTransaction> {
 	@Override
 	public UserTransaction get() {
 		try {
-			LOGGER.debug(MessageCodes.DG006, transactionName);
+			LOGGER.debug(MessageCodes.DG006, dbName, transactionName);
 			UserTransaction tx = (UserTransaction) context
 					.lookup(transactionName);
-			LOGGER.debug(MessageCodes.DG008);
+			LOGGER.debug(MessageCodes.DG008, dbName);
 			return tx;
 		} catch (NamingException e) {
-			LOGGER.error(e, MessageCodes.DG007, transactionName);
+			LOGGER.error(e, MessageCodes.DG007, dbName, transactionName);
 			throw new DoceException("Lookup error : " + transactionName, e);
 		}
 	}

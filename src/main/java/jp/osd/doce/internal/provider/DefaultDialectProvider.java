@@ -30,6 +30,8 @@ public class DefaultDialectProvider implements Provider<Dialect> {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(DefaultDialectProvider.class);
     
+    private final String dbName;
+    
     private String jdbcUrl = null;
 
     private Dialect dialect = null;
@@ -45,6 +47,7 @@ public class DefaultDialectProvider implements Provider<Dialect> {
     public DefaultDialectProvider(DbNamedPropeties properties) {
         LOGGER.logConstructor(DbNamedPropeties.class);
         
+        dbName = properties.getDbName();
         jdbcUrl = properties.getString(JDBC_URL);
         dialectClassName = properties.getString(DOMA_DIALECT_CLASS_NAME);
     }
@@ -55,25 +58,25 @@ public class DefaultDialectProvider implements Provider<Dialect> {
     @Override
     public Dialect get() {
         if (dialect != null) {
-            LOGGER.info(MessageCodes.DG011);
+            LOGGER.info(MessageCodes.DG011, dbName);
             return dialect;
         }
         if (dialectClassName != null) {
             try {
-                LOGGER.info(MessageCodes.DG012, dialectClassName);
+                LOGGER.info(MessageCodes.DG012, dbName, dialectClassName);
                 return Class.forName(dialectClassName)
                         .asSubclass(Dialect.class).newInstance();
             } catch (Exception e) {
-                LOGGER.error(e, MessageCodes.DG013, e);
+                LOGGER.error(e, MessageCodes.DG013, dbName);
                 throw new DoceException(dialectClassName + " newInstance error", e);
             }
         }
         if (jdbcUrl == null) {
-            LOGGER.info(MessageCodes.DG014);
+            LOGGER.info(MessageCodes.DG014, dbName);
             return new StandardDialect();
         }
         Dialect d = JdbcUtils.getDialect(jdbcUrl);
-        LOGGER.info(MessageCodes.DG015, jdbcUrl, d.getClass());
+        LOGGER.info(MessageCodes.DG015, dbName, jdbcUrl, d.getClass());
         return d;
     }
 

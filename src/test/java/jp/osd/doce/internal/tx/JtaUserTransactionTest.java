@@ -27,7 +27,7 @@ public class JtaUserTransactionTest {
     @Before
     public void setUp() throws Exception {
         tx = createMock(UserTransaction.class);
-        jut = new JtaUserTransaction(tx);
+        jut = new JtaUserTransaction(null, tx);
     }
 
     @After

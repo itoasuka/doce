@@ -3,6 +3,9 @@ package jp.osd.doce.internal.tx;
 import javax.sql.DataSource;
 
 import jp.osd.doce.Transaction;
+import jp.osd.doce.internal.logging.Logger;
+import jp.osd.doce.internal.logging.LoggerFactory;
+import jp.osd.doce.internal.logging.MessageCodes;
 
 import org.seasar.doma.jdbc.JdbcLogger;
 import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
@@ -14,6 +17,10 @@ import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
  * @author asuka
  */
 public class LocalTransaction implements Transaction {
+	private final Logger LOGGER = LoggerFactory.getLogger(LocalTransaction.class);
+	
+	private final String dbName;
+	
 	private final LocalTransactionalDataSource dataSource;
 
 	private final JdbcLogger jdbcLogger;
@@ -26,7 +33,8 @@ public class LocalTransaction implements Transaction {
 	 * @param jdbcLogger
 	 *            JDBC ロガー
 	 */
-	public LocalTransaction(DataSource dataSource, JdbcLogger jdbcLogger) {
+	public LocalTransaction(String dbName, DataSource dataSource, JdbcLogger jdbcLogger) {
+		this.dbName = dbName;
 		this.dataSource = (LocalTransactionalDataSource) dataSource;
 		this.jdbcLogger = jdbcLogger;
 	}
@@ -36,7 +44,12 @@ public class LocalTransaction implements Transaction {
 	 */
 	@Override
 	public void begin() {
-		dataSource.getLocalTransaction(jdbcLogger).begin();
+		org.seasar.doma.jdbc.tx.LocalTransaction tx = getLocalTransaction();
+
+		if (!tx.isActive()) {
+			tx.begin();
+			LOGGER.debug(MessageCodes.DG016, dbName);
+		}
 	}
 
 	/**
@@ -44,11 +57,11 @@ public class LocalTransaction implements Transaction {
 	 */
 	@Override
 	public void commit() {
-		org.seasar.doma.jdbc.tx.LocalTransaction tx = dataSource
-				.getLocalTransaction(jdbcLogger);
+		org.seasar.doma.jdbc.tx.LocalTransaction tx = getLocalTransaction();
 
 		if (tx.isActive()) {
 			tx.commit();
+			LOGGER.debug(MessageCodes.DG018, dbName);
 		}
 	}
 
@@ -57,11 +70,11 @@ public class LocalTransaction implements Transaction {
 	 */
 	@Override
 	public void rollback() {
-		org.seasar.doma.jdbc.tx.LocalTransaction tx = dataSource
-				.getLocalTransaction(jdbcLogger);
+		org.seasar.doma.jdbc.tx.LocalTransaction tx = getLocalTransaction();
 
 		if (tx.isActive()) {
 			tx.rollback();
+			LOGGER.debug(MessageCodes.DG020, dbName);
 		}
 	}
 
@@ -70,7 +83,11 @@ public class LocalTransaction implements Transaction {
 	 */
 	@Override
 	public boolean isActive() {
-		return dataSource.getLocalTransaction(jdbcLogger).isActive();
+		return getLocalTransaction().isActive();
 	}
 
+	private org.seasar.doma.jdbc.tx.LocalTransaction getLocalTransaction() {
+		return dataSource
+				.getLocalTransaction(jdbcLogger);
+	}
 }

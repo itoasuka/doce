@@ -25,7 +25,7 @@ public class UserTransactionProviderTest {
 			protected void configure() {
 				try {
 					bind(UserTransaction.class).toProvider(
-							new UserTransactionProvider(new InitialContext()))
+							new UserTransactionProvider(null, new InitialContext()))
 							.in(Scopes.SINGLETON);
 				} catch (NamingException e) {
 					throw new RuntimeException(e);

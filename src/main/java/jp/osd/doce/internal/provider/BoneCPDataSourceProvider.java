@@ -28,6 +28,7 @@ import com.jolbox.bonecp.BoneCPDataSource;
 public class BoneCPDataSourceProvider implements Provider<DataSource> {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(BoneCPDataSourceProvider.class);
+	private final String dbName;
 	private final BoneCPDataSource dataSource = new BoneCPDataSource();
 	private final String url;
 	private final TransactionBinding transactionBinding;
@@ -41,6 +42,7 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 	 */
 	public BoneCPDataSourceProvider(DbNamedPropeties properties) {
 		LOGGER.logConstructor(DbNamedPropeties.class);
+		dbName = properties.getDbName();
 		url = properties.getString(JDBC_URL);
 		LOGGER.debug(MessageCodes.DG002, JDBC_URL, url);
 		String username = properties.getString(JDBC_USERNAME);
@@ -189,9 +191,9 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 		try {
 			Class.forName(dcn);
 		} catch (ClassNotFoundException e) {
-			LOGGER.error(e, MessageCodes.DG023, dcn);
+			LOGGER.error(e, MessageCodes.DG023, dbName, dcn);
 		}
-		LOGGER.info(MessageCodes.DG010, BoneCPDataSource.class);
+		LOGGER.info(MessageCodes.DG010, dbName, BoneCPDataSource.class);
 
 		// トランザクション実装を使用しない場合はそのまま返す
 		if (transactionBinding == TransactionBinding.NONE) {

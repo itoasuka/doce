@@ -27,7 +27,7 @@ import com.google.inject.Provider;
 public class SimpleDataSourceProvider implements Provider<DataSource> {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(SimpleDataSourceProvider.class);
-
+	private final String dbName;
 	private final SimpleDataSource dataSource = new SimpleDataSource();
 	private final TransactionBinding transactionBinding;
 
@@ -38,7 +38,8 @@ public class SimpleDataSourceProvider implements Provider<DataSource> {
 	 *            データベース名付き設定プロパティ
 	 */
 	public SimpleDataSourceProvider(DbNamedPropeties properties) {
-		LOGGER.logConstructor(String.class, String.class, String.class);
+		LOGGER.logConstructor(DbNamedPropeties.class);
+		dbName = properties.getDbName();
 		String url = properties.getString(JDBC_URL);
 		String username = properties.getString(JDBC_USERNAME);
 		LOGGER.debug(MessageCodes.DG002, JDBC_URL, url);
@@ -68,7 +69,7 @@ public class SimpleDataSourceProvider implements Provider<DataSource> {
 	 */
 	@Override
 	public DataSource get() {
-		LOGGER.info(MessageCodes.DG010, SimpleDataSource.class);
+		LOGGER.info(MessageCodes.DG010, dbName, SimpleDataSource.class);
 
 		// トランザクション実装を使用しない場合はそのまま返す
 		if (transactionBinding == TransactionBinding.NONE) {

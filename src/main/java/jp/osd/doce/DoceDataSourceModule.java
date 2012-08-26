@@ -2,6 +2,7 @@ package jp.osd.doce;
 
 import static com.google.inject.Scopes.SINGLETON;
 
+import java.lang.reflect.Method;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -27,6 +28,7 @@ import org.seasar.doma.jdbc.dialect.Dialect;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.binder.LinkedBindingBuilder;
+import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
 
@@ -142,15 +144,28 @@ public class DoceDataSourceModule extends AbstractModule {
 			break;
 		}
 	}
-	
+
 	protected void bindTransactionInterceptor() {
 		if (properties.getTransactionBinding() != TransactionBinding.NONE) {
 			TransactionInterceptor lti = new TransactionInterceptor(dbName);
 			requestInjection(lti);
-			bindInterceptor(Matchers.any(),
-					Matchers.annotatedWith(Transactional.class), lti);
-			bindInterceptor(Matchers.annotatedWith(Transactional.class),
-					Matchers.any(), lti);
+
+			bindInterceptor(Matchers.any(), new AbstractMatcher<Method>() {
+				@Override
+				public boolean matches(Method method) {
+					Transactional t = method.getAnnotation(Transactional.class);
+
+					return matchTransaction(t);
+				}
+			}, lti);
+			bindInterceptor(new AbstractMatcher<Class<?>>() {
+				@Override
+				public boolean matches(Class<?> clazz) {
+					Transactional t = clazz.getAnnotation(Transactional.class);
+
+					return matchTransaction(t);
+				}
+			}, Matchers.any(), lti);
 		}
 	}
 
@@ -159,5 +174,26 @@ public class DoceDataSourceModule extends AbstractModule {
 			return bind(type).annotatedWith(Doma.class);
 		}
 		return bind(type).annotatedWith(Names.named(dbName));
+	}
+
+	private boolean matchTransaction(Transactional t) {
+		if (t == null) {
+			return false;
+		}
+		if (t.value().length == 0) {
+			return dbName == null;
+		}
+		for (String dn : t.value()) {
+			if (dbName == null) {
+				if (dbName.length() == 0) {
+					return true;
+				}
+			} else {
+				if (dbName.equals(dn)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

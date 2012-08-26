@@ -127,7 +127,7 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 					.get();
 			return true;
 		}
-		LOGGER.debug(MessageCodes.DG003);
+		LOGGER.debug(MessageCodes.DG003, properties.getDbName());
 		return false;
 	}
 
@@ -138,7 +138,7 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 			dataSource = boneCPDataSourceProvider.get();
 			return true;
 		}
-		LOGGER.debug(MessageCodes.DG004);
+		LOGGER.debug(MessageCodes.DG004, properties.getDbName());
 		return false;
 	}
 	

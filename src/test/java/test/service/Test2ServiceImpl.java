@@ -11,7 +11,7 @@ public class Test2ServiceImpl implements Test2Service {
 	private FooDao fooDao;
 
 	@Override
-	@Transactional
+	@Transactional({"", "test"})
 	public void test() {
 		fooDao.dropTable();
 		fooDao.createTable();
@@ -35,7 +35,7 @@ public class Test2ServiceImpl implements Test2Service {
 	}
 
 	@Override
-	@Transactional
+	@Transactional({"", "test"})
 	public Foo get(int id) {
 		return fooDao.findById(id);
 	}
