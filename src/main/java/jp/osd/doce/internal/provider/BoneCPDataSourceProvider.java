@@ -169,8 +169,8 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 		}
 		if (properties.containsKey("BoneCP.idleConnectionTestPeriodInSeconds")) {
 			int idleConnectionTestPeriodInSeconds = properties.getInt(
-					"BoneCP.connectionTestStatement", 0);
-			LOGGER.debug(MessageCodes.DG002, "BoneCP.connectionTestStatement",
+					"BoneCP.idleConnectionTestPeriodInSeconds", 0);
+			LOGGER.debug(MessageCodes.DG002, "BoneCP.idleConnectionTestPeriodInSeconds",
 					idleConnectionTestPeriodInSeconds);
 			dataSource
 					.setIdleConnectionTestPeriodInSeconds(idleConnectionTestPeriodInSeconds);
