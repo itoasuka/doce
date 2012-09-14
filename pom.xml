@@ -4,7 +4,7 @@
 
 	<groupId>jp.osd.doce</groupId>
 	<artifactId>doce</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0-beta1</version>
 	<packaging>jar</packaging>
 
 	<name>Doce</name>
