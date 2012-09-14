@@ -4,7 +4,6 @@
 package jp.osd.doce.internal.provider;
 
 import static jp.osd.doce.JndiProperties.JNDI_USER_TRANSACTION;
-import static jp.osd.doce.internal.provider.UserTransactionProvider.DEFAULT_JNDI_TRANSACTION_NAME;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -88,7 +87,7 @@ public class JndiDataSourceProvider implements Provider<DataSource> {
 		try {
 			LOGGER.debug(MessageCodes.DG006, dbName, jndiDataSourceName);
 			ds = (DataSource) getContext().lookup(jndiDataSourceName);
-			LOGGER.debug(MessageCodes.DG008, dbName);
+			LOGGER.debug(MessageCodes.DG008, dbName, ds.getClass().getName());
 		} catch (NamingException e) {
 			LOGGER.error(e, MessageCodes.DG007, dbName, jndiDataSourceName);
 			throw new DoceException("Lookup error : " + jndiDataSourceName, e);
@@ -114,20 +113,7 @@ public class JndiDataSourceProvider implements Provider<DataSource> {
 				// を使うということはない
 				result = false;
 			} else {
-				// ためしに JNDI でトランザクションを取得してみる
-				try {
-					LOGGER.debug(MessageCodes.DG006,
-							DEFAULT_JNDI_TRANSACTION_NAME);
-					getContext().lookup(DEFAULT_JNDI_TRANSACTION_NAME);
-					// 取得できるのならばローカルトランザクションは使わない
-					LOGGER.debug(MessageCodes.DG008);
-					result = false;
-				} catch (NamingException e) {
-					// 例外がでるようならローカルトランザクションを使うしかない
-					LOGGER.debug(MessageCodes.DG007,
-							DEFAULT_JNDI_TRANSACTION_NAME);
-					result = true;
-				}
+				result = true;
 			}
 			break;
 		case LOCAL_TRANSACTION:

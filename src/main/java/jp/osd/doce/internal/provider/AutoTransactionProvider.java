@@ -96,14 +96,14 @@ public class AutoTransactionProvider implements Provider<Transaction> {
 				LOGGER.info(MessageCodes.DG005, properties.getDbName());
 				transaction = getLocalTransaction(dataSource);
 			} else {
-				transaction = getJtaUserTransaction();
+				transaction = getJtaUserTransaction(dataSource);
 			}
 			break;
 		case LOCAL_TRANSACTION:
 			transaction = getLocalTransaction(dataSource);
 			break;
 		case JTA_USER_TRANSACTION:
-			transaction = getJtaUserTransaction();
+			transaction = getJtaUserTransaction(dataSource);
 			break;
 		default:
 			transaction = null;
@@ -129,7 +129,7 @@ public class AutoTransactionProvider implements Provider<Transaction> {
 				jdbcLogger);
 	}
 
-	private Transaction getJtaUserTransaction() {
+	private Transaction getJtaUserTransaction(DataSource dataSource) {
 		Context context = getInstance(Context.class);
 		UserTransactionProvider provider = new UserTransactionProvider(
 				properties.getDbName(), context);
@@ -137,6 +137,8 @@ public class AutoTransactionProvider implements Provider<Transaction> {
 			provider.setDefaultJndiTransactionName(properties
 					.getString(JNDI_USER_TRANSACTION));
 		}
-		return new JtaUserTransaction(properties.getDbName(), provider.get());
+		// TODO 検討
+		//return new JtaUserTransaction(properties.getDbName(), provider.get());
+		return getLocalTransaction(dataSource);
 	}
 }

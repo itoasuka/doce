@@ -122,9 +122,11 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 
 	private boolean createJndiDataSource() {
 		String jndiDataSourceName = properties.getString(JNDI_DATA_SOURCE);
+		LOGGER.debug(MessageCodes.DG002, JNDI_DATA_SOURCE, jndiDataSourceName);
 		if (jndiDataSourceName != null) {
-			dataSource = injector.getInstance(JndiDataSourceProvider.class)
-					.get();
+			JndiDataSourceProvider provider = new JndiDataSourceProvider(properties);
+			injector.injectMembers(provider);
+			dataSource = provider.get();
 			return true;
 		}
 		LOGGER.debug(MessageCodes.DG003, properties.getDbName());
@@ -141,7 +143,7 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 		LOGGER.debug(MessageCodes.DG004, properties.getDbName());
 		return false;
 	}
-	
+
 	private boolean createSimpleDataSource() {
 		SimpleDataSourceProvider simpleDataSourceProvider = new SimpleDataSourceProvider(
 				properties);

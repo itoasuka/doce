@@ -69,7 +69,6 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 			dataSource.setDriverClass(driverClassName);
 		}
 
-
 		// データソースのパラメータ
 		if (properties.containsKey("BoneCP.defaultAutoCommit")) {
 			boolean defaultAutoCommit = properties
@@ -116,7 +115,7 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 			dataSource
 					.setMaxConnectionsPerPartition(maxConnectionsPerPartition);
 		} else {
-			 // 何も設定しないと警告がでるのでデフォルト値を設定
+			// 何も設定しないと警告がでるのでデフォルト値を設定
 			dataSource.setMaxConnectionsPerPartition(20);
 		}
 		if (properties.containsKey("BoneCP.minConnectionsPerPartition")) {
@@ -167,6 +166,21 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 			String initSQL = properties.getString("BoneCP.initSQL");
 			LOGGER.debug(MessageCodes.DG002, "BoneCP.initSQL", initSQL);
 			dataSource.setInitSQL(initSQL);
+		}
+		if (properties.containsKey("BoneCP.idleConnectionTestPeriodInSeconds")) {
+			int idleConnectionTestPeriodInSeconds = properties.getInt(
+					"BoneCP.connectionTestStatement", 0);
+			LOGGER.debug(MessageCodes.DG002, "BoneCP.connectionTestStatement",
+					idleConnectionTestPeriodInSeconds);
+			dataSource
+					.setIdleConnectionTestPeriodInSeconds(idleConnectionTestPeriodInSeconds);
+		}
+		if (properties.containsKey("BoneCP.connectionTestStatement")) {
+			String connectionTestStatement = properties
+					.getString("BoneCP.connectionTestStatement");
+			LOGGER.debug(MessageCodes.DG002, "BoneCP.connectionTestStatement",
+					connectionTestStatement);
+			dataSource.setConnectionTestStatement(connectionTestStatement);
 		}
 		if (properties.containsKey("BoneCP.logStatementsEnabled")) {
 			boolean logStatementsEnabled = properties
