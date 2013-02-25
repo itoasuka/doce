@@ -12,6 +12,7 @@ import jp.osd.doce.Doma;
 import org.seasar.doma.jdbc.ClassHelper;
 import org.seasar.doma.jdbc.Config;
 import org.seasar.doma.jdbc.DefaultClassHelper;
+import org.seasar.doma.jdbc.DomaAbstractConfig;
 import org.seasar.doma.jdbc.ExceptionSqlLogType;
 import org.seasar.doma.jdbc.JdbcLogger;
 import org.seasar.doma.jdbc.RequiresNewController;
@@ -63,14 +64,13 @@ import com.google.inject.name.Names;
  *
  * @author asuka
  */
-public class GuiceManagedConfig implements Config {
-	private final DbNamedPropeties properties;
+public class GuiceManagedConfig extends DomaAbstractConfig {
+	private final DbNamedProperties properties;
 	private Injector injector;
 	private DataSource dataSource;
 	private Dialect dialect;
 	private SqlFileRepository sqlFileRepository;
 	private JdbcLogger jdbcLogger;
-	private RequiresNewController requiresNewController;
 	private int maxRows = 0;
 	private int fetchSize = 0;
 	private int queryTimeout = 0;
@@ -82,7 +82,7 @@ public class GuiceManagedConfig implements Config {
 	 * @param properties
 	 *            データベース名付き設定プロパティ
 	 */
-	public GuiceManagedConfig(DbNamedPropeties properties) {
+	public GuiceManagedConfig(DbNamedProperties properties) {
 		this.properties = properties;
 		maxRows = this.properties.getInt(DOMA_MAX_ROWS, maxRows);
 		fetchSize = this.properties.getInt(DOMA_FETCH_SIZE, fetchSize);
@@ -155,22 +155,6 @@ public class GuiceManagedConfig implements Config {
 		
 		return jdbcLogger;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public RequiresNewController getRequiresNewController() {
-		return requiresNewController;
-	}
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ClassHelper getClassHelper() {
-        return new DefaultClassHelper();
-    }
 
     /**
 	 * {@inheritDoc}

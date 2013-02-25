@@ -3,13 +3,14 @@ package jp.osd.doce;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import jp.osd.doce.internal.ClassUtils;
-import jp.osd.doce.internal.DbNamedPropeties;
+import jp.osd.doce.internal.DbNamedProperties;
 
 import com.google.inject.AbstractModule;
 
@@ -25,7 +26,7 @@ public class DoceModule extends AbstractModule {
 	private static final String DEFAUL_DAO_SUBPACKAGE = "";
 	private static final String DEFAUL_DAO_SUFFIX = "Impl";
 
-	private final Map<String, DbNamedPropeties> dbNamedPropetiesMap;
+	private final Map<String, DbNamedProperties> dbNamedPropetiesMap;
 	private final Collection<Class<?>> daoTypes;
 	private final String daoPackage;
 	private final String daoSubpackage;
@@ -41,9 +42,9 @@ public class DoceModule extends AbstractModule {
 
 	public DoceModule(String dbName, Properties properties,
 			Collection<Class<?>> daoTypes) {
-		this.dbNamedPropetiesMap = new HashMap<String, DbNamedPropeties>();
+		this.dbNamedPropetiesMap = new HashMap<String, DbNamedProperties>();
 		dbNamedPropetiesMap.put(dbName,
-				new DbNamedPropeties(dbName, properties));
+				new DbNamedProperties(dbName, properties));
 		this.daoTypes = daoTypes;
 		daoPackage = DEFAUL_DAO_PACKAGE;
 		daoSubpackage = DEFAUL_DAO_SUBPACKAGE;
@@ -55,7 +56,7 @@ public class DoceModule extends AbstractModule {
 	 */
 	@Override
 	protected void configure() {
-		for (Map.Entry<String, DbNamedPropeties> e : dbNamedPropetiesMap
+		for (Map.Entry<String, DbNamedProperties> e : dbNamedPropetiesMap
 				.entrySet()) {
 			install(new DoceDataSourceModule(e.getKey(), e.getValue()
 					.getProperties()));
@@ -67,7 +68,7 @@ public class DoceModule extends AbstractModule {
 		}
 	}
 
-	private DoceModule(Map<String, DbNamedPropeties> dbNamedPropetiesMap,
+	private DoceModule(Map<String, DbNamedProperties> dbNamedPropetiesMap,
 			List<Class<?>> daoTypes, String daoPackage, String daoSubpackage,
 			String daoSuffix) {
 		this.dbNamedPropetiesMap = dbNamedPropetiesMap;
@@ -96,7 +97,7 @@ public class DoceModule extends AbstractModule {
 	 * @author asuka
 	 */
 	public static final class Builder {
-		private final Map<String, DbNamedPropeties> dbNamedPropetiesMap = new HashMap<String, DbNamedPropeties>();
+		private final Map<String, DbNamedProperties> dbNamedPropetiesMap = new HashMap<String, DbNamedProperties>();
 		private DataSourceBinding dataSourceBinding = null;
 		private TransactionBinding transactionBinding = null;
 		private final List<Class<?>> daoTypes = new ArrayList<Class<?>>();
@@ -132,7 +133,7 @@ public class DoceModule extends AbstractModule {
 		 */
 		public Builder setDataSourceProperties(String dbName,
 				Properties properties) {
-			dbNamedPropetiesMap.put(dbName, new DbNamedPropeties(dbName,
+			dbNamedPropetiesMap.put(dbName, new DbNamedProperties(dbName,
 					properties));
 			return this;
 		}
@@ -190,9 +191,7 @@ public class DoceModule extends AbstractModule {
 		 * @return このメソッドのレシーバオブジェクト
 		 */
 		public Builder addDaoTypes(Class<?>... daoTypes) {
-			for (Class<? extends Object> daoType : daoTypes) {
-				this.daoTypes.add(daoType);
-			}
+            Collections.addAll(this.daoTypes, daoTypes);
 			return this;
 		}
 
@@ -261,20 +260,20 @@ public class DoceModule extends AbstractModule {
 		public DoceModule create() {
 			if (dataSourceBinding != null) {
 				if (!dbNamedPropetiesMap.containsKey(null)) {
-					DbNamedPropeties props = new DbNamedPropeties(null,
+					DbNamedProperties props = new DbNamedProperties(null,
 							new Properties());
 					dbNamedPropetiesMap.put(null, props);
 				}
-				DbNamedPropeties props = dbNamedPropetiesMap.get(null);
+				DbNamedProperties props = dbNamedPropetiesMap.get(null);
 				props.setDataSourceBinding(dataSourceBinding);
 			}
 			if (transactionBinding != null) {
 				if (!dbNamedPropetiesMap.containsKey(null)) {
-					DbNamedPropeties props = new DbNamedPropeties(null,
+					DbNamedProperties props = new DbNamedProperties(null,
 							new Properties());
 					dbNamedPropetiesMap.put(null, props);
 				}
-				DbNamedPropeties props = dbNamedPropetiesMap.get(null);
+				DbNamedProperties props = dbNamedPropetiesMap.get(null);
 				props.setTransactionBinding(transactionBinding);
 			}
 

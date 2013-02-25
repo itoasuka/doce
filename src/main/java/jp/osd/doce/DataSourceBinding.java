@@ -42,5 +42,5 @@ public enum DataSourceBinding {
 	/**
 	 * バインディングに関して何も設定を行わないように指定します。別途 {@link Doma} アノテーションを付加してデータソースのバインドの定義する場合に用います。
 	 */
-	NONE;
+	NONE
 }

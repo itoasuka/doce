@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 import jp.osd.doce.DoceException;
 import jp.osd.doce.Doma;
 import jp.osd.doce.TransactionBinding;
-import jp.osd.doce.internal.DbNamedPropeties;
+import jp.osd.doce.internal.DbNamedProperties;
 import jp.osd.doce.internal.logging.Logger;
 import jp.osd.doce.internal.logging.LoggerFactory;
 import jp.osd.doce.internal.logging.MessageCodes;
@@ -35,7 +35,7 @@ import com.google.inject.name.Names;
  * <LI>コンストラクタの引数 {@code transactionBinding} に {@link TransactionBinding#AUTO}
  * が設定されたときで以下のすべての条件に当てはまるとき。
  * <UL>
- * <LI>{@link #setJndiTransactionName(String)} で JNDI
+ * <LI>設定プロパティの設定値 <code>JNDI.userTransaction</code> で JNDI
  * でルックアップする際に使用するトランザクションのオブジェクト名が指定されていない。
  * <LI>{@code "java:comp/UserTransaction"} というオブジェクト名で JNDI ルックアップが失敗する。
  * </UL>
@@ -66,8 +66,8 @@ public class JndiDataSourceProvider implements Provider<DataSource> {
 	 * @param properties
 	 *            データベース名付き設定プロパティ
 	 */
-	public JndiDataSourceProvider(DbNamedPropeties properties) {
-		LOGGER.logConstructor(DbNamedPropeties.class);
+	public JndiDataSourceProvider(DbNamedProperties properties) {
+		LOGGER.logConstructor(DbNamedProperties.class);
 		dbName = properties.getDbName();
 		jndiDataSourceName = properties.getString("JNDI.dataSource");
 		transactionBinding = properties.getTransactionBinding();

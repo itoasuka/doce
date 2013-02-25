@@ -18,7 +18,7 @@ public @interface Transactional {
 	 * <P>
 	 * 何も指定しない場合はデフォルトのデータベースのみが対象となります。デフォルトのデータベースを明示的に指定する場合は空文字列を指定してください。
 	 * 
-	 * @return
+	 * @return データベース名
 	 */
 	String[] value() default {};
 }
