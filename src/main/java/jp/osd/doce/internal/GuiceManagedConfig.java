@@ -9,7 +9,9 @@ import javax.sql.DataSource;
 
 import jp.osd.doce.Doma;
 
+import org.seasar.doma.jdbc.ClassHelper;
 import org.seasar.doma.jdbc.Config;
+import org.seasar.doma.jdbc.DefaultClassHelper;
 import org.seasar.doma.jdbc.ExceptionSqlLogType;
 import org.seasar.doma.jdbc.JdbcLogger;
 import org.seasar.doma.jdbc.RequiresNewController;
@@ -80,12 +82,12 @@ public class GuiceManagedConfig implements Config {
 	 * @param properties
 	 *            データベース名付き設定プロパティ
 	 */
-	public GuiceManagedConfig(DbNamedPropeties propeties) {
-		this.properties = propeties;
-		maxRows = properties.getInt(DOMA_MAX_ROWS, maxRows);
-		fetchSize = properties.getInt(DOMA_FETCH_SIZE, fetchSize);
-		queryTimeout = properties.getInt(DOMA_QUERY_TIMEOUT, queryTimeout);
-		batchSize = properties.getInt(DOMA_BATCH_SIZE, batchSize);
+	public GuiceManagedConfig(DbNamedPropeties properties) {
+		this.properties = properties;
+		maxRows = this.properties.getInt(DOMA_MAX_ROWS, maxRows);
+		fetchSize = this.properties.getInt(DOMA_FETCH_SIZE, fetchSize);
+		queryTimeout = this.properties.getInt(DOMA_QUERY_TIMEOUT, queryTimeout);
+		batchSize = this.properties.getInt(DOMA_BATCH_SIZE, batchSize);
 	}
 	
 	/**
@@ -162,7 +164,15 @@ public class GuiceManagedConfig implements Config {
 		return requiresNewController;
 	}
 
-	/**
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ClassHelper getClassHelper() {
+        return new DefaultClassHelper();
+    }
+
+    /**
 	 * {@inheritDoc}
 	 */
 	@Override
