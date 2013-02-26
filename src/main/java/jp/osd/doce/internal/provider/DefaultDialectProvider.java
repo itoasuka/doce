@@ -2,6 +2,7 @@ package jp.osd.doce.internal.provider;
 
 import static jp.osd.doce.DomaProperties.DOMA_DIALECT_CLASS_NAME;
 import static jp.osd.doce.JdbcProperties.JDBC_URL;
+
 import jp.osd.doce.DoceException;
 import jp.osd.doce.internal.DbNamedProperties;
 import jp.osd.doce.internal.JdbcUtils;

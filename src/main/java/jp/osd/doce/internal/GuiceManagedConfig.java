@@ -9,13 +9,10 @@ import javax.sql.DataSource;
 
 import jp.osd.doce.Doma;
 
-import org.seasar.doma.jdbc.ClassHelper;
 import org.seasar.doma.jdbc.Config;
-import org.seasar.doma.jdbc.DefaultClassHelper;
 import org.seasar.doma.jdbc.DomaAbstractConfig;
 import org.seasar.doma.jdbc.ExceptionSqlLogType;
 import org.seasar.doma.jdbc.JdbcLogger;
-import org.seasar.doma.jdbc.RequiresNewController;
 import org.seasar.doma.jdbc.SqlFileRepository;
 import org.seasar.doma.jdbc.dialect.Dialect;
 

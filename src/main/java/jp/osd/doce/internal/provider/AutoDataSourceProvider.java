@@ -116,7 +116,7 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 		default:
 			break;
 		}
-		assert (dataSource != null);
+		assert dataSource != null;
 		return dataSource;
 	}
 

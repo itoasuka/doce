@@ -135,11 +135,10 @@ public class DoceDataSourceModule extends AbstractModule {
 					properties);
 			requestInjection(provider);
 			if (dbName == null) {
-				bind(Transaction.class).toProvider(provider).in(
-						Scopes.SINGLETON);
+				bind(Transaction.class).toProvider(provider).in(SINGLETON);
 			} else {
 				bind(Transaction.class).annotatedWith(Names.named(dbName))
-						.toProvider(provider).in(Scopes.SINGLETON);
+						.toProvider(provider).in(SINGLETON);
 			}
 			break;
 		}
