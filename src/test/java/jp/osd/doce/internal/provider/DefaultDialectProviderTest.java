@@ -1,6 +1,7 @@
 package jp.osd.doce.internal.provider;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.*;
+
 import jp.osd.doce.JdbcProperties;
 import jp.osd.doce.internal.DbNamedProperties;
 

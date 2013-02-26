@@ -1,10 +1,8 @@
 package jp.osd.doce;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,14 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.seasar.doma.jdbc.tx.LocalTransactionalDataSource;
 
-import test.dao.FooDao;
-import test.dao.FugaDao;
-import test.dao.HogeDao;
-import test.entity.Foo;
-import test.entity.Hoge;
-import test.service.Test2Service;
-import test.service.TestService;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
 import com.google.inject.CreationException;
@@ -35,6 +25,14 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 import com.jolbox.bonecp.BoneCPDataSource;
+
+import test.dao.FooDao;
+import test.dao.FugaDao;
+import test.dao.HogeDao;
+import test.entity.Foo;
+import test.entity.Hoge;
+import test.service.Test2Service;
+import test.service.TestService;
 
 public class DoceModuleTest {
 	private JdbcProperties domaProperties;
@@ -64,7 +62,7 @@ public class DoceModuleTest {
 		};
 		domaProperties
 				.setTransactionBinding(TransactionBinding.LOCAL_TRANSACTION);
-		Module m3 = new DoceModule.Builder().setProperties(domaProperties)
+		Module m3 = new DoceModule.Builder().setDataSourceProperties(domaProperties)
 				.setDaoPackage("").setDaoSubpackage("").setDaoSuffix("Impl")
 				.addDaoTypes(HogeDao.class).addDaoTypes(list).create();
 
@@ -124,7 +122,7 @@ public class DoceModuleTest {
 			}
 		};
 		domaProperties.setDataSourceBinding(DataSourceBinding.NONE);
-		Module m2 = new DoceModule.Builder().setProperties(domaProperties)
+		Module m2 = new DoceModule.Builder().setDataSourceProperties(domaProperties)
 				.addDaoTypes(HogeDao.class).create();
 
 		Injector injector = Guice.createInjector(m1, m2);
@@ -140,7 +138,7 @@ public class DoceModuleTest {
 	@Test
 	public void testConfigure_5() {
 		domaProperties.setTransactionBinding(TransactionBinding.NONE);
-		Module m = new DoceModule.Builder().setProperties(domaProperties)
+		Module m = new DoceModule.Builder().setDataSourceProperties(domaProperties)
 				.addDaoTypes(HogeDao.class).create();
 
 		Injector injector = Guice.createInjector(m);

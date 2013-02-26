@@ -175,6 +175,9 @@
 					<optimize>true</optimize>
 					<debug>true</debug>
 					<encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArguments>
+                        <Xlint:deprecation />
+                    </compilerArguments>
 				</configuration>
 			</plugin>
 
