@@ -4,7 +4,7 @@
 
 	<groupId>jp.osd.doce</groupId>
 	<artifactId>doce</artifactId>
-	<version>1.0.0-beta3-SNAPSHOT</version>
+	<version>1.0.0-beta3</version>
 	<packaging>jar</packaging>
 
 	<name>Doce</name>
@@ -175,6 +175,9 @@
 					<optimize>true</optimize>
 					<debug>true</debug>
 					<encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArguments>
+                        <Xlint:deprecation />
+                    </compilerArguments>
 				</configuration>
 			</plugin>
 

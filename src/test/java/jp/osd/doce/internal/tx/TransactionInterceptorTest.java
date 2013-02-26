@@ -1,8 +1,6 @@
 package jp.osd.doce.internal.tx;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.Properties;
 
@@ -11,12 +9,12 @@ import jp.osd.doce.DoceModule;
 import org.junit.Test;
 import org.seasar.doma.jdbc.dialect.H2Dialect;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
 import test.dao.HogeDao;
 import test.entity.Hoge;
 import test.service.TestService;
-
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 
 public class TransactionInterceptorTest {
 	private final Injector injector;
@@ -29,7 +27,7 @@ public class TransactionInterceptorTest {
 		domaProperties.setProperty("JDBC.password", "bar");
 		domaProperties.setProperty("Doma.dialect", H2Dialect.class.getName());
 		injector = Guice.createInjector(new DoceModule.Builder()
-				.setProperties(domaProperties).addDaoTypes(HogeDao.class)
+				.setDataSourceProperties(domaProperties).addDaoTypes(HogeDao.class)
 				.create());
 	}
 
