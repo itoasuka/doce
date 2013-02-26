@@ -8,7 +8,7 @@ import java.util.Properties;
 import javax.naming.Context;
 import javax.sql.DataSource;
 
-import jp.osd.doce.internal.DbNamedPropeties;
+import jp.osd.doce.internal.DbNamedProperties;
 import jp.osd.doce.internal.GuiceManagedConfig;
 import jp.osd.doce.internal.provider.AutoDataSourceProvider;
 import jp.osd.doce.internal.provider.AutoJdbcLoggerProvider;
@@ -36,11 +36,11 @@ public class DoceDataSourceModule extends AbstractModule {
 
 	private final String dbName;
 
-	private final DbNamedPropeties properties;
+	private final DbNamedProperties properties;
 
 	public DoceDataSourceModule(String dbName, Properties properties) {
 		this.dbName = dbName;
-		this.properties = new DbNamedPropeties(dbName, properties);
+		this.properties = new DbNamedProperties(dbName, properties);
 	}
 
 	@Override
@@ -135,11 +135,10 @@ public class DoceDataSourceModule extends AbstractModule {
 					properties);
 			requestInjection(provider);
 			if (dbName == null) {
-				bind(Transaction.class).toProvider(provider).in(
-						Scopes.SINGLETON);
+				bind(Transaction.class).toProvider(provider).in(SINGLETON);
 			} else {
 				bind(Transaction.class).annotatedWith(Names.named(dbName))
-						.toProvider(provider).in(Scopes.SINGLETON);
+						.toProvider(provider).in(SINGLETON);
 			}
 			break;
 		}
@@ -185,7 +184,7 @@ public class DoceDataSourceModule extends AbstractModule {
 		}
 		for (String dn : t.value()) {
 			if (dbName == null) {
-				if (dbName.length() == 0) {
+				if (dn == null) {
 					return true;
 				}
 			} else {

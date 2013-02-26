@@ -11,7 +11,7 @@ import static jp.osd.doce.JdbcProperties.JDBC_USERNAME;
 import javax.sql.DataSource;
 
 import jp.osd.doce.TransactionBinding;
-import jp.osd.doce.internal.DbNamedPropeties;
+import jp.osd.doce.internal.DbNamedProperties;
 import jp.osd.doce.internal.JdbcUtils;
 import jp.osd.doce.internal.logging.Logger;
 import jp.osd.doce.internal.logging.LoggerFactory;
@@ -40,8 +40,8 @@ public class BoneCPDataSourceProvider implements Provider<DataSource> {
 	 * @param properties
 	 *            データベース名付き設定プロパティ
 	 */
-	public BoneCPDataSourceProvider(DbNamedPropeties properties) {
-		LOGGER.logConstructor(DbNamedPropeties.class);
+	public BoneCPDataSourceProvider(DbNamedProperties properties) {
+		LOGGER.logConstructor(DbNamedProperties.class);
 		dbName = properties.getDbName();
 		url = properties.getString(JDBC_URL);
 		LOGGER.debug(MessageCodes.DG002, JDBC_URL, url);

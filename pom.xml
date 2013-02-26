@@ -4,7 +4,7 @@
 
 	<groupId>jp.osd.doce</groupId>
 	<artifactId>doce</artifactId>
-	<version>1.0.0-beta1</version>
+	<version>1.0.0-beta3</version>
 	<packaging>jar</packaging>
 
 	<name>Doce</name>
@@ -81,7 +81,7 @@
 		<dependency>
 			<groupId>org.seasar.doma</groupId>
 			<artifactId>doma</artifactId>
-			<version>1.24.0</version>
+			<version>1.29.0</version>
 		</dependency>
 
 		<!-- Guice 関連 -->
@@ -112,7 +112,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.6.6</version>
+			<version>1.7.2</version>
 			<optional>true</optional>
 		</dependency>
 
@@ -120,19 +120,19 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.10</version>
+			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
-			<version>3.0</version>
+			<version>3.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.0.6</version>
+			<version>1.0.9</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -145,7 +145,7 @@
 			<!-- テストで用いる DB -->
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>1.3.168</version>
+			<version>1.3.170</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -158,7 +158,7 @@
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
 				<artifactId>wagon-ssh</artifactId>
-				<version>2.0</version>
+				<version>2.4</version>
 			</extension>
 		</extensions>
 
@@ -168,20 +168,23 @@
 				<inherited>true</inherited>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
+				<version>3.0</version>
 				<configuration>
 					<source>${source.version}</source>
 					<target>1.6</target>
 					<optimize>true</optimize>
 					<debug>true</debug>
 					<encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArguments>
+                        <Xlint:deprecation />
+                    </compilerArguments>
 				</configuration>
 			</plugin>
 
 			<!-- resources: http://maven.apache.org/plugins/maven-resources-plugin/ -->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
+				<version>2.6</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 				</configuration>
@@ -191,7 +194,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.12</version>
+				<version>2.13</version>
 				<configuration>
 					<systemPropertyVariables>
 						<net.sourceforge.cobertura.datafile>${basedir}/target/cobertura/cobertura.ser</net.sourceforge.cobertura.datafile>
@@ -207,7 +210,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.1.2</version>
+				<version>2.2.1</version>
 				<executions>
 					<execution>
 						<id>source-jar</id>
@@ -223,7 +226,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.8.1</version>
+				<version>2.9</version>
 				<executions>
 					<!-- Javadoc を Jar にする設定 -->
 					<execution>
@@ -304,10 +307,9 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-install-plugin</artifactId>
-				<version>2.3.1</version>
+				<version>2.4</version>
 				<configuration>
 					<createChecksum>true</createChecksum>
-					<sha1Digester />
 					<updateReleaseInfo>true</updateReleaseInfo>
 				</configuration>
 			</plugin>
@@ -316,7 +318,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.9.1</version>
+				<version>2.10</version>
 				<configuration>
 					<!-- 設定ファイルのありか -->
 					<configLocation>https://github.com/itoasuka/checkstyle/raw/master/standard.xml</configLocation>
@@ -337,7 +339,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-site-plugin</artifactId>
-						<version>3.1</version>
+						<version>3.2</version>
 						<configuration>
 							<!-- サイトのロケール -->
 							<locales>ja</locales>
@@ -393,14 +395,14 @@
 								<plugin>
 									<groupId>org.codehaus.mojo</groupId>
 									<artifactId>cobertura-maven-plugin</artifactId>
-									<version>2.5.1</version>
+									<version>2.5.2</version>
 								</plugin>
 
 								<!-- surefire-report: http://maven.apache.org/plugins/maven-surefire-report-plugin/ -->
 								<plugin>
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-surefire-report-plugin</artifactId>
-									<version>2.12</version>
+									<version>2.13</version>
 									<reportSets>
 										<reportSet>
 											<reports>
@@ -414,24 +416,18 @@
 								<plugin>
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-javadoc-plugin</artifactId>
-									<version>2.8.1</version>
+									<version>2.9</version>
 									<configuration>
 										<!-- build で生成しているのでここでは生成しない -->
 										<skip>true</skip>
 									</configuration>
 								</plugin>
 
-								<!-- jdepend: http://mojo.codehaus.org/jdepend-maven-plugin/ -->
-								<plugin>
-									<groupId>org.codehaus.mojo</groupId>
-									<artifactId>jdepend-maven-plugin</artifactId>
-									<version>2.0-beta-2</version>
-								</plugin>
 								<!-- pmd/cpd: http://maven.apache.org/plugins/maven-pmd-plugin/ -->
 								<plugin>
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-pmd-plugin</artifactId>
-									<version>2.7.1</version>
+									<version>3.0</version>
 									<configuration>
 										<linkXref>true</linkXref>
 										<sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
@@ -444,7 +440,7 @@
 								<plugin>
 									<groupId>org.codehaus.mojo</groupId>
 									<artifactId>findbugs-maven-plugin</artifactId>
-									<version>2.5.1</version>
+									<version>2.5.2</version>
 									<configuration>
 										<xmlOutput>true</xmlOutput>
 										<effort>Max</effort>
@@ -459,7 +455,7 @@
 								<plugin>
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-checkstyle-plugin</artifactId>
-									<version>2.9.1</version>
+									<version>2.10</version>
 									<configuration>
 										<!-- 設定ファイルのありか -->
 										<configLocation>https://github.com/itoasuka/checkstyle/raw/master/standard.xml</configLocation>
@@ -506,7 +502,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.8.1</version>
+						<version>2.9</version>
 						<executions>
 							<!-- Javadoc を Jar にする設定 -->
 							<execution>
@@ -586,7 +582,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-site-plugin</artifactId>
-						<version>3.1</version>
+						<version>3.2</version>
 						<configuration>
 							<!-- サイトのロケール -->
 							<locales>ja</locales>

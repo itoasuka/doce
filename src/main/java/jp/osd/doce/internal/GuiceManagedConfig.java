@@ -10,9 +10,9 @@ import javax.sql.DataSource;
 import jp.osd.doce.Doma;
 
 import org.seasar.doma.jdbc.Config;
+import org.seasar.doma.jdbc.DomaAbstractConfig;
 import org.seasar.doma.jdbc.ExceptionSqlLogType;
 import org.seasar.doma.jdbc.JdbcLogger;
-import org.seasar.doma.jdbc.RequiresNewController;
 import org.seasar.doma.jdbc.SqlFileRepository;
 import org.seasar.doma.jdbc.dialect.Dialect;
 
@@ -61,14 +61,13 @@ import com.google.inject.name.Names;
  *
  * @author asuka
  */
-public class GuiceManagedConfig implements Config {
-	private final DbNamedPropeties properties;
+public class GuiceManagedConfig extends DomaAbstractConfig {
+	private final DbNamedProperties properties;
 	private Injector injector;
 	private DataSource dataSource;
 	private Dialect dialect;
 	private SqlFileRepository sqlFileRepository;
 	private JdbcLogger jdbcLogger;
-	private RequiresNewController requiresNewController;
 	private int maxRows = 0;
 	private int fetchSize = 0;
 	private int queryTimeout = 0;
@@ -80,12 +79,12 @@ public class GuiceManagedConfig implements Config {
 	 * @param properties
 	 *            データベース名付き設定プロパティ
 	 */
-	public GuiceManagedConfig(DbNamedPropeties propeties) {
-		this.properties = propeties;
-		maxRows = properties.getInt(DOMA_MAX_ROWS, maxRows);
-		fetchSize = properties.getInt(DOMA_FETCH_SIZE, fetchSize);
-		queryTimeout = properties.getInt(DOMA_QUERY_TIMEOUT, queryTimeout);
-		batchSize = properties.getInt(DOMA_BATCH_SIZE, batchSize);
+	public GuiceManagedConfig(DbNamedProperties properties) {
+		this.properties = properties;
+		maxRows = this.properties.getInt(DOMA_MAX_ROWS, maxRows);
+		fetchSize = this.properties.getInt(DOMA_FETCH_SIZE, fetchSize);
+		queryTimeout = this.properties.getInt(DOMA_QUERY_TIMEOUT, queryTimeout);
+		batchSize = this.properties.getInt(DOMA_BATCH_SIZE, batchSize);
 	}
 	
 	/**
@@ -154,15 +153,7 @@ public class GuiceManagedConfig implements Config {
 		return jdbcLogger;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public RequiresNewController getRequiresNewController() {
-		return requiresNewController;
-	}
-
-	/**
+    /**
 	 * {@inheritDoc}
 	 */
 	@Override

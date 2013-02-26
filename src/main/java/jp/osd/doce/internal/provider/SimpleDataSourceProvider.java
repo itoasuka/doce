@@ -11,7 +11,7 @@ import static jp.osd.doce.JdbcProperties.JDBC_USERNAME;
 import javax.sql.DataSource;
 
 import jp.osd.doce.TransactionBinding;
-import jp.osd.doce.internal.DbNamedPropeties;
+import jp.osd.doce.internal.DbNamedProperties;
 import jp.osd.doce.internal.logging.Logger;
 import jp.osd.doce.internal.logging.LoggerFactory;
 import jp.osd.doce.internal.logging.MessageCodes;
@@ -37,8 +37,8 @@ public class SimpleDataSourceProvider implements Provider<DataSource> {
 	 * @param properties
 	 *            データベース名付き設定プロパティ
 	 */
-	public SimpleDataSourceProvider(DbNamedPropeties properties) {
-		LOGGER.logConstructor(DbNamedPropeties.class);
+	public SimpleDataSourceProvider(DbNamedProperties properties) {
+		LOGGER.logConstructor(DbNamedProperties.class);
 		dbName = properties.getDbName();
 		String url = properties.getString(JDBC_URL);
 		String username = properties.getString(JDBC_USERNAME);

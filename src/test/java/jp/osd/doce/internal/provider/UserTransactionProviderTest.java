@@ -1,7 +1,6 @@
 package jp.osd.doce.internal.provider;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;

@@ -12,7 +12,7 @@ import javax.transaction.UserTransaction;
 import jp.osd.doce.Doma;
 import jp.osd.doce.Transaction;
 import jp.osd.doce.TransactionBinding;
-import jp.osd.doce.internal.DbNamedPropeties;
+import jp.osd.doce.internal.DbNamedProperties;
 import jp.osd.doce.internal.logging.Logger;
 import jp.osd.doce.internal.logging.LoggerFactory;
 import jp.osd.doce.internal.logging.MessageCodes;
@@ -64,7 +64,7 @@ import com.google.inject.name.Names;
 public class AutoTransactionProvider implements Provider<Transaction> {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AutoTransactionProvider.class);
-	private final DbNamedPropeties properties;
+	private final DbNamedProperties properties;
 	@Inject
 	private Injector injector;
 
@@ -74,8 +74,8 @@ public class AutoTransactionProvider implements Provider<Transaction> {
 	 * @param properties
 	 *            データベース名付き設定プロパティ
 	 */
-	public AutoTransactionProvider(DbNamedPropeties properties) {
-		LOGGER.logConstructor(DbNamedPropeties.class);
+	public AutoTransactionProvider(DbNamedProperties properties) {
+		LOGGER.logConstructor(DbNamedProperties.class);
 		this.properties = properties;
 	}
 

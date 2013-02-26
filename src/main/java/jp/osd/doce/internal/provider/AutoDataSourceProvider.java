@@ -10,7 +10,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import jp.osd.doce.DataSourceBinding;
-import jp.osd.doce.internal.DbNamedPropeties;
+import jp.osd.doce.internal.DbNamedProperties;
 import jp.osd.doce.internal.SettingHelper;
 import jp.osd.doce.internal.logging.Logger;
 import jp.osd.doce.internal.logging.LoggerFactory;
@@ -30,7 +30,7 @@ import com.google.inject.Provider;
  * 提供される実装クラスオブジェクトは以下のように決定されます。
  * <OL>
  * <LI>{@link #setDataSource(DataSource)} で設定されたデータソースがあればそれを提供します。
- * <LI>{@link #setJndiDataSourceName(String)} で設定された値があれば
+ * <LI>設定プロパティの設定値 <code>JNDI.dataSource</code> が設定されていれば
  * {@link JndiDataSourceProvider} を用いてデータソースを取得して提供します。
  * <LI>{@code org.apache.commons.dbcp.BasicDataSource} クラスがクラスパス上に存在するとき、
  * {@link BoneCPDataSourceProvider} を用いてデータソースを取得して提供します。
@@ -64,7 +64,7 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AutoDataSourceProvider.class);
 
-	private final DbNamedPropeties properties;
+	private final DbNamedProperties properties;
 
 	private DataSource dataSource = null;
 
@@ -80,7 +80,7 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 	 * @param properties
 	 *            データベース名付き設定プロパティ
 	 */
-	public AutoDataSourceProvider(DbNamedPropeties properties) {
+	public AutoDataSourceProvider(DbNamedProperties properties) {
 		LOGGER.logConstructor(String.class, Properties.class);
 		this.properties = properties;
 	}
@@ -116,7 +116,7 @@ public class AutoDataSourceProvider implements Provider<DataSource> {
 		default:
 			break;
 		}
-		assert (dataSource != null);
+		assert dataSource != null;
 		return dataSource;
 	}
 

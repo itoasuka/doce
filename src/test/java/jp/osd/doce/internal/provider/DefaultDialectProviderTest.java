@@ -1,8 +1,9 @@
 package jp.osd.doce.internal.provider;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.*;
+
 import jp.osd.doce.JdbcProperties;
-import jp.osd.doce.internal.DbNamedPropeties;
+import jp.osd.doce.internal.DbNamedProperties;
 
 import org.junit.Test;
 import org.seasar.doma.jdbc.dialect.Db2Dialect;
@@ -29,7 +30,7 @@ public class DefaultDialectProviderTest {
 
 		@Override
 		protected void configure() {
-			DbNamedPropeties props = new DbNamedPropeties(null, new JdbcProperties(url, "sa"));
+			DbNamedProperties props = new DbNamedProperties(null, new JdbcProperties(url, "sa"));
 			DefaultDialectProvider provider = new DefaultDialectProvider(props);
 			bind(Dialect.class).toProvider(provider);
 		}

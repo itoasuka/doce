@@ -15,9 +15,9 @@ import jp.osd.doce.internal.logging.MessageCodes;
  * @author asuka
  * @since 1.0.0
  */
-public class DbNamedPropeties {
+public class DbNamedProperties {
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(DbNamedPropeties.class);
+			.getLogger(DbNamedProperties.class);
 	private final String dbName;
 	private final Properties properties;
 
@@ -29,7 +29,7 @@ public class DbNamedPropeties {
 	 * @param properties
 	 *            設定プロパティー
 	 */
-	public DbNamedPropeties(String dbName, Properties properties) {
+	public DbNamedProperties(String dbName, Properties properties) {
 		this.dbName = dbName;
 		this.properties = properties;
 	}
@@ -102,8 +102,6 @@ public class DbNamedPropeties {
 	 * 
 	 * @param key
 	 *            キー
-	 * @param defaultValue
-	 *            キーに対応する設定値がない場合に返すデフォルト値
 	 * @return 設定値
 	 */
 	public boolean getBoolean(String key) {
@@ -198,14 +196,8 @@ public class DbNamedPropeties {
 	 * @return 存在した場合 <code>true</code>
 	 */
 	public boolean containsKey(String key) {
-		if (properties == null) {
-			return false;
-		}
-		if (properties.containsKey(getDbNamedKey(key))) {
-			return true;
-		}
-		return properties.containsKey(key);
-	}
+        return properties != null && (properties.containsKey(getDbNamedKey(key)) || properties.containsKey(key));
+    }
 
 	private String getDbNamedKey(String key) {
 		if (dbName == null) {

@@ -2,8 +2,9 @@ package jp.osd.doce.internal.provider;
 
 import static jp.osd.doce.DomaProperties.DOMA_DIALECT_CLASS_NAME;
 import static jp.osd.doce.JdbcProperties.JDBC_URL;
+
 import jp.osd.doce.DoceException;
-import jp.osd.doce.internal.DbNamedPropeties;
+import jp.osd.doce.internal.DbNamedProperties;
 import jp.osd.doce.internal.JdbcUtils;
 import jp.osd.doce.internal.logging.Logger;
 import jp.osd.doce.internal.logging.LoggerFactory;
@@ -44,8 +45,8 @@ public class DefaultDialectProvider implements Provider<Dialect> {
 	 * @param properties
 	 *            データベース名付き設定プロパティ
 	 */
-    public DefaultDialectProvider(DbNamedPropeties properties) {
-        LOGGER.logConstructor(DbNamedPropeties.class);
+    public DefaultDialectProvider(DbNamedProperties properties) {
+        LOGGER.logConstructor(DbNamedProperties.class);
         
         dbName = properties.getDbName();
         jdbcUrl = properties.getString(JDBC_URL);

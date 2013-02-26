@@ -1,7 +1,6 @@
 package jp.osd.doce.internal;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Constructor;
 
